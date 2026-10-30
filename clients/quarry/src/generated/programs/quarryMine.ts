@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -739,82 +740,103 @@ export type QuarryMinePluginAccounts = {
 export type QuarryMinePluginInstructions = {
   newRewarder: (
     input: MakeOptional<NewRewarderAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewRewarderInstructionAsync> &
     SelfPlanAndSendFunctions;
   newRewarderV2: (
     input: MakeOptional<NewRewarderV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewRewarderV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setPauseAuthority: (
     input: SetPauseAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetPauseAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   pause: (
     input: PauseInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPauseInstruction> & SelfPlanAndSendFunctions;
   unpause: (
     input: UnpauseInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnpauseInstruction> & SelfPlanAndSendFunctions;
   transferAuthority: (
     input: TransferAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   acceptAuthority: (
     input: AcceptAuthorityInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAcceptAuthorityInstruction> &
     SelfPlanAndSendFunctions;
   setAnnualRewards: (
     input: SetAnnualRewardsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetAnnualRewardsInstruction> &
     SelfPlanAndSendFunctions;
   createQuarry: (
     input: MakeOptional<CreateQuarryAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateQuarryInstructionAsync> &
     SelfPlanAndSendFunctions;
   createQuarryV2: (
     input: MakeOptional<CreateQuarryV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateQuarryV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   setRewardsShare: (
     input: SetRewardsShareInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetRewardsShareInstruction> &
     SelfPlanAndSendFunctions;
   setFamine: (
     input: SetFamineInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetFamineInstruction> & SelfPlanAndSendFunctions;
   updateQuarryRewards: (
     input: UpdateQuarryRewardsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateQuarryRewardsInstruction> &
     SelfPlanAndSendFunctions;
   createMiner: (
     input: MakeOptional<CreateMinerAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   createMinerV2: (
     input: MakeOptional<CreateMinerV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateMinerV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   claimRewards: (
     input: ClaimRewardsAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimRewardsInstructionAsync> &
     SelfPlanAndSendFunctions;
   claimRewardsV2: (
     input: ClaimRewardsV2AsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimRewardsV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   stakeTokens: (
     input: StakeTokensAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getStakeTokensInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawTokens: (
     input: WithdrawTokensAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawTokensInstructionAsync> &
     SelfPlanAndSendFunctions;
   rescueTokens: (
     input: RescueTokensInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRescueTokensInstruction> & SelfPlanAndSendFunctions;
   extractFees: (
     input: ExtractFeesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExtractFeesInstruction> & SelfPlanAndSendFunctions;
 };
 
@@ -831,7 +853,9 @@ export type QuarryMinePluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryMineProgram() {
+export function quarryMineProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryMinePluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryMine: QuarryMinePlugin }> => {
@@ -843,125 +867,209 @@ export function quarryMineProgram() {
           miner: addSelfFetchFunctions(client, getMinerCodec()),
         },
         instructions: {
-          newRewarder: (input) =>
+          newRewarder: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewRewarderInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getNewRewarderInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          newRewarderV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewRewarderV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          setPauseAuthority: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetPauseAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newRewarderV2: (input) =>
+          pause: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewRewarderV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getPauseInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setPauseAuthority: (input) =>
+          unpause: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetPauseAuthorityInstruction(input),
-            ),
-          pause: (input) =>
-            addSelfPlanAndSendFunctions(client, getPauseInstruction(input)),
-          unpause: (input) =>
-            addSelfPlanAndSendFunctions(client, getUnpauseInstruction(input)),
-          transferAuthority: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getTransferAuthorityInstruction(input),
-            ),
-          acceptAuthority: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAcceptAuthorityInstruction(input),
-            ),
-          setAnnualRewards: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetAnnualRewardsInstruction(input),
-            ),
-          createQuarry: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateQuarryInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnpauseInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createQuarryV2: (input) =>
+          transferAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateQuarryV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getTransferAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setRewardsShare: (input) =>
+          acceptAuthority: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetRewardsShareInstruction(input),
-            ),
-          setFamine: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetFamineInstruction(input)),
-          updateQuarryRewards: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateQuarryRewardsInstruction(input),
-            ),
-          createMiner: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateMinerInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getAcceptAuthorityInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createMinerV2: (input) =>
+          setAnnualRewards: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateMinerV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetAnnualRewardsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          claimRewards: (input) =>
+          createQuarry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getClaimRewardsInstructionAsync(input),
+              getCreateQuarryInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          claimRewardsV2: (input) =>
+          createQuarryV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getClaimRewardsV2InstructionAsync(input),
+              getCreateQuarryV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          stakeTokens: (input) =>
+          setRewardsShare: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getStakeTokensInstructionAsync(input),
+              getSetRewardsShareInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawTokens: (input) =>
+          setFamine: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawTokensInstructionAsync(input),
+              getSetFamineInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          rescueTokens: (input) =>
+          updateQuarryRewards: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRescueTokensInstruction(input),
+              getUpdateQuarryRewardsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          extractFees: (input) =>
+          createMiner: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getExtractFeesInstruction(input),
+              getCreateMinerInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createMinerV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateMinerV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          claimRewards: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardsInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          claimRewardsV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClaimRewardsV2InstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          stakeTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getStakeTokensInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawTokensInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          rescueTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRescueTokensInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          extractFees: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getExtractFeesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          rewarder: findRewarderPda,
-          quarry: findQuarryPda,
-          miner: findMinerPda,
+          rewarder: (seeds, pdaConfig) =>
+            findRewarderPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          quarry: (seeds, pdaConfig) =>
+            findQuarryPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          miner: (seeds, pdaConfig) =>
+            findMinerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyQuarryMineAccount,
         identifyInstruction: identifyQuarryMineInstruction,

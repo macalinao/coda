@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -113,20 +116,21 @@ export function getMarkObligationForDeleveragingInstructionDataCodec(): FixedSiz
 }
 
 export type MarkObligationForDeleveragingInput<
-  TAccountRiskCouncil extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
+  TAccountRiskCouncil extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  riskCouncil: TransactionSigner<TAccountRiskCouncil>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
+  riskCouncil: TAccountRiskCouncil;
+  obligation: TAccountObligation;
+  lendingMarket: TAccountLendingMarket;
   autodeleverageTargetLtvPct: MarkObligationForDeleveragingInstructionDataArgs["autodeleverageTargetLtvPct"];
 };
 
 export function getMarkObligationForDeleveragingInstruction<
-  TAccountRiskCouncil extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
+  TAccountRiskCouncil extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: MarkObligationForDeleveragingInput<
@@ -134,22 +138,55 @@ export function getMarkObligationForDeleveragingInstruction<
     TAccountObligation,
     TAccountLendingMarket
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): MarkObligationForDeleveragingInstruction<
   TProgramAddress,
-  TAccountRiskCouncil,
-  TAccountObligation,
-  TAccountLendingMarket
+  ResolvedInstructionAccountMeta<
+    TAccountRiskCouncil,
+    InstructionAccountInputAddress<TAccountRiskCouncil>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    riskCouncil: { value: input.riskCouncil ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    riskCouncil: {
+      value: input.riskCouncil ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -159,7 +196,6 @@ export function getMarkObligationForDeleveragingInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("riskCouncil", accounts.riskCouncil),
@@ -172,9 +208,18 @@ export function getMarkObligationForDeleveragingInstruction<
     programAddress,
   } as MarkObligationForDeleveragingInstruction<
     TProgramAddress,
-    TAccountRiskCouncil,
-    TAccountObligation,
-    TAccountLendingMarket
+    ResolvedInstructionAccountMeta<
+      TAccountRiskCouncil,
+      InstructionAccountInputAddress<TAccountRiskCouncil>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >
   >);
 }
 

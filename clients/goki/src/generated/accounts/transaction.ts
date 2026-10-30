@@ -36,12 +36,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -77,15 +81,15 @@ export type Transaction = {
 };
 
 export type TransactionArgs = {
-  smartWallet: Address;
+  smartWallet: Address | HasAddress;
   index: number | bigint;
   bump: number;
-  proposer: Address;
+  proposer: Address | HasAddress;
   instructions: Array<TXInstructionArgs>;
   signers: Array<boolean>;
   ownerSetSeqno: number;
   eta: number | bigint;
-  executor: Address;
+  executor: Address | HasAddress;
   executedAt: number | bigint;
 };
 
@@ -147,8 +151,10 @@ export function decodeTransaction<TAddress extends string = string>(
 }
 
 export async function fetchTransaction<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Transaction, TAddress>> {
   const maybeAccount = await fetchMaybeTransaction(rpc, address, config);
@@ -157,17 +163,25 @@ export async function fetchTransaction<TAddress extends string = string>(
 }
 
 export async function fetchMaybeTransaction<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Transaction, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeTransaction(maybeAccount);
 }
 
 export async function fetchAllTransaction(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Transaction>[]> {
   const maybeAccounts = await fetchAllMaybeTransaction(rpc, addresses, config);
@@ -176,18 +190,26 @@ export async function fetchAllTransaction(
 }
 
 export async function fetchAllMaybeTransaction(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Transaction>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeTransaction(maybeAccount));
 }
 
 export async function fetchTransactionFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TransactionSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Transaction>> {
   const maybeAccount = await fetchMaybeTransactionFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -195,9 +217,11 @@ export async function fetchTransactionFromSeeds(
 }
 
 export async function fetchMaybeTransactionFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TransactionSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Transaction>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findTransactionPda(seeds, { programAddress });

@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getSwapParameters2Decoder,
@@ -50,7 +51,7 @@ export type EvtSwap2 = {
 };
 
 export type EvtSwap2Args = {
-  pool: Address;
+  pool: Address | HasAddress;
   tradeDirection: number;
   collectFeeMode: number;
   hasReferral: boolean;

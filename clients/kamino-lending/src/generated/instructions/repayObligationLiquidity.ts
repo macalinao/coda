@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -140,38 +143,45 @@ export function getRepayObligationLiquidityInstructionDataCodec(): FixedSizeCode
 }
 
 export type RepayObligationLiquidityInput<
-  TAccountOwner extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountRepayReserve extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountReserveDestinationLiquidity extends string = string,
-  TAccountUserSourceLiquidity extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRepayReserve extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveDestinationLiquidity extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  repayReserve: Address<TAccountRepayReserve>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveDestinationLiquidity: Address<TAccountReserveDestinationLiquidity>;
-  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  owner: TAccountOwner;
+  obligation: TAccountObligation;
+  lendingMarket: TAccountLendingMarket;
+  repayReserve: TAccountRepayReserve;
+  reserveLiquidityMint: TAccountReserveLiquidityMint;
+  reserveDestinationLiquidity: TAccountReserveDestinationLiquidity;
+  userSourceLiquidity: TAccountUserSourceLiquidity;
+  tokenProgram?: TAccountTokenProgram;
+  instructionSysvarAccount?: TAccountInstructionSysvarAccount;
   liquidityAmount: RepayObligationLiquidityInstructionDataArgs["liquidityAmount"];
 };
 
 export function getRepayObligationLiquidityInstruction<
-  TAccountOwner extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
-  TAccountRepayReserve extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountReserveDestinationLiquidity extends string,
-  TAccountUserSourceLiquidity extends string,
-  TAccountTokenProgram extends string,
-  TAccountInstructionSysvarAccount extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountRepayReserve extends InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput,
+  TAccountReserveDestinationLiquidity extends InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: RepayObligationLiquidityInput<
@@ -185,44 +195,103 @@ export function getRepayObligationLiquidityInstruction<
     TAccountTokenProgram,
     TAccountInstructionSysvarAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RepayObligationLiquidityInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountObligation,
-  TAccountLendingMarket,
-  TAccountRepayReserve,
-  TAccountReserveLiquidityMint,
-  TAccountReserveDestinationLiquidity,
-  TAccountUserSourceLiquidity,
-  TAccountTokenProgram,
-  TAccountInstructionSysvarAccount
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRepayReserve,
+    InstructionAccountInputAddress<TAccountRepayReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveLiquidityMint,
+    InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveDestinationLiquidity,
+    InstructionAccountInputAddress<TAccountReserveDestinationLiquidity>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserSourceLiquidity,
+    InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountInstructionSysvarAccount,
+    InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    repayReserve: { value: input.repayReserve ?? null, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    repayReserve: {
+      value: input.repayReserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     reserveLiquidityMint: {
       value: input.reserveLiquidityMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     reserveDestinationLiquidity: {
       value: input.reserveDestinationLiquidity ?? null,
+      isSigner: false,
       isWritable: true,
     },
     userSourceLiquidity: {
       value: input.userSourceLiquidity ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     instructionSysvarAccount: {
       value: input.instructionSysvarAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -244,7 +313,6 @@ export function getRepayObligationLiquidityInstruction<
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -269,15 +337,42 @@ export function getRepayObligationLiquidityInstruction<
     programAddress,
   } as RepayObligationLiquidityInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountRepayReserve,
-    TAccountReserveLiquidityMint,
-    TAccountReserveDestinationLiquidity,
-    TAccountUserSourceLiquidity,
-    TAccountTokenProgram,
-    TAccountInstructionSysvarAccount
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRepayReserve,
+      InstructionAccountInputAddress<TAccountRepayReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveDestinationLiquidity,
+      InstructionAccountInputAddress<TAccountReserveDestinationLiquidity>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserSourceLiquidity,
+      InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructionSysvarAccount,
+      InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+    >
   >);
 }
 

@@ -30,11 +30,11 @@
     "lint": "oxlint"
   },
   "peerDependencies": {
-    "@solana/kit": "^6.10.0 || ^7.0.0 || ^8.0.0",
-    "@solana/program-client-core": "^6.10.0 || ^7.0.0 || ^8.0.0"
+    "@solana/kit": "^8.5.0",
+    "@solana/program-client-core": "^8.5.0"
   },
   "devDependencies": {
-    "@macalinao/coda": "^0.7.1",
+    "@macalinao/coda": "^0.8.0",
     "@macalinao/tsconfig": "^4.0.0",
     "@solana/kit": "*",
     "@solana/program-client-core": "*",

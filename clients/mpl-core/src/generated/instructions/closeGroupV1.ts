@@ -26,13 +26,16 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -112,16 +115,16 @@ export function getCloseGroupV1InstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CloseGroupV1Input<
-  TAccountGroup extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
+  TAccountGroup extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /** The address of the group to close */
-  group: Address<TAccountGroup>;
+  group: TAccountGroup;
   /** The account receiving reclaimed lamports */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The update authority of the group */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   closeGroupV1Args: CloseGroupV1InstructionDataArgs["closeGroupV1Args"];
 };
 
@@ -129,28 +132,53 @@ export type CloseGroupV1Input<
  * Closes an empty group account and refunds its rent to `payer`.
  */
 export function getCloseGroupV1Instruction<
-  TAccountGroup extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
+  TAccountGroup extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: CloseGroupV1Input<TAccountGroup, TAccountPayer, TAccountAuthority>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CloseGroupV1Instruction<
   TProgramAddress,
-  TAccountGroup,
-  TAccountPayer,
-  TAccountAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountGroup,
+    InstructionAccountInputAddress<TAccountGroup>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    group: { value: input.group ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
+    group: { value: input.group ?? null, isSigner: false, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -160,7 +188,6 @@ export function getCloseGroupV1Instruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("group", accounts.group),
@@ -173,9 +200,18 @@ export function getCloseGroupV1Instruction<
     programAddress,
   } as CloseGroupV1Instruction<
     TProgramAddress,
-    TAccountGroup,
-    TAccountPayer,
-    TAccountAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountGroup,
+      InstructionAccountInputAddress<TAccountGroup>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >
   >);
 }
 

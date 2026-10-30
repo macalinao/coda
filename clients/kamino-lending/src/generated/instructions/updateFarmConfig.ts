@@ -34,13 +34,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -118,21 +121,21 @@ export function getUpdateFarmConfigInstructionDataCodec(): Codec<
 }
 
 export type UpdateFarmConfigInput<
-  TAccountSigner extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
-  farmState: Address<TAccountFarmState>;
-  scopePrices?: Address<TAccountScopePrices>;
+  signer: TAccountSigner;
+  farmState: TAccountFarmState;
+  scopePrices?: TAccountScopePrices;
   mode: UpdateFarmConfigInstructionDataArgs["mode"];
   data: UpdateFarmConfigInstructionDataArgs["data"];
 };
 
 export function getUpdateFarmConfigInstruction<
-  TAccountSigner extends string,
-  TAccountFarmState extends string,
-  TAccountScopePrices extends string,
+  TAccountSigner extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: UpdateFarmConfigInput<
@@ -140,21 +143,50 @@ export function getUpdateFarmConfigInstruction<
     TAccountFarmState,
     TAccountScopePrices
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateFarmConfigInstruction<
   TProgramAddress,
-  TAccountSigner,
-  TAccountFarmState,
-  TAccountScopePrices
+  ResolvedInstructionAccountMeta<
+    TAccountSigner,
+    InstructionAccountInputAddress<TAccountSigner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: true },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -164,7 +196,6 @@ export function getUpdateFarmConfigInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("signer", accounts.signer),
@@ -177,9 +208,18 @@ export function getUpdateFarmConfigInstruction<
     programAddress,
   } as UpdateFarmConfigInstruction<
     TProgramAddress,
-    TAccountSigner,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 

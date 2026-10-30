@@ -27,13 +27,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -129,25 +132,26 @@ export function getRevokePluginAuthorityV1InstructionDataCodec(): FixedSizeCodec
 }
 
 export type RevokePluginAuthorityV1Input<
-  TAccountAsset extends string = string,
-  TAccountCollection extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountLogWrapper extends string = string,
+  TAccountAsset extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** The address of the asset */
-  asset: Address<TAccountAsset>;
+  asset: TAccountAsset;
   /** The collection to which the asset belongs */
-  collection?: Address<TAccountCollection>;
+  collection?: TAccountCollection;
   /** The account paying for the storage fees */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The owner or delegate of the asset */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** The system program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The SPL Noop Program */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   revokePluginAuthorityV1Args: RevokePluginAuthorityV1InstructionDataArgs["revokePluginAuthorityV1Args"];
 };
 
@@ -157,12 +161,12 @@ export type RevokePluginAuthorityV1Input<
  * `ApprovePluginAuthorityV1`.
  */
 export function getRevokePluginAuthorityV1Instruction<
-  TAccountAsset extends string,
-  TAccountCollection extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountSystemProgram extends string,
-  TAccountLogWrapper extends string,
+  TAccountAsset extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: RevokePluginAuthorityV1Input<
@@ -173,28 +177,74 @@ export function getRevokePluginAuthorityV1Instruction<
     TAccountSystemProgram,
     TAccountLogWrapper
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RevokePluginAuthorityV1Instruction<
   TProgramAddress,
-  TAccountAsset,
-  TAccountCollection,
-  TAccountPayer,
-  TAccountAuthority,
-  TAccountSystemProgram,
-  TAccountLogWrapper
+  ResolvedInstructionAccountMeta<
+    TAccountAsset,
+    InstructionAccountInputAddress<TAccountAsset>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLogWrapper,
+    InstructionAccountInputAddress<TAccountLogWrapper>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    asset: { value: input.asset ?? null, isWritable: true },
-    collection: { value: input.collection ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isSigner: false, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -210,7 +260,6 @@ export function getRevokePluginAuthorityV1Instruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("asset", accounts.asset),
@@ -226,12 +275,30 @@ export function getRevokePluginAuthorityV1Instruction<
     programAddress,
   } as RevokePluginAuthorityV1Instruction<
     TProgramAddress,
-    TAccountAsset,
-    TAccountCollection,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountSystemProgram,
-    TAccountLogWrapper
+    ResolvedInstructionAccountMeta<
+      TAccountAsset,
+      InstructionAccountInputAddress<TAccountAsset>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >
   >);
 }
 

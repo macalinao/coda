@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -128,30 +131,33 @@ export function getLockInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type LockInput<
-  TAccountLocker extends string = string,
-  TAccountEscrow extends string = string,
-  TAccountEscrowTokens extends string = string,
-  TAccountEscrowOwner extends string = string,
-  TAccountSourceTokens extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrowTokens extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSourceTokens extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  locker: Address<TAccountLocker>;
-  escrow: Address<TAccountEscrow>;
-  escrowTokens: Address<TAccountEscrowTokens>;
-  escrowOwner: TransactionSigner<TAccountEscrowOwner>;
-  sourceTokens: Address<TAccountSourceTokens>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  locker: TAccountLocker;
+  escrow: TAccountEscrow;
+  escrowTokens: TAccountEscrowTokens;
+  escrowOwner: TAccountEscrowOwner;
+  sourceTokens: TAccountSourceTokens;
+  tokenProgram?: TAccountTokenProgram;
   amount: LockInstructionDataArgs["amount"];
   duration: LockInstructionDataArgs["duration"];
 };
 
 export function getLockInstruction<
-  TAccountLocker extends string,
-  TAccountEscrow extends string,
-  TAccountEscrowTokens extends string,
-  TAccountEscrowOwner extends string,
-  TAccountSourceTokens extends string,
-  TAccountTokenProgram extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountEscrowTokens extends InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput,
+  TAccountSourceTokens extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: LockInput<
@@ -162,27 +168,74 @@ export function getLockInstruction<
     TAccountSourceTokens,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): LockInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountEscrow,
-  TAccountEscrowTokens,
-  TAccountEscrowOwner,
-  TAccountSourceTokens,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowTokens,
+    InstructionAccountInputAddress<TAccountEscrowTokens>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowOwner,
+    InstructionAccountInputAddress<TAccountEscrowOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSourceTokens,
+    InstructionAccountInputAddress<TAccountSourceTokens>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: true },
-    escrow: { value: input.escrow ?? null, isWritable: true },
-    escrowTokens: { value: input.escrowTokens ?? null, isWritable: true },
-    escrowOwner: { value: input.escrowOwner ?? null, isWritable: false },
-    sourceTokens: { value: input.sourceTokens ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: true },
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: true },
+    escrowTokens: {
+      value: input.escrowTokens ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    escrowOwner: {
+      value: input.escrowOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    sourceTokens: {
+      value: input.sourceTokens ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -198,7 +251,6 @@ export function getLockInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -214,12 +266,30 @@ export function getLockInstruction<
     programAddress,
   } as LockInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountEscrow,
-    TAccountEscrowTokens,
-    TAccountEscrowOwner,
-    TAccountSourceTokens,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowTokens,
+      InstructionAccountInputAddress<TAccountEscrowTokens>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowOwner,
+      InstructionAccountInputAddress<TAccountEscrowOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSourceTokens,
+      InstructionAccountInputAddress<TAccountSourceTokens>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

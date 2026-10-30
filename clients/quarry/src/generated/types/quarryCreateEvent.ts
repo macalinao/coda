@@ -18,12 +18,13 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type QuarryCreateEvent = { tokenMint: Address; timestamp: bigint };
 
 export type QuarryCreateEventArgs = {
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   timestamp: number | bigint;
 };
 

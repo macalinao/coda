@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -90,36 +93,61 @@ export function getSyncQuarryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SyncQuarryInput<
-  TAccountQuarry extends string = string,
-  TAccountRegistry extends string = string,
+  TAccountQuarry extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRegistry extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  quarry: Address<TAccountQuarry>;
-  registry: Address<TAccountRegistry>;
+  quarry: TAccountQuarry;
+  registry: TAccountRegistry;
 };
 
 export function getSyncQuarryInstruction<
-  TAccountQuarry extends string,
-  TAccountRegistry extends string,
+  TAccountQuarry extends InstructionAccountInput,
+  TAccountRegistry extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: SyncQuarryInput<TAccountQuarry, TAccountRegistry>,
-  config?: { programAddress?: TProgramAddress },
-): SyncQuarryInstruction<TProgramAddress, TAccountQuarry, TAccountRegistry> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): SyncQuarryInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountQuarry,
+    InstructionAccountInputAddress<TAccountQuarry>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRegistry,
+    InstructionAccountInputAddress<TAccountRegistry>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    quarry: { value: input.quarry ?? null, isWritable: false },
-    registry: { value: input.registry ?? null, isWritable: true },
+    quarry: { value: input.quarry ?? null, isSigner: false, isWritable: false },
+    registry: {
+      value: input.registry ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("quarry", accounts.quarry),
@@ -129,8 +157,14 @@ export function getSyncQuarryInstruction<
     programAddress,
   } as SyncQuarryInstruction<
     TProgramAddress,
-    TAccountQuarry,
-    TAccountRegistry
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRegistry,
+      InstructionAccountInputAddress<TAccountRegistry>
+    >
   >);
 }
 

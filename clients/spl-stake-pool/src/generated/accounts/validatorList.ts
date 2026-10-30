@@ -22,12 +22,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -111,8 +115,10 @@ export function decodeValidatorList<TAddress extends string = string>(
 }
 
 export async function fetchValidatorList<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<ValidatorList, TAddress>> {
   const maybeAccount = await fetchMaybeValidatorList(rpc, address, config);
@@ -121,17 +127,25 @@ export async function fetchValidatorList<TAddress extends string = string>(
 }
 
 export async function fetchMaybeValidatorList<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<ValidatorList, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeValidatorList(maybeAccount);
 }
 
 export async function fetchAllValidatorList(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ValidatorList>[]> {
   const maybeAccounts = await fetchAllMaybeValidatorList(
@@ -144,10 +158,16 @@ export async function fetchAllValidatorList(
 }
 
 export async function fetchAllMaybeValidatorList(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ValidatorList>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeValidatorList(maybeAccount));
 }

@@ -41,14 +41,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.ts";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -242,55 +245,60 @@ export function getThawV2InstructionDataCodec(): Codec<
 }
 
 export type ThawV2AsyncInput<
-  TAccountTreeAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountLeafOwner extends string = string,
-  TAccountLeafDelegate extends string = string,
-  TAccountMerkleTree extends string = string,
-  TAccountCoreCollection extends string = string,
-  TAccountLogWrapper extends string = string,
-  TAccountCompressionProgram extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountLeafOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLeafDelegate extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCoreCollection extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCompressionProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority?: Address<TAccountTreeAuthority>;
+  treeAuthority?: TAccountTreeAuthority;
   /** Account that pays for the transaction and any account rent. */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /**
    * Optional authority, defaults to `payer`. Must be either the leaf
    * delegate or a permanent freeze delegate plugin on the collection.
    */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** Owner of the compressed NFT leaf being operated on. */
-  leafOwner: Address<TAccountLeafOwner>;
+  leafOwner: TAccountLeafOwner;
   /**
    * Delegate authority for the leaf; defaults to the leaf owner when no
    * delegate is set.
    */
-  leafDelegate: Address<TAccountLeafDelegate>;
+  leafDelegate: TAccountLeafDelegate;
   /**
    * The concurrent Merkle tree account storing the compressed leaves,
    * owned by the account compression program.
    */
-  merkleTree: Address<TAccountMerkleTree>;
+  merkleTree: TAccountMerkleTree;
   /** MPL Core collection account the asset belongs to (V2 collections). */
-  coreCollection?: Address<TAccountCoreCollection>;
+  coreCollection?: TAccountCoreCollection;
   /**
    * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
    * can reconstruct the tree.
    */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   /**
    * The SPL/MPL Account Compression program that owns and manages the
    * Merkle tree.
    */
-  compressionProgram?: Address<TAccountCompressionProgram>;
+  compressionProgram?: TAccountCompressionProgram;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   root: ThawV2InstructionDataArgs["root"];
   dataHash: ThawV2InstructionDataArgs["dataHash"];
   creatorHash: ThawV2InstructionDataArgs["creatorHash"];
@@ -305,16 +313,16 @@ export type ThawV2AsyncInput<
  * ability to be transferred or burned.
  */
 export async function getThawV2InstructionAsync<
-  TAccountTreeAuthority extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountLeafOwner extends string,
-  TAccountLeafDelegate extends string,
-  TAccountMerkleTree extends string,
-  TAccountCoreCollection extends string,
-  TAccountLogWrapper extends string,
-  TAccountCompressionProgram extends string,
-  TAccountSystemProgram extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountLeafOwner extends InstructionAccountInput,
+  TAccountLeafDelegate extends InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput,
+  TAccountCoreCollection extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
+  TAccountCompressionProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: ThawV2AsyncInput<
@@ -329,40 +337,116 @@ export async function getThawV2InstructionAsync<
     TAccountCompressionProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ThawV2Instruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountLeafOwner,
-    TAccountLeafDelegate,
-    TAccountMerkleTree,
-    TAccountCoreCollection,
-    TAccountLogWrapper,
-    TAccountCompressionProgram,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafDelegate,
+      InstructionAccountInputAddress<TAccountLeafDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCoreCollection,
+      InstructionAccountInputAddress<TAccountCoreCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCompressionProgram,
+      InstructionAccountInputAddress<TAccountCompressionProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
-    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
-    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
-    coreCollection: { value: input.coreCollection ?? null, isWritable: false },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
-    compressionProgram: {
-      value: input.compressionProgram ?? null,
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    leafOwner: {
+      value: input.leafOwner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    leafDelegate: {
+      value: input.leafDelegate ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    merkleTree: {
+      value: input.merkleTree ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    coreCollection: {
+      value: input.coreCollection ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -397,7 +481,6 @@ export async function getThawV2InstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -417,69 +500,104 @@ export async function getThawV2InstructionAsync<
     programAddress,
   } as ThawV2Instruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountLeafOwner,
-    TAccountLeafDelegate,
-    TAccountMerkleTree,
-    TAccountCoreCollection,
-    TAccountLogWrapper,
-    TAccountCompressionProgram,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafDelegate,
+      InstructionAccountInputAddress<TAccountLeafDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCoreCollection,
+      InstructionAccountInputAddress<TAccountCoreCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCompressionProgram,
+      InstructionAccountInputAddress<TAccountCompressionProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type ThawV2Input<
-  TAccountTreeAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountLeafOwner extends string = string,
-  TAccountLeafDelegate extends string = string,
-  TAccountMerkleTree extends string = string,
-  TAccountCoreCollection extends string = string,
-  TAccountLogWrapper extends string = string,
-  TAccountCompressionProgram extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountLeafOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLeafDelegate extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCoreCollection extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCompressionProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority: Address<TAccountTreeAuthority>;
+  treeAuthority: TAccountTreeAuthority;
   /** Account that pays for the transaction and any account rent. */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /**
    * Optional authority, defaults to `payer`. Must be either the leaf
    * delegate or a permanent freeze delegate plugin on the collection.
    */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** Owner of the compressed NFT leaf being operated on. */
-  leafOwner: Address<TAccountLeafOwner>;
+  leafOwner: TAccountLeafOwner;
   /**
    * Delegate authority for the leaf; defaults to the leaf owner when no
    * delegate is set.
    */
-  leafDelegate: Address<TAccountLeafDelegate>;
+  leafDelegate: TAccountLeafDelegate;
   /**
    * The concurrent Merkle tree account storing the compressed leaves,
    * owned by the account compression program.
    */
-  merkleTree: Address<TAccountMerkleTree>;
+  merkleTree: TAccountMerkleTree;
   /** MPL Core collection account the asset belongs to (V2 collections). */
-  coreCollection?: Address<TAccountCoreCollection>;
+  coreCollection?: TAccountCoreCollection;
   /**
    * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
    * can reconstruct the tree.
    */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   /**
    * The SPL/MPL Account Compression program that owns and manages the
    * Merkle tree.
    */
-  compressionProgram?: Address<TAccountCompressionProgram>;
+  compressionProgram?: TAccountCompressionProgram;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   root: ThawV2InstructionDataArgs["root"];
   dataHash: ThawV2InstructionDataArgs["dataHash"];
   creatorHash: ThawV2InstructionDataArgs["creatorHash"];
@@ -494,16 +612,16 @@ export type ThawV2Input<
  * ability to be transferred or burned.
  */
 export function getThawV2Instruction<
-  TAccountTreeAuthority extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountLeafOwner extends string,
-  TAccountLeafDelegate extends string,
-  TAccountMerkleTree extends string,
-  TAccountCoreCollection extends string,
-  TAccountLogWrapper extends string,
-  TAccountCompressionProgram extends string,
-  TAccountSystemProgram extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountLeafOwner extends InstructionAccountInput,
+  TAccountLeafDelegate extends InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput,
+  TAccountCoreCollection extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
+  TAccountCompressionProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: ThawV2Input<
@@ -518,38 +636,114 @@ export function getThawV2Instruction<
     TAccountCompressionProgram,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ThawV2Instruction<
   TProgramAddress,
-  TAccountTreeAuthority,
-  TAccountPayer,
-  TAccountAuthority,
-  TAccountLeafOwner,
-  TAccountLeafDelegate,
-  TAccountMerkleTree,
-  TAccountCoreCollection,
-  TAccountLogWrapper,
-  TAccountCompressionProgram,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountTreeAuthority,
+    InstructionAccountInputAddress<TAccountTreeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLeafOwner,
+    InstructionAccountInputAddress<TAccountLeafOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLeafDelegate,
+    InstructionAccountInputAddress<TAccountLeafDelegate>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMerkleTree,
+    InstructionAccountInputAddress<TAccountMerkleTree>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCoreCollection,
+    InstructionAccountInputAddress<TAccountCoreCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLogWrapper,
+    InstructionAccountInputAddress<TAccountLogWrapper>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCompressionProgram,
+    InstructionAccountInputAddress<TAccountCompressionProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    leafOwner: { value: input.leafOwner ?? null, isWritable: false },
-    leafDelegate: { value: input.leafDelegate ?? null, isWritable: false },
-    merkleTree: { value: input.merkleTree ?? null, isWritable: true },
-    coreCollection: { value: input.coreCollection ?? null, isWritable: false },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
-    compressionProgram: {
-      value: input.compressionProgram ?? null,
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    leafOwner: {
+      value: input.leafOwner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    leafDelegate: {
+      value: input.leafDelegate ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    merkleTree: {
+      value: input.merkleTree ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    coreCollection: {
+      value: input.coreCollection ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    compressionProgram: {
+      value: input.compressionProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -573,7 +767,6 @@ export function getThawV2Instruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -593,16 +786,46 @@ export function getThawV2Instruction<
     programAddress,
   } as ThawV2Instruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountLeafOwner,
-    TAccountLeafDelegate,
-    TAccountMerkleTree,
-    TAccountCoreCollection,
-    TAccountLogWrapper,
-    TAccountCompressionProgram,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafDelegate,
+      InstructionAccountInputAddress<TAccountLeafDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCoreCollection,
+      InstructionAccountInputAddress<TAccountCoreCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCompressionProgram,
+      InstructionAccountInputAddress<TAccountCompressionProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

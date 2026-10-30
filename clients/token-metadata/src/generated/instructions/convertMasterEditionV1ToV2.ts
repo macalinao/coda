@@ -28,7 +28,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -92,22 +95,24 @@ export function getConvertMasterEditionV1ToV2InstructionDataCodec(): FixedSizeCo
 }
 
 export type ConvertMasterEditionV1ToV2Input<
-  TAccountMasterEdition extends string = string,
-  TAccountOneTimeAuth extends string = string,
-  TAccountPrintingMint extends string = string,
+  TAccountMasterEdition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOneTimeAuth extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPrintingMint extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Master Record Edition V1 (pda of ['metadata', program id, master metadata mint id, 'edition']) */
-  masterEdition: Address<TAccountMasterEdition>;
+  masterEdition: TAccountMasterEdition;
   /** One time authorization mint */
-  oneTimeAuth: Address<TAccountOneTimeAuth>;
+  oneTimeAuth: TAccountOneTimeAuth;
   /** Printing mint */
-  printingMint: Address<TAccountPrintingMint>;
+  printingMint: TAccountPrintingMint;
 };
 
 export function getConvertMasterEditionV1ToV2Instruction<
-  TAccountMasterEdition extends string,
-  TAccountOneTimeAuth extends string,
-  TAccountPrintingMint extends string,
+  TAccountMasterEdition extends InstructionAccountInput,
+  TAccountOneTimeAuth extends InstructionAccountInput,
+  TAccountPrintingMint extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: ConvertMasterEditionV1ToV2Input<
@@ -115,29 +120,61 @@ export function getConvertMasterEditionV1ToV2Instruction<
     TAccountOneTimeAuth,
     TAccountPrintingMint
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ConvertMasterEditionV1ToV2Instruction<
   TProgramAddress,
-  TAccountMasterEdition,
-  TAccountOneTimeAuth,
-  TAccountPrintingMint
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEdition,
+    InstructionAccountInputAddress<TAccountMasterEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOneTimeAuth,
+    InstructionAccountInputAddress<TAccountOneTimeAuth>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrintingMint,
+    InstructionAccountInputAddress<TAccountPrintingMint>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
-    oneTimeAuth: { value: input.oneTimeAuth ?? null, isWritable: true },
-    printingMint: { value: input.printingMint ?? null, isWritable: true },
+    masterEdition: {
+      value: input.masterEdition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    oneTimeAuth: {
+      value: input.oneTimeAuth ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    printingMint: {
+      value: input.printingMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("masterEdition", accounts.masterEdition),
@@ -148,9 +185,18 @@ export function getConvertMasterEditionV1ToV2Instruction<
     programAddress,
   } as ConvertMasterEditionV1ToV2Instruction<
     TProgramAddress,
-    TAccountMasterEdition,
-    TAccountOneTimeAuth,
-    TAccountPrintingMint
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOneTimeAuth,
+      InstructionAccountInputAddress<TAccountOneTimeAuth>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrintingMint,
+      InstructionAccountInputAddress<TAccountPrintingMint>
+    >
   >);
 }
 

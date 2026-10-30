@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -111,20 +114,22 @@ export function getSetRewardAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetRewardAuthorityInput<
-  TAccountWhirlpool extends string = string,
-  TAccountRewardAuthority extends string = string,
-  TAccountNewRewardAuthority extends string = string,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountNewRewardAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpool: Address<TAccountWhirlpool>;
-  rewardAuthority: TransactionSigner<TAccountRewardAuthority>;
-  newRewardAuthority: Address<TAccountNewRewardAuthority>;
+  whirlpool: TAccountWhirlpool;
+  rewardAuthority: TAccountRewardAuthority;
+  newRewardAuthority: TAccountNewRewardAuthority;
   rewardIndex: SetRewardAuthorityInstructionDataArgs["rewardIndex"];
 };
 
 export function getSetRewardAuthorityInstruction<
-  TAccountWhirlpool extends string,
-  TAccountRewardAuthority extends string,
-  TAccountNewRewardAuthority extends string,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountRewardAuthority extends InstructionSignerInput,
+  TAccountNewRewardAuthority extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: SetRewardAuthorityInput<
@@ -132,25 +137,53 @@ export function getSetRewardAuthorityInstruction<
     TAccountRewardAuthority,
     TAccountNewRewardAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetRewardAuthorityInstruction<
   TProgramAddress,
-  TAccountWhirlpool,
-  TAccountRewardAuthority,
-  TAccountNewRewardAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardAuthority,
+    InstructionAccountInputAddress<TAccountRewardAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewRewardAuthority,
+    InstructionAccountInputAddress<TAccountNewRewardAuthority>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    whirlpool: { value: input.whirlpool ?? null, isWritable: true },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     rewardAuthority: {
       value: input.rewardAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     newRewardAuthority: {
       value: input.newRewardAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -162,7 +195,6 @@ export function getSetRewardAuthorityInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpool", accounts.whirlpool),
@@ -175,9 +207,18 @@ export function getSetRewardAuthorityInstruction<
     programAddress,
   } as SetRewardAuthorityInstruction<
     TProgramAddress,
-    TAccountWhirlpool,
-    TAccountRewardAuthority,
-    TAccountNewRewardAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardAuthority,
+      InstructionAccountInputAddress<TAccountRewardAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewRewardAuthority,
+      InstructionAccountInputAddress<TAccountNewRewardAuthority>
+    >
   >);
 }
 

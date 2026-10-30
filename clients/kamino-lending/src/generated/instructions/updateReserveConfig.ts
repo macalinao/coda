@@ -35,12 +35,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -135,25 +138,27 @@ export function getUpdateReserveConfigInstructionDataCodec(): Codec<
 }
 
 export type UpdateReserveConfigInput<
-  TAccountSigner extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  signer: TransactionSigner<TAccountSigner>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
+  signer: TAccountSigner;
+  globalConfig: TAccountGlobalConfig;
+  lendingMarket: TAccountLendingMarket;
+  reserve: TAccountReserve;
   mode: UpdateReserveConfigInstructionDataArgs["mode"];
   value: UpdateReserveConfigInstructionDataArgs["value"];
   skipConfigIntegrityValidation: UpdateReserveConfigInstructionDataArgs["skipConfigIntegrityValidation"];
 };
 
 export function getUpdateReserveConfigInstruction<
-  TAccountSigner extends string,
-  TAccountGlobalConfig extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
+  TAccountSigner extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: UpdateReserveConfigInput<
@@ -162,24 +167,60 @@ export function getUpdateReserveConfigInstruction<
     TAccountLendingMarket,
     TAccountReserve
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateReserveConfigInstruction<
   TProgramAddress,
-  TAccountSigner,
-  TAccountGlobalConfig,
-  TAccountLendingMarket,
-  TAccountReserve
+  ResolvedInstructionAccountMeta<
+    TAccountSigner,
+    InstructionAccountInputAddress<TAccountSigner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    signer: { value: input.signer ?? null, isWritable: false },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: true },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: false },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -189,7 +230,6 @@ export function getUpdateReserveConfigInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("signer", accounts.signer),
@@ -203,10 +243,22 @@ export function getUpdateReserveConfigInstruction<
     programAddress,
   } as UpdateReserveConfigInstruction<
     TProgramAddress,
-    TAccountSigner,
-    TAccountGlobalConfig,
-    TAccountLendingMarket,
-    TAccountReserve
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >
   >);
 }
 

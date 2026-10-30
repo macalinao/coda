@@ -28,14 +28,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findFarmVaultsAuthorityPda,
@@ -143,43 +146,49 @@ export function getInitializeRewardInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeRewardAsyncInput<
-  TAccountFarmAdmin extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountRewardVault extends string = string,
-  TAccountRewardTreasuryVault extends string = string,
-  TAccountFarmVaultsAuthority extends string = string,
-  TAccountTreasuryVaultsAuthority extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountFarmAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
-  farmState: Address<TAccountFarmState>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  rewardMint: Address<TAccountRewardMint>;
-  rewardVault?: Address<TAccountRewardVault>;
-  rewardTreasuryVault?: Address<TAccountRewardTreasuryVault>;
-  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
-  treasuryVaultsAuthority?: Address<TAccountTreasuryVaultsAuthority>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  farmAdmin: TAccountFarmAdmin;
+  farmState: TAccountFarmState;
+  globalConfig: TAccountGlobalConfig;
+  rewardMint: TAccountRewardMint;
+  rewardVault?: TAccountRewardVault;
+  rewardTreasuryVault?: TAccountRewardTreasuryVault;
+  farmVaultsAuthority?: TAccountFarmVaultsAuthority;
+  treasuryVaultsAuthority?: TAccountTreasuryVaultsAuthority;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export async function getInitializeRewardInstructionAsync<
-  TAccountFarmAdmin extends string,
-  TAccountFarmState extends string,
-  TAccountGlobalConfig extends string,
-  TAccountRewardMint extends string,
-  TAccountRewardVault extends string,
-  TAccountRewardTreasuryVault extends string,
-  TAccountFarmVaultsAuthority extends string,
-  TAccountTreasuryVaultsAuthority extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountFarmAdmin extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeRewardAsyncInput<
@@ -195,48 +204,124 @@ export async function getInitializeRewardInstructionAsync<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   InitializeRewardInstruction<
     TProgramAddress,
-    TAccountFarmAdmin,
-    TAccountFarmState,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardVault,
-    TAccountRewardTreasuryVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTreasuryVaultsAuthority,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountFarmAdmin,
+      InstructionAccountInputAddress<TAccountFarmAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
+    farmAdmin: {
+      value: input.farmAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     rewardTreasuryVault: {
       value: input.rewardTreasuryVault ?? null,
+      isSigner: false,
       isWritable: true,
     },
     farmVaultsAuthority: {
       value: input.farmVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     treasuryVaultsAuthority: {
       value: input.treasuryVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -310,7 +395,6 @@ export async function getInitializeRewardInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("farmAdmin", accounts.farmAdmin),
@@ -332,58 +416,97 @@ export async function getInitializeRewardInstructionAsync<
     programAddress,
   } as InitializeRewardInstruction<
     TProgramAddress,
-    TAccountFarmAdmin,
-    TAccountFarmState,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardVault,
-    TAccountRewardTreasuryVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTreasuryVaultsAuthority,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountFarmAdmin,
+      InstructionAccountInputAddress<TAccountFarmAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 
 export type InitializeRewardInput<
-  TAccountFarmAdmin extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountRewardVault extends string = string,
-  TAccountRewardTreasuryVault extends string = string,
-  TAccountFarmVaultsAuthority extends string = string,
-  TAccountTreasuryVaultsAuthority extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountFarmAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  farmAdmin: TransactionSigner<TAccountFarmAdmin>;
-  farmState: Address<TAccountFarmState>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  rewardMint: Address<TAccountRewardMint>;
-  rewardVault: Address<TAccountRewardVault>;
-  rewardTreasuryVault: Address<TAccountRewardTreasuryVault>;
-  farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
-  treasuryVaultsAuthority: Address<TAccountTreasuryVaultsAuthority>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  farmAdmin: TAccountFarmAdmin;
+  farmState: TAccountFarmState;
+  globalConfig: TAccountGlobalConfig;
+  rewardMint: TAccountRewardMint;
+  rewardVault: TAccountRewardVault;
+  rewardTreasuryVault: TAccountRewardTreasuryVault;
+  farmVaultsAuthority: TAccountFarmVaultsAuthority;
+  treasuryVaultsAuthority: TAccountTreasuryVaultsAuthority;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export function getInitializeRewardInstruction<
-  TAccountFarmAdmin extends string,
-  TAccountFarmState extends string,
-  TAccountGlobalConfig extends string,
-  TAccountRewardMint extends string,
-  TAccountRewardVault extends string,
-  TAccountRewardTreasuryVault extends string,
-  TAccountFarmVaultsAuthority extends string,
-  TAccountTreasuryVaultsAuthority extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountFarmAdmin extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountRewardVault extends InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput,
+  TAccountTreasuryVaultsAuthority extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeRewardInput<
@@ -399,46 +522,122 @@ export function getInitializeRewardInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeRewardInstruction<
   TProgramAddress,
-  TAccountFarmAdmin,
-  TAccountFarmState,
-  TAccountGlobalConfig,
-  TAccountRewardMint,
-  TAccountRewardVault,
-  TAccountRewardTreasuryVault,
-  TAccountFarmVaultsAuthority,
-  TAccountTreasuryVaultsAuthority,
-  TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountFarmAdmin,
+    InstructionAccountInputAddress<TAccountFarmAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardMint,
+    InstructionAccountInputAddress<TAccountRewardMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardVault,
+    InstructionAccountInputAddress<TAccountRewardVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardTreasuryVault,
+    InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmVaultsAuthority,
+    InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTreasuryVaultsAuthority,
+    InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    farmAdmin: { value: input.farmAdmin ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
-    rewardVault: { value: input.rewardVault ?? null, isWritable: true },
+    farmAdmin: {
+      value: input.farmAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardVault: {
+      value: input.rewardVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     rewardTreasuryVault: {
       value: input.rewardTreasuryVault ?? null,
+      isSigner: false,
       isWritable: true,
     },
     farmVaultsAuthority: {
       value: input.farmVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     treasuryVaultsAuthority: {
       value: input.treasuryVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -459,7 +658,6 @@ export function getInitializeRewardInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("farmAdmin", accounts.farmAdmin),
@@ -481,17 +679,50 @@ export function getInitializeRewardInstruction<
     programAddress,
   } as InitializeRewardInstruction<
     TProgramAddress,
-    TAccountFarmAdmin,
-    TAccountFarmState,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardVault,
-    TAccountRewardTreasuryVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTreasuryVaultsAuthority,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountFarmAdmin,
+      InstructionAccountInputAddress<TAccountFarmAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardVault,
+      InstructionAccountInputAddress<TAccountRewardVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultsAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

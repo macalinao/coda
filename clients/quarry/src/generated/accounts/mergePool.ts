@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -62,9 +66,9 @@ export type MergePool = {
 };
 
 export type MergePoolArgs = {
-  primaryMint: Address;
+  primaryMint: Address | HasAddress;
   bump: number;
-  replicaMint: Address;
+  replicaMint: Address | HasAddress;
   mmCount: number | bigint;
   totalPrimaryBalance: number | bigint;
   totalReplicaBalance: number | bigint;
@@ -123,8 +127,10 @@ export function decodeMergePool<TAddress extends string = string>(
 }
 
 export async function fetchMergePool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<MergePool, TAddress>> {
   const maybeAccount = await fetchMaybeMergePool(rpc, address, config);
@@ -133,17 +139,25 @@ export async function fetchMergePool<TAddress extends string = string>(
 }
 
 export async function fetchMaybeMergePool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MergePool, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeMergePool(maybeAccount);
 }
 
 export async function fetchAllMergePool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MergePool>[]> {
   const maybeAccounts = await fetchAllMaybeMergePool(rpc, addresses, config);
@@ -152,18 +166,26 @@ export async function fetchAllMergePool(
 }
 
 export async function fetchAllMaybeMergePool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MergePool>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeMergePool(maybeAccount));
 }
 
 export async function fetchMergePoolFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MergePoolSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<MergePool>> {
   const maybeAccount = await fetchMaybeMergePoolFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -171,9 +193,11 @@ export async function fetchMergePoolFromSeeds(
 }
 
 export async function fetchMaybeMergePoolFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: MergePoolSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<MergePool>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findMergePoolPda(seeds, { programAddress });

@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -136,17 +140,17 @@ export type PoolArgs = {
   /** Pool fee */
   poolFees: PoolFeesStructArgs;
   /** token a mint */
-  tokenAMint: Address;
+  tokenAMint: Address | HasAddress;
   /** token b mint */
-  tokenBMint: Address;
+  tokenBMint: Address | HasAddress;
   /** token a vault */
-  tokenAVault: Address;
+  tokenAVault: Address | HasAddress;
   /** token b vault */
-  tokenBVault: Address;
+  tokenBVault: Address | HasAddress;
   /** Whitelisted vault to be able to buy pool before activation_point */
-  whitelistedVault: Address;
+  whitelistedVault: Address | HasAddress;
   /** partner */
-  partner: Address;
+  partner: Address | HasAddress;
   /** liquidity share */
   liquidity: number | bigint;
   /** padding, previous reserve amount, be careful to use that field */
@@ -191,7 +195,7 @@ export type PoolArgs = {
   /** metrics */
   metrics: PoolMetricsArgs;
   /** pool creator */
-  creator: Address;
+  creator: Address | HasAddress;
   /** Padding for further use */
   padding1: Array<number | bigint>;
   /** Farming reward information */
@@ -300,8 +304,10 @@ export function decodePool<TAddress extends string = string>(
 }
 
 export async function fetchPool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Pool, TAddress>> {
   const maybeAccount = await fetchMaybePool(rpc, address, config);
@@ -310,17 +316,25 @@ export async function fetchPool<TAddress extends string = string>(
 }
 
 export async function fetchMaybePool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Pool, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodePool(maybeAccount);
 }
 
 export async function fetchAllPool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Pool>[]> {
   const maybeAccounts = await fetchAllMaybePool(rpc, addresses, config);
@@ -329,10 +343,16 @@ export async function fetchAllPool(
 }
 
 export async function fetchAllMaybePool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Pool>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodePool(maybeAccount));
 }

@@ -28,13 +28,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -147,46 +150,56 @@ export function getInitializePositionBundleWithMetadataInstructionDataCodec(): F
 }
 
 export type InitializePositionBundleWithMetadataInput<
-  TAccountPositionBundle extends string = string,
-  TAccountPositionBundleMint extends string = string,
-  TAccountPositionBundleMetadata extends string = string,
-  TAccountPositionBundleTokenAccount extends string = string,
-  TAccountPositionBundleOwner extends string = string,
-  TAccountFunder extends string = string,
-  TAccountMetadataUpdateAuth extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountAssociatedTokenProgram extends string = string,
-  TAccountMetadataProgram extends string = string,
+  TAccountPositionBundle extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleMint extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPositionBundleMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleOwner extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountMetadataUpdateAuth extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  positionBundle: Address<TAccountPositionBundle>;
-  positionBundleMint: TransactionSigner<TAccountPositionBundleMint>;
-  positionBundleMetadata: Address<TAccountPositionBundleMetadata>;
-  positionBundleTokenAccount: Address<TAccountPositionBundleTokenAccount>;
-  positionBundleOwner: Address<TAccountPositionBundleOwner>;
-  funder: TransactionSigner<TAccountFunder>;
-  metadataUpdateAuth: Address<TAccountMetadataUpdateAuth>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-  metadataProgram?: Address<TAccountMetadataProgram>;
+  positionBundle: TAccountPositionBundle;
+  positionBundleMint: TAccountPositionBundleMint;
+  positionBundleMetadata: TAccountPositionBundleMetadata;
+  positionBundleTokenAccount: TAccountPositionBundleTokenAccount;
+  positionBundleOwner: TAccountPositionBundleOwner;
+  funder: TAccountFunder;
+  metadataUpdateAuth: TAccountMetadataUpdateAuth;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
+  associatedTokenProgram?: TAccountAssociatedTokenProgram;
+  metadataProgram?: TAccountMetadataProgram;
 };
 
 export function getInitializePositionBundleWithMetadataInstruction<
-  TAccountPositionBundle extends string,
-  TAccountPositionBundleMint extends string,
-  TAccountPositionBundleMetadata extends string,
-  TAccountPositionBundleTokenAccount extends string,
-  TAccountPositionBundleOwner extends string,
-  TAccountFunder extends string,
-  TAccountMetadataUpdateAuth extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountAssociatedTokenProgram extends string,
-  TAccountMetadataProgram extends string,
+  TAccountPositionBundle extends InstructionAccountInput,
+  TAccountPositionBundleMint extends InstructionSignerInput,
+  TAccountPositionBundleMetadata extends InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput,
+  TAccountPositionBundleOwner extends InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountMetadataUpdateAuth extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: InitializePositionBundleWithMetadataInput<
@@ -203,58 +216,126 @@ export function getInitializePositionBundleWithMetadataInstruction<
     TAccountAssociatedTokenProgram,
     TAccountMetadataProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializePositionBundleWithMetadataInstruction<
   TProgramAddress,
-  TAccountPositionBundle,
-  TAccountPositionBundleMint,
-  TAccountPositionBundleMetadata,
-  TAccountPositionBundleTokenAccount,
-  TAccountPositionBundleOwner,
-  TAccountFunder,
-  TAccountMetadataUpdateAuth,
-  TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountRent,
-  TAccountAssociatedTokenProgram,
-  TAccountMetadataProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundle,
+    InstructionAccountInputAddress<TAccountPositionBundle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleMint,
+    InstructionAccountInputAddress<TAccountPositionBundleMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleMetadata,
+    InstructionAccountInputAddress<TAccountPositionBundleMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleOwner,
+    InstructionAccountInputAddress<TAccountPositionBundleOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataUpdateAuth,
+    InstructionAccountInputAddress<TAccountMetadataUpdateAuth>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAssociatedTokenProgram,
+    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataProgram,
+    InstructionAccountInputAddress<TAccountMetadataProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    positionBundle: { value: input.positionBundle ?? null, isWritable: true },
+    positionBundle: {
+      value: input.positionBundle ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     positionBundleMint: {
       value: input.positionBundleMint ?? null,
+      isSigner: true,
       isWritable: true,
     },
     positionBundleMetadata: {
       value: input.positionBundleMetadata ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionBundleTokenAccount: {
       value: input.positionBundleTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionBundleOwner: {
       value: input.positionBundleOwner ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    funder: { value: input.funder ?? null, isWritable: true },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
     metadataUpdateAuth: {
       value: input.metadataUpdateAuth ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
     associatedTokenProgram: {
       value: input.associatedTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     metadataProgram: {
       value: input.metadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -285,7 +366,6 @@ export function getInitializePositionBundleWithMetadataInstruction<
       "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("positionBundle", accounts.positionBundle),
@@ -310,18 +390,54 @@ export function getInitializePositionBundleWithMetadataInstruction<
     programAddress,
   } as InitializePositionBundleWithMetadataInstruction<
     TProgramAddress,
-    TAccountPositionBundle,
-    TAccountPositionBundleMint,
-    TAccountPositionBundleMetadata,
-    TAccountPositionBundleTokenAccount,
-    TAccountPositionBundleOwner,
-    TAccountFunder,
-    TAccountMetadataUpdateAuth,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountAssociatedTokenProgram,
-    TAccountMetadataProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundle,
+      InstructionAccountInputAddress<TAccountPositionBundle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleMint,
+      InstructionAccountInputAddress<TAccountPositionBundleMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleMetadata,
+      InstructionAccountInputAddress<TAccountPositionBundleMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleOwner,
+      InstructionAccountInputAddress<TAccountPositionBundleOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataUpdateAuth,
+      InstructionAccountInputAddress<TAccountMetadataUpdateAuth>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataProgram,
+      InstructionAccountInputAddress<TAccountMetadataProgram>
+    >
   >);
 }
 

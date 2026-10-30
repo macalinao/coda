@@ -32,14 +32,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findReplicaMintPda } from "../pdas/index.ts";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -133,33 +136,35 @@ export function getNewPoolInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type NewPoolAsyncInput<
-  TAccountPool extends string = string,
-  TAccountPrimaryMint extends string = string,
-  TAccountReplicaMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPrimaryMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReplicaMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool?: Address<TAccountPool>;
-  primaryMint: Address<TAccountPrimaryMint>;
-  replicaMint?: Address<TAccountReplicaMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  pool?: TAccountPool;
+  primaryMint: TAccountPrimaryMint;
+  replicaMint?: TAccountReplicaMint;
+  payer: TAccountPayer;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
   bump: NewPoolInstructionDataArgs["bump"];
   mintBump: NewPoolInstructionDataArgs["mintBump"];
 };
 
 export async function getNewPoolInstructionAsync<
-  TAccountPool extends string,
-  TAccountPrimaryMint extends string,
-  TAccountReplicaMint extends string,
-  TAccountPayer extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPrimaryMint extends InstructionAccountInput,
+  TAccountReplicaMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: NewPoolAsyncInput<
@@ -171,32 +176,81 @@ export async function getNewPoolInstructionAsync<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   NewPoolInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrimaryMint,
+      InstructionAccountInputAddress<TAccountPrimaryMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReplicaMint,
+      InstructionAccountInputAddress<TAccountReplicaMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    primaryMint: { value: input.primaryMint ?? null, isWritable: false },
-    replicaMint: { value: input.replicaMint ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    primaryMint: {
+      value: input.primaryMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    replicaMint: {
+      value: input.replicaMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -247,7 +301,6 @@ export async function getNewPoolInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -264,44 +317,67 @@ export async function getNewPoolInstructionAsync<
     programAddress,
   } as NewPoolInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrimaryMint,
+      InstructionAccountInputAddress<TAccountPrimaryMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReplicaMint,
+      InstructionAccountInputAddress<TAccountReplicaMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 
 export type NewPoolInput<
-  TAccountPool extends string = string,
-  TAccountPrimaryMint extends string = string,
-  TAccountReplicaMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPrimaryMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReplicaMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  primaryMint: Address<TAccountPrimaryMint>;
-  replicaMint: Address<TAccountReplicaMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  pool: TAccountPool;
+  primaryMint: TAccountPrimaryMint;
+  replicaMint: TAccountReplicaMint;
+  payer: TAccountPayer;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
   bump: NewPoolInstructionDataArgs["bump"];
   mintBump: NewPoolInstructionDataArgs["mintBump"];
 };
 
 export function getNewPoolInstruction<
-  TAccountPool extends string,
-  TAccountPrimaryMint extends string,
-  TAccountReplicaMint extends string,
-  TAccountPayer extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPrimaryMint extends InstructionAccountInput,
+  TAccountReplicaMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: NewPoolInput<
@@ -313,30 +389,79 @@ export function getNewPoolInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): NewPoolInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountPrimaryMint,
-  TAccountReplicaMint,
-  TAccountPayer,
-  TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrimaryMint,
+    InstructionAccountInputAddress<TAccountPrimaryMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReplicaMint,
+    InstructionAccountInputAddress<TAccountReplicaMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    primaryMint: { value: input.primaryMint ?? null, isWritable: false },
-    replicaMint: { value: input.replicaMint ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    primaryMint: {
+      value: input.primaryMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    replicaMint: {
+      value: input.replicaMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -360,7 +485,6 @@ export function getNewPoolInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -377,13 +501,34 @@ export function getNewPoolInstruction<
     programAddress,
   } as NewPoolInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPrimaryMint,
-    TAccountReplicaMint,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrimaryMint,
+      InstructionAccountInputAddress<TAccountPrimaryMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReplicaMint,
+      InstructionAccountInputAddress<TAccountReplicaMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

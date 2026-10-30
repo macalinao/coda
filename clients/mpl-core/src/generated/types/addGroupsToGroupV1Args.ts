@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Arguments for `addGroupsToGroupV1`. */
@@ -26,7 +27,10 @@ export type AddGroupsToGroupV1Args = {
   groups: Array<Address>;
 };
 
-export type AddGroupsToGroupV1ArgsArgs = AddGroupsToGroupV1Args;
+export type AddGroupsToGroupV1ArgsArgs = {
+  /** The addresses of the child groups to add to the parent. */
+  groups: Array<Address | HasAddress>;
+};
 
 export function getAddGroupsToGroupV1ArgsEncoder(): Encoder<AddGroupsToGroupV1ArgsArgs> {
   return getStructEncoder([["groups", getArrayEncoder(getAddressEncoder())]]);

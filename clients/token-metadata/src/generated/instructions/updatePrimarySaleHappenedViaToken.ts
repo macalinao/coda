@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -99,22 +102,22 @@ export function getUpdatePrimarySaleHappenedViaTokenInstructionDataCodec(): Fixe
 }
 
 export type UpdatePrimarySaleHappenedViaTokenInput<
-  TAccountMetadata extends string = string,
-  TAccountOwner extends string = string,
-  TAccountToken extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountToken extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Metadata key (pda of ['metadata', program id, mint id]) */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Owner on the token account */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Account containing tokens from the metadata's mint */
-  token: Address<TAccountToken>;
+  token: TAccountToken;
 };
 
 export function getUpdatePrimarySaleHappenedViaTokenInstruction<
-  TAccountMetadata extends string,
-  TAccountOwner extends string,
-  TAccountToken extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountToken extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: UpdatePrimarySaleHappenedViaTokenInput<
@@ -122,29 +125,53 @@ export function getUpdatePrimarySaleHappenedViaTokenInstruction<
     TAccountOwner,
     TAccountToken
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdatePrimarySaleHappenedViaTokenInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountOwner,
-  TAccountToken
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountToken,
+    InstructionAccountInputAddress<TAccountToken>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    token: { value: input.token ?? null, isWritable: false },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    token: { value: input.token ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -157,9 +184,18 @@ export function getUpdatePrimarySaleHappenedViaTokenInstruction<
     programAddress,
   } as UpdatePrimarySaleHappenedViaTokenInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountOwner,
-    TAccountToken
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken,
+      InstructionAccountInputAddress<TAccountToken>
+    >
   >);
 }
 

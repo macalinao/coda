@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -66,13 +70,13 @@ export type UserMetadata = {
 
 export type UserMetadataArgs = {
   /** Pubkey of the referrer/owner - pubkey::default if no referrer */
-  referrer: Address;
+  referrer: Address | HasAddress;
   /** Bump used for validation of account address */
   bump: number | bigint;
   /** User lookup table - used to store all user accounts - atas for each reserve mint, each obligation PDA, UserMetadata itself and all referrer_token_states if there is a referrer */
-  userLookupTable: Address;
+  userLookupTable: Address | HasAddress;
   /** User metadata account owner */
-  owner: Address;
+  owner: Address | HasAddress;
   padding1: Array<number | bigint>;
   padding2: Array<number | bigint>;
 };
@@ -130,8 +134,10 @@ export function decodeUserMetadata<TAddress extends string = string>(
 }
 
 export async function fetchUserMetadata<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<UserMetadata, TAddress>> {
   const maybeAccount = await fetchMaybeUserMetadata(rpc, address, config);
@@ -140,17 +146,25 @@ export async function fetchUserMetadata<TAddress extends string = string>(
 }
 
 export async function fetchMaybeUserMetadata<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<UserMetadata, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeUserMetadata(maybeAccount);
 }
 
 export async function fetchAllUserMetadata(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<UserMetadata>[]> {
   const maybeAccounts = await fetchAllMaybeUserMetadata(rpc, addresses, config);
@@ -159,18 +173,26 @@ export async function fetchAllUserMetadata(
 }
 
 export async function fetchAllMaybeUserMetadata(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<UserMetadata>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeUserMetadata(maybeAccount));
 }
 
 export async function fetchUserMetadataFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: UserMetadataSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<UserMetadata>> {
   const maybeAccount = await fetchMaybeUserMetadataFromSeeds(
     rpc,
@@ -182,9 +204,11 @@ export async function fetchUserMetadataFromSeeds(
 }
 
 export async function fetchMaybeUserMetadataFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: UserMetadataSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<UserMetadata>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findUserMetadataPda(seeds, { programAddress });

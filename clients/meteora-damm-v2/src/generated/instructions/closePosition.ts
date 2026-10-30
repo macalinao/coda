@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -138,44 +141,50 @@ export function getClosePositionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ClosePositionAsyncInput<
-  TAccountPositionNftMint extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPoolAuthority extends string = string,
-  TAccountRentReceiver extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPositionNftMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** position_nft_mint */
-  positionNftMint: Address<TAccountPositionNftMint>;
+  positionNftMint: TAccountPositionNftMint;
   /** The token account for nft */
-  positionNftAccount?: Address<TAccountPositionNftAccount>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
-  poolAuthority?: Address<TAccountPoolAuthority>;
-  rentReceiver: Address<TAccountRentReceiver>;
+  positionNftAccount?: TAccountPositionNftAccount;
+  pool: TAccountPool;
+  position: TAccountPosition;
+  poolAuthority?: TAccountPoolAuthority;
+  rentReceiver: TAccountRentReceiver;
   /** Owner of position */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Program to create NFT mint/token account and transfer for token22 account */
-  tokenProgram?: Address<TAccountTokenProgram>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  tokenProgram?: TAccountTokenProgram;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export async function getClosePositionInstructionAsync<
-  TAccountPositionNftMint extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountPoolAuthority extends string,
-  TAccountRentReceiver extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPositionNftMint extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClosePositionAsyncInput<
@@ -190,40 +199,111 @@ export async function getClosePositionInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ClosePositionInstruction<
     TProgramAddress,
-    TAccountPositionNftMint,
-    TAccountPositionNftAccount,
-    TAccountPool,
-    TAccountPosition,
-    TAccountPoolAuthority,
-    TAccountRentReceiver,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftMint,
+      InstructionAccountInputAddress<TAccountPositionNftMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    positionNftMint: { value: input.positionNftMint ?? null, isWritable: true },
-    positionNftAccount: {
-      value: input.positionNftAccount ?? null,
+    positionNftMint: {
+      value: input.positionNftMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    pool: { value: input.pool ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    rentReceiver: { value: input.rentReceiver ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    positionNftAccount: {
+      value: input.positionNftAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rentReceiver: {
+      value: input.rentReceiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -261,7 +341,6 @@ export async function getClosePositionInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("positionNftMint", accounts.positionNftMint),
@@ -279,58 +358,94 @@ export async function getClosePositionInstructionAsync<
     programAddress,
   } as ClosePositionInstruction<
     TProgramAddress,
-    TAccountPositionNftMint,
-    TAccountPositionNftAccount,
-    TAccountPool,
-    TAccountPosition,
-    TAccountPoolAuthority,
-    TAccountRentReceiver,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftMint,
+      InstructionAccountInputAddress<TAccountPositionNftMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type ClosePositionInput<
-  TAccountPositionNftMint extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPoolAuthority extends string = string,
-  TAccountRentReceiver extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPositionNftMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** position_nft_mint */
-  positionNftMint: Address<TAccountPositionNftMint>;
+  positionNftMint: TAccountPositionNftMint;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
-  poolAuthority: Address<TAccountPoolAuthority>;
-  rentReceiver: Address<TAccountRentReceiver>;
+  positionNftAccount: TAccountPositionNftAccount;
+  pool: TAccountPool;
+  position: TAccountPosition;
+  poolAuthority: TAccountPoolAuthority;
+  rentReceiver: TAccountRentReceiver;
   /** Owner of position */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Program to create NFT mint/token account and transfer for token22 account */
-  tokenProgram?: Address<TAccountTokenProgram>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  tokenProgram?: TAccountTokenProgram;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export function getClosePositionInstruction<
-  TAccountPositionNftMint extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountPoolAuthority extends string,
-  TAccountRentReceiver extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPositionNftMint extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountRentReceiver extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClosePositionInput<
@@ -345,38 +460,109 @@ export function getClosePositionInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ClosePositionInstruction<
   TProgramAddress,
-  TAccountPositionNftMint,
-  TAccountPositionNftAccount,
-  TAccountPool,
-  TAccountPosition,
-  TAccountPoolAuthority,
-  TAccountRentReceiver,
-  TAccountOwner,
-  TAccountTokenProgram,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftMint,
+    InstructionAccountInputAddress<TAccountPositionNftMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftAccount,
+    InstructionAccountInputAddress<TAccountPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPoolAuthority,
+    InstructionAccountInputAddress<TAccountPoolAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRentReceiver,
+    InstructionAccountInputAddress<TAccountRentReceiver>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    positionNftMint: { value: input.positionNftMint ?? null, isWritable: true },
-    positionNftAccount: {
-      value: input.positionNftAccount ?? null,
+    positionNftMint: {
+      value: input.positionNftMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    pool: { value: input.pool ?? null, isWritable: true },
-    position: { value: input.position ?? null, isWritable: true },
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    rentReceiver: { value: input.rentReceiver ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    positionNftAccount: {
+      value: input.positionNftAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rentReceiver: {
+      value: input.rentReceiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -393,7 +579,6 @@ export function getClosePositionInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("positionNftMint", accounts.positionNftMint),
@@ -411,16 +596,46 @@ export function getClosePositionInstruction<
     programAddress,
   } as ClosePositionInstruction<
     TProgramAddress,
-    TAccountPositionNftMint,
-    TAccountPositionNftAccount,
-    TAccountPool,
-    TAccountPosition,
-    TAccountPoolAuthority,
-    TAccountRentReceiver,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftMint,
+      InstructionAccountInputAddress<TAccountPositionNftMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentReceiver,
+      InstructionAccountInputAddress<TAccountRentReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type NewMinterEvent = {
@@ -28,10 +29,10 @@ export type NewMinterEvent = {
 };
 
 export type NewMinterEventArgs = {
-  mintWrapper: Address;
-  minter: Address;
+  mintWrapper: Address | HasAddress;
+  minter: Address | HasAddress;
   index: number | bigint;
-  minterAuthority: Address;
+  minterAuthority: Address | HasAddress;
 };
 
 export function getNewMinterEventEncoder(): FixedSizeEncoder<NewMinterEventArgs> {

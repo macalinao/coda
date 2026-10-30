@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -80,7 +84,7 @@ export type ProposalInstructionV1 = {
 };
 
 export type ProposalInstructionV1Args = {
-  proposal: Address;
+  proposal: Address | HasAddress;
   instructionIndex: number;
   holdUpTime: number;
   instruction: InstructionDataArgs;
@@ -151,8 +155,10 @@ export function decodeProposalInstructionV1<TAddress extends string = string>(
 export async function fetchProposalInstructionV1<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<ProposalInstructionV1, TAddress>> {
   const maybeAccount = await fetchMaybeProposalInstructionV1(
@@ -167,17 +173,25 @@ export async function fetchProposalInstructionV1<
 export async function fetchMaybeProposalInstructionV1<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<ProposalInstructionV1, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeProposalInstructionV1(maybeAccount);
 }
 
 export async function fetchAllProposalInstructionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<ProposalInstructionV1>[]> {
   const maybeAccounts = await fetchAllMaybeProposalInstructionV1(
@@ -190,20 +204,28 @@ export async function fetchAllProposalInstructionV1(
 }
 
 export async function fetchAllMaybeProposalInstructionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<ProposalInstructionV1>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeProposalInstructionV1(maybeAccount),
   );
 }
 
 export async function fetchProposalInstructionV1FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ProposalTransactionSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<ProposalInstructionV1>> {
   const maybeAccount = await fetchMaybeProposalInstructionV1FromSeeds(
     rpc,
@@ -215,9 +237,11 @@ export async function fetchProposalInstructionV1FromSeeds(
 }
 
 export async function fetchMaybeProposalInstructionV1FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: ProposalTransactionSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<ProposalInstructionV1>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findProposalTransactionPda(seeds, { programAddress });

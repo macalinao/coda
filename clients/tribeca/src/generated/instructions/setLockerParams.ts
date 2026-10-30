@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -112,20 +115,20 @@ export function getSetLockerParamsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetLockerParamsInput<
-  TAccountLocker extends string = string,
-  TAccountGovernor extends string = string,
-  TAccountSmartWallet extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSmartWallet extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  locker: Address<TAccountLocker>;
-  governor: Address<TAccountGovernor>;
-  smartWallet: TransactionSigner<TAccountSmartWallet>;
+  locker: TAccountLocker;
+  governor: TAccountGovernor;
+  smartWallet: TAccountSmartWallet;
   params: SetLockerParamsInstructionDataArgs["params"];
 };
 
 export function getSetLockerParamsInstruction<
-  TAccountLocker extends string,
-  TAccountGovernor extends string,
-  TAccountSmartWallet extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountSmartWallet extends InstructionSignerInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: SetLockerParamsInput<
@@ -133,21 +136,51 @@ export function getSetLockerParamsInstruction<
     TAccountGovernor,
     TAccountSmartWallet
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetLockerParamsInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountGovernor,
-  TAccountSmartWallet
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: true },
-    governor: { value: input.governor ?? null, isWritable: false },
-    smartWallet: { value: input.smartWallet ?? null, isWritable: false },
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: true },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -157,7 +190,6 @@ export function getSetLockerParamsInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -170,9 +202,18 @@ export function getSetLockerParamsInstruction<
     programAddress,
   } as SetLockerParamsInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountGovernor,
-    TAccountSmartWallet
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Arguments for `removeCollectionsFromGroupV1`. */
@@ -26,8 +27,10 @@ export type RemoveCollectionsFromGroupV1Args = {
   collections: Array<Address>;
 };
 
-export type RemoveCollectionsFromGroupV1ArgsArgs =
-  RemoveCollectionsFromGroupV1Args;
+export type RemoveCollectionsFromGroupV1ArgsArgs = {
+  /** The addresses of the collections to remove from the group. */
+  collections: Array<Address | HasAddress>;
+};
 
 export function getRemoveCollectionsFromGroupV1ArgsEncoder(): Encoder<RemoveCollectionsFromGroupV1ArgsArgs> {
   return getStructEncoder([

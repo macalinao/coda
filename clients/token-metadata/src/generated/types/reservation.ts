@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type Reservation = {
@@ -27,7 +28,7 @@ export type Reservation = {
 };
 
 export type ReservationArgs = {
-  address: Address;
+  address: Address | HasAddress;
   spotsRemaining: number | bigint;
   totalSpots: number | bigint;
 };

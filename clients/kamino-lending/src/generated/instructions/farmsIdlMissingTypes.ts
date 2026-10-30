@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -144,11 +147,12 @@ export function getFarmsIdlMissingTypesInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type FarmsIdlMissingTypesInput<
-  TAccountGlobalAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
+  TAccountGlobalAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
+  globalAdmin: TAccountGlobalAdmin;
+  globalConfig: TAccountGlobalConfig;
   globalConfigOptionKind: FarmsIdlMissingTypesInstructionDataArgs["globalConfigOptionKind"];
   farmConfigOptionKind: FarmsIdlMissingTypesInstructionDataArgs["farmConfigOptionKind"];
   timeUnit: FarmsIdlMissingTypesInstructionDataArgs["timeUnit"];
@@ -157,24 +161,50 @@ export type FarmsIdlMissingTypesInput<
 };
 
 export function getFarmsIdlMissingTypesInstruction<
-  TAccountGlobalAdmin extends string,
-  TAccountGlobalConfig extends string,
+  TAccountGlobalAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: FarmsIdlMissingTypesInput<TAccountGlobalAdmin, TAccountGlobalConfig>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): FarmsIdlMissingTypesInstruction<
   TProgramAddress,
-  TAccountGlobalAdmin,
-  TAccountGlobalConfig
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalAdmin,
+    InstructionAccountInputAddress<TAccountGlobalAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalAdmin: { value: input.globalAdmin ?? null, isWritable: false },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
+    globalAdmin: {
+      value: input.globalAdmin ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -184,7 +214,6 @@ export function getFarmsIdlMissingTypesInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalAdmin", accounts.globalAdmin),
@@ -196,8 +225,14 @@ export function getFarmsIdlMissingTypesInstruction<
     programAddress,
   } as FarmsIdlMissingTypesInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >
   >);
 }
 

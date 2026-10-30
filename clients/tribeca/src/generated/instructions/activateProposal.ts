@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -113,28 +116,29 @@ export function getActivateProposalInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ActivateProposalInput<
-  TAccountLocker extends string = string,
-  TAccountGovernor extends string = string,
-  TAccountProposal extends string = string,
-  TAccountEscrow extends string = string,
-  TAccountEscrowOwner extends string = string,
-  TAccountGovernProgram extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGovernProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  locker: Address<TAccountLocker>;
-  governor: Address<TAccountGovernor>;
-  proposal: Address<TAccountProposal>;
-  escrow: Address<TAccountEscrow>;
-  escrowOwner: TransactionSigner<TAccountEscrowOwner>;
-  governProgram: Address<TAccountGovernProgram>;
+  locker: TAccountLocker;
+  governor: TAccountGovernor;
+  proposal: TAccountProposal;
+  escrow: TAccountEscrow;
+  escrowOwner: TAccountEscrowOwner;
+  governProgram: TAccountGovernProgram;
 };
 
 export function getActivateProposalInstruction<
-  TAccountLocker extends string,
-  TAccountGovernor extends string,
-  TAccountProposal extends string,
-  TAccountEscrow extends string,
-  TAccountEscrowOwner extends string,
-  TAccountGovernProgram extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput,
+  TAccountGovernProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: ActivateProposalInput<
@@ -145,34 +149,80 @@ export function getActivateProposalInstruction<
     TAccountEscrowOwner,
     TAccountGovernProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ActivateProposalInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountGovernor,
-  TAccountProposal,
-  TAccountEscrow,
-  TAccountEscrowOwner,
-  TAccountGovernProgram
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowOwner,
+    InstructionAccountInputAddress<TAccountEscrowOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernProgram,
+    InstructionAccountInputAddress<TAccountGovernProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: false },
-    governor: { value: input.governor ?? null, isWritable: false },
-    proposal: { value: input.proposal ?? null, isWritable: true },
-    escrow: { value: input.escrow ?? null, isWritable: false },
-    escrowOwner: { value: input.escrowOwner ?? null, isWritable: false },
-    governProgram: { value: input.governProgram ?? null, isWritable: false },
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: false },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: false },
+    escrowOwner: {
+      value: input.escrowOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    governProgram: {
+      value: input.governProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -186,12 +236,30 @@ export function getActivateProposalInstruction<
     programAddress,
   } as ActivateProposalInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountGovernor,
-    TAccountProposal,
-    TAccountEscrow,
-    TAccountEscrowOwner,
-    TAccountGovernProgram
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowOwner,
+      InstructionAccountInputAddress<TAccountEscrowOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernProgram,
+      InstructionAccountInputAddress<TAccountGovernProgram>
+    >
   >);
 }
 

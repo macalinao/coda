@@ -28,14 +28,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findMasterEditionPda,
@@ -153,70 +156,77 @@ export function getMigrateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type MigrateAsyncInput<
-  TAccountMetadata extends string = string,
-  TAccountEdition extends string = string,
-  TAccountToken extends string = string,
-  TAccountTokenOwner extends string = string,
-  TAccountMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountCollectionMetadata extends string = string,
-  TAccountDelegateRecord extends string = string,
-  TAccountTokenRecord extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountSysvarInstructions extends string = string,
-  TAccountSplTokenProgram extends string = string,
-  TAccountAuthorizationRulesProgram extends string = string,
-  TAccountAuthorizationRules extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountCollectionMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDelegateRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenRecord extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAuthorizationRulesProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAuthorizationRules extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata?: Address<TAccountMetadata>;
+  metadata?: TAccountMetadata;
   /** Edition account */
-  edition?: Address<TAccountEdition>;
+  edition?: TAccountEdition;
   /** Token account */
-  token: Address<TAccountToken>;
+  token: TAccountToken;
   /** Token account owner */
-  tokenOwner: Address<TAccountTokenOwner>;
+  tokenOwner: TAccountTokenOwner;
   /** Mint account */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Update authority */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** Collection metadata account */
-  collectionMetadata: Address<TAccountCollectionMetadata>;
+  collectionMetadata: TAccountCollectionMetadata;
   /** Delegate record account */
-  delegateRecord: Address<TAccountDelegateRecord>;
+  delegateRecord: TAccountDelegateRecord;
   /** Token record account */
-  tokenRecord?: Address<TAccountTokenRecord>;
+  tokenRecord?: TAccountTokenRecord;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Instruction sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions?: TAccountSysvarInstructions;
   /** SPL Token Program */
-  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  splTokenProgram?: TAccountSplTokenProgram;
   /** Token Authorization Rules Program */
-  authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
+  authorizationRulesProgram?: TAccountAuthorizationRulesProgram;
   /** Token Authorization Rules account */
-  authorizationRules?: Address<TAccountAuthorizationRules>;
+  authorizationRules?: TAccountAuthorizationRules;
 };
 
 export async function getMigrateInstructionAsync<
-  TAccountMetadata extends string,
-  TAccountEdition extends string,
-  TAccountToken extends string,
-  TAccountTokenOwner extends string,
-  TAccountMint extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountCollectionMetadata extends string,
-  TAccountDelegateRecord extends string,
-  TAccountTokenRecord extends string,
-  TAccountSystemProgram extends string,
-  TAccountSysvarInstructions extends string,
-  TAccountSplTokenProgram extends string,
-  TAccountAuthorizationRulesProgram extends string,
-  TAccountAuthorizationRules extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput,
+  TAccountTokenOwner extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountCollectionMetadata extends InstructionAccountInput,
+  TAccountDelegateRecord extends InstructionAccountInput,
+  TAccountTokenRecord extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput,
+  TAccountAuthorizationRulesProgram extends InstructionAccountInput,
+  TAccountAuthorizationRules extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: MigrateAsyncInput<
@@ -236,61 +246,151 @@ export async function getMigrateInstructionAsync<
     TAccountAuthorizationRulesProgram,
     TAccountAuthorizationRules
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   MigrateInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountToken,
-    TAccountTokenOwner,
-    TAccountMint,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountCollectionMetadata,
-    TAccountDelegateRecord,
-    TAccountTokenRecord,
-    TAccountSystemProgram,
-    TAccountSysvarInstructions,
-    TAccountSplTokenProgram,
-    TAccountAuthorizationRulesProgram,
-    TAccountAuthorizationRules
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken,
+      InstructionAccountInputAddress<TAccountToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwner,
+      InstructionAccountInputAddress<TAccountTokenOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMetadata,
+      InstructionAccountInputAddress<TAccountCollectionMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegateRecord,
+      InstructionAccountInputAddress<TAccountDelegateRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenRecord,
+      InstructionAccountInputAddress<TAccountTokenRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarInstructions,
+      InstructionAccountInputAddress<TAccountSysvarInstructions>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSplTokenProgram,
+      InstructionAccountInputAddress<TAccountSplTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRulesProgram,
+      InstructionAccountInputAddress<TAccountAuthorizationRulesProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRules,
+      InstructionAccountInputAddress<TAccountAuthorizationRules>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    edition: { value: input.edition ?? null, isWritable: true },
-    token: { value: input.token ?? null, isWritable: true },
-    tokenOwner: { value: input.tokenOwner ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    collectionMetadata: {
-      value: input.collectionMetadata ?? null,
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    edition: {
+      value: input.edition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    token: { value: input.token ?? null, isSigner: false, isWritable: true },
+    tokenOwner: {
+      value: input.tokenOwner ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    delegateRecord: { value: input.delegateRecord ?? null, isWritable: false },
-    tokenRecord: { value: input.tokenRecord ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    delegateRecord: {
+      value: input.delegateRecord ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenRecord: {
+      value: input.tokenRecord ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     sysvarInstructions: {
       value: input.sysvarInstructions ?? null,
+      isSigner: false,
       isWritable: false,
     },
     splTokenProgram: {
       value: input.splTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     authorizationRulesProgram: {
       value: input.authorizationRulesProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     authorizationRules: {
       value: input.authorizationRules ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -353,7 +453,6 @@ export async function getMigrateInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -379,89 +478,141 @@ export async function getMigrateInstructionAsync<
     programAddress,
   } as MigrateInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountToken,
-    TAccountTokenOwner,
-    TAccountMint,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountCollectionMetadata,
-    TAccountDelegateRecord,
-    TAccountTokenRecord,
-    TAccountSystemProgram,
-    TAccountSysvarInstructions,
-    TAccountSplTokenProgram,
-    TAccountAuthorizationRulesProgram,
-    TAccountAuthorizationRules
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken,
+      InstructionAccountInputAddress<TAccountToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwner,
+      InstructionAccountInputAddress<TAccountTokenOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMetadata,
+      InstructionAccountInputAddress<TAccountCollectionMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegateRecord,
+      InstructionAccountInputAddress<TAccountDelegateRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenRecord,
+      InstructionAccountInputAddress<TAccountTokenRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarInstructions,
+      InstructionAccountInputAddress<TAccountSysvarInstructions>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSplTokenProgram,
+      InstructionAccountInputAddress<TAccountSplTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRulesProgram,
+      InstructionAccountInputAddress<TAccountAuthorizationRulesProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRules,
+      InstructionAccountInputAddress<TAccountAuthorizationRules>
+    >
   >);
 }
 
 export type MigrateInput<
-  TAccountMetadata extends string = string,
-  TAccountEdition extends string = string,
-  TAccountToken extends string = string,
-  TAccountTokenOwner extends string = string,
-  TAccountMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountCollectionMetadata extends string = string,
-  TAccountDelegateRecord extends string = string,
-  TAccountTokenRecord extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountSysvarInstructions extends string = string,
-  TAccountSplTokenProgram extends string = string,
-  TAccountAuthorizationRulesProgram extends string = string,
-  TAccountAuthorizationRules extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountCollectionMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDelegateRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenRecord extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAuthorizationRulesProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAuthorizationRules extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Edition account */
-  edition: Address<TAccountEdition>;
+  edition: TAccountEdition;
   /** Token account */
-  token: Address<TAccountToken>;
+  token: TAccountToken;
   /** Token account owner */
-  tokenOwner: Address<TAccountTokenOwner>;
+  tokenOwner: TAccountTokenOwner;
   /** Mint account */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Update authority */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** Collection metadata account */
-  collectionMetadata: Address<TAccountCollectionMetadata>;
+  collectionMetadata: TAccountCollectionMetadata;
   /** Delegate record account */
-  delegateRecord: Address<TAccountDelegateRecord>;
+  delegateRecord: TAccountDelegateRecord;
   /** Token record account */
-  tokenRecord: Address<TAccountTokenRecord>;
+  tokenRecord: TAccountTokenRecord;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Instruction sysvar account */
-  sysvarInstructions?: Address<TAccountSysvarInstructions>;
+  sysvarInstructions?: TAccountSysvarInstructions;
   /** SPL Token Program */
-  splTokenProgram?: Address<TAccountSplTokenProgram>;
+  splTokenProgram?: TAccountSplTokenProgram;
   /** Token Authorization Rules Program */
-  authorizationRulesProgram?: Address<TAccountAuthorizationRulesProgram>;
+  authorizationRulesProgram?: TAccountAuthorizationRulesProgram;
   /** Token Authorization Rules account */
-  authorizationRules?: Address<TAccountAuthorizationRules>;
+  authorizationRules?: TAccountAuthorizationRules;
 };
 
 export function getMigrateInstruction<
-  TAccountMetadata extends string,
-  TAccountEdition extends string,
-  TAccountToken extends string,
-  TAccountTokenOwner extends string,
-  TAccountMint extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountCollectionMetadata extends string,
-  TAccountDelegateRecord extends string,
-  TAccountTokenRecord extends string,
-  TAccountSystemProgram extends string,
-  TAccountSysvarInstructions extends string,
-  TAccountSplTokenProgram extends string,
-  TAccountAuthorizationRulesProgram extends string,
-  TAccountAuthorizationRules extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountEdition extends InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput,
+  TAccountTokenOwner extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountCollectionMetadata extends InstructionAccountInput,
+  TAccountDelegateRecord extends InstructionAccountInput,
+  TAccountTokenRecord extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountSysvarInstructions extends InstructionAccountInput,
+  TAccountSplTokenProgram extends InstructionAccountInput,
+  TAccountAuthorizationRulesProgram extends InstructionAccountInput,
+  TAccountAuthorizationRules extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: MigrateInput<
@@ -481,59 +632,149 @@ export function getMigrateInstruction<
     TAccountAuthorizationRulesProgram,
     TAccountAuthorizationRules
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): MigrateInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountEdition,
-  TAccountToken,
-  TAccountTokenOwner,
-  TAccountMint,
-  TAccountPayer,
-  TAccountAuthority,
-  TAccountCollectionMetadata,
-  TAccountDelegateRecord,
-  TAccountTokenRecord,
-  TAccountSystemProgram,
-  TAccountSysvarInstructions,
-  TAccountSplTokenProgram,
-  TAccountAuthorizationRulesProgram,
-  TAccountAuthorizationRules
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEdition,
+    InstructionAccountInputAddress<TAccountEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountToken,
+    InstructionAccountInputAddress<TAccountToken>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwner,
+    InstructionAccountInputAddress<TAccountTokenOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionMetadata,
+    InstructionAccountInputAddress<TAccountCollectionMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDelegateRecord,
+    InstructionAccountInputAddress<TAccountDelegateRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenRecord,
+    InstructionAccountInputAddress<TAccountTokenRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSysvarInstructions,
+    InstructionAccountInputAddress<TAccountSysvarInstructions>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSplTokenProgram,
+    InstructionAccountInputAddress<TAccountSplTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthorizationRulesProgram,
+    InstructionAccountInputAddress<TAccountAuthorizationRulesProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthorizationRules,
+    InstructionAccountInputAddress<TAccountAuthorizationRules>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    edition: { value: input.edition ?? null, isWritable: true },
-    token: { value: input.token ?? null, isWritable: true },
-    tokenOwner: { value: input.tokenOwner ?? null, isWritable: false },
-    mint: { value: input.mint ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    collectionMetadata: {
-      value: input.collectionMetadata ?? null,
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    edition: {
+      value: input.edition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    token: { value: input.token ?? null, isSigner: false, isWritable: true },
+    tokenOwner: {
+      value: input.tokenOwner ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    delegateRecord: { value: input.delegateRecord ?? null, isWritable: false },
-    tokenRecord: { value: input.tokenRecord ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    collectionMetadata: {
+      value: input.collectionMetadata ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    delegateRecord: {
+      value: input.delegateRecord ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenRecord: {
+      value: input.tokenRecord ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     sysvarInstructions: {
       value: input.sysvarInstructions ?? null,
+      isSigner: false,
       isWritable: false,
     },
     splTokenProgram: {
       value: input.splTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     authorizationRulesProgram: {
       value: input.authorizationRulesProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     authorizationRules: {
       value: input.authorizationRules ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -556,7 +797,6 @@ export function getMigrateInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -582,21 +822,66 @@ export function getMigrateInstruction<
     programAddress,
   } as MigrateInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountEdition,
-    TAccountToken,
-    TAccountTokenOwner,
-    TAccountMint,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountCollectionMetadata,
-    TAccountDelegateRecord,
-    TAccountTokenRecord,
-    TAccountSystemProgram,
-    TAccountSysvarInstructions,
-    TAccountSplTokenProgram,
-    TAccountAuthorizationRulesProgram,
-    TAccountAuthorizationRules
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEdition,
+      InstructionAccountInputAddress<TAccountEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken,
+      InstructionAccountInputAddress<TAccountToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwner,
+      InstructionAccountInputAddress<TAccountTokenOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMetadata,
+      InstructionAccountInputAddress<TAccountCollectionMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegateRecord,
+      InstructionAccountInputAddress<TAccountDelegateRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenRecord,
+      InstructionAccountInputAddress<TAccountTokenRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarInstructions,
+      InstructionAccountInputAddress<TAccountSysvarInstructions>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSplTokenProgram,
+      InstructionAccountInputAddress<TAccountSplTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRulesProgram,
+      InstructionAccountInputAddress<TAccountAuthorizationRulesProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthorizationRules,
+      InstructionAccountInputAddress<TAccountAuthorizationRules>
+    >
   >);
 }
 

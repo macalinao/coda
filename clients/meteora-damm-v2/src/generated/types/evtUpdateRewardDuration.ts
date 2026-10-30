@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtUpdateRewardDuration = {
@@ -30,7 +31,7 @@ export type EvtUpdateRewardDuration = {
 };
 
 export type EvtUpdateRewardDurationArgs = {
-  pool: Address;
+  pool: Address | HasAddress;
   rewardIndex: number;
   oldRewardDuration: number | bigint;
   newRewardDuration: number | bigint;

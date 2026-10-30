@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type NftSignerSeeds = {
-  mint: Address;
+  mint: Address | HasAddress;
 };
 
 /** Signer PDA owned by the holder of a given NFT mint */
 export async function findNftSignerPda(
   seeds: NftSignerSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn" as Address<"NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn">,
+    programAddress:
+      programAddressInput = "NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn" as Address<"NFTUJzSHuUCsMMqMRJpB7PmbsaU7Wm51acdPk2FXMLn">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

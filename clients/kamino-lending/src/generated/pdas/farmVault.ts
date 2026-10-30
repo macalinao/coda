@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type FarmVaultSeeds = {
-  farmState: Address;
-  tokenMint: Address;
+  farmState: Address | HasAddress;
+  tokenMint: Address | HasAddress;
 };
 
 export async function findFarmVaultPda(
   seeds: FarmVaultSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">,
+    programAddress:
+      programAddressInput = "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr" as Address<"FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

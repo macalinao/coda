@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -174,12 +178,12 @@ export type StakePoolArgs = {
    * Manager authority, allows for updating the staker, manager, and fee
    * account
    */
-  manager: Address;
+  manager: Address | HasAddress;
   /**
    * Staker authority, allows for adding and removing validators, and
    * managing stake distribution
    */
-  staker: Address;
+  staker: Address | HasAddress;
   /**
    * Stake deposit authority
    * If a depositor pubkey is specified on initialization, then deposits must
@@ -190,22 +194,22 @@ export type StakePoolArgs = {
    * program_id,
    * )`
    */
-  stakeDepositAuthority: Address;
+  stakeDepositAuthority: Address | HasAddress;
   /**
    * Stake withdrawal authority bump seed
    * for `create_program_address(&[state::StakePool account, "withdrawal"])`
    */
   stakeWithdrawBumpSeed: number;
   /** Validator stake list storage account */
-  validatorList: Address;
+  validatorList: Address | HasAddress;
   /** Reserve stake account, holds deactivated stake */
-  reserveStake: Address;
+  reserveStake: Address | HasAddress;
   /** Pool Mint */
-  poolMint: Address;
+  poolMint: Address | HasAddress;
   /** Manager fee account */
-  managerFeeAccount: Address;
+  managerFeeAccount: Address | HasAddress;
   /** Pool token program id */
-  tokenProgramId: Address;
+  tokenProgramId: Address | HasAddress;
   /**
    * Total stake under management.
    * Note that if `last_update_epoch` does not match the current epoch then
@@ -226,9 +230,9 @@ export type StakePoolArgs = {
   /** Fee for next epoch */
   nextEpochFee: FutureEpochArgs;
   /** Preferred deposit validator vote account pubkey */
-  preferredDepositValidatorVoteAddress: OptionOrNullable<Address>;
+  preferredDepositValidatorVoteAddress: OptionOrNullable<Address | HasAddress>;
   /** Preferred withdraw validator vote account pubkey */
-  preferredWithdrawValidatorVoteAddress: OptionOrNullable<Address>;
+  preferredWithdrawValidatorVoteAddress: OptionOrNullable<Address | HasAddress>;
   /** Fee assessed on stake deposits */
   stakeDepositFee: FeeArgs;
   /** Fee assessed on withdrawals */
@@ -247,7 +251,7 @@ export type StakePoolArgs = {
    * Toggles whether the `DepositSol` instruction requires a signature from
    * this `sol_deposit_authority`
    */
-  solDepositAuthority: OptionOrNullable<Address>;
+  solDepositAuthority: OptionOrNullable<Address | HasAddress>;
   /** Fee assessed on SOL deposits */
   solDepositFee: FeeArgs;
   /**
@@ -262,7 +266,7 @@ export type StakePoolArgs = {
    * Toggles whether the `WithdrawSol` instruction requires a signature from
    * the `deposit_authority`
    */
-  solWithdrawAuthority: OptionOrNullable<Address>;
+  solWithdrawAuthority: OptionOrNullable<Address | HasAddress>;
   /** Fee assessed on SOL withdrawals */
   solWithdrawalFee: FeeArgs;
   /** Future SOL withdrawal fee, to be set for the following epoch */
@@ -381,8 +385,10 @@ export function decodeStakePool<TAddress extends string = string>(
 }
 
 export async function fetchStakePool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<StakePool, TAddress>> {
   const maybeAccount = await fetchMaybeStakePool(rpc, address, config);
@@ -391,17 +397,25 @@ export async function fetchStakePool<TAddress extends string = string>(
 }
 
 export async function fetchMaybeStakePool<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<StakePool, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeStakePool(maybeAccount);
 }
 
 export async function fetchAllStakePool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<StakePool>[]> {
   const maybeAccounts = await fetchAllMaybeStakePool(rpc, addresses, config);
@@ -410,10 +424,16 @@ export async function fetchAllStakePool(
 }
 
 export async function fetchAllMaybeStakePool(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<StakePool>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeStakePool(maybeAccount));
 }

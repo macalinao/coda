@@ -23,12 +23,16 @@ import {
   getU64Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -53,8 +57,8 @@ export type MasterEditionV1Args = {
   key: KeyArgs;
   supply: number | bigint;
   maxSupply: OptionOrNullable<number | bigint>;
-  printingMint: Address;
-  oneTimePrintingAuthorizationMint: Address;
+  printingMint: Address | HasAddress;
+  oneTimePrintingAuthorizationMint: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link MasterEditionV1Args} account data. */
@@ -105,8 +109,10 @@ export function decodeMasterEditionV1<TAddress extends string = string>(
 }
 
 export async function fetchMasterEditionV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<MasterEditionV1, TAddress>> {
   const maybeAccount = await fetchMaybeMasterEditionV1(rpc, address, config);
@@ -117,17 +123,25 @@ export async function fetchMasterEditionV1<TAddress extends string = string>(
 export async function fetchMaybeMasterEditionV1<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<MasterEditionV1, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeMasterEditionV1(maybeAccount);
 }
 
 export async function fetchAllMasterEditionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<MasterEditionV1>[]> {
   const maybeAccounts = await fetchAllMaybeMasterEditionV1(
@@ -140,11 +154,17 @@ export async function fetchAllMasterEditionV1(
 }
 
 export async function fetchAllMaybeMasterEditionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<MasterEditionV1>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeMasterEditionV1(maybeAccount),
   );

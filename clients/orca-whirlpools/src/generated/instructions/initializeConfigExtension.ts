@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -115,25 +118,27 @@ export function getInitializeConfigExtensionInstructionDataCodec(): FixedSizeCod
 }
 
 export type InitializeConfigExtensionInput<
-  TAccountConfig extends string = string,
-  TAccountConfigExtension extends string = string,
-  TAccountFunder extends string = string,
-  TAccountFeeAuthority extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountConfig extends InstructionAccountInput = InstructionAccountInput,
+  TAccountConfigExtension extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFeeAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  config: Address<TAccountConfig>;
-  configExtension: Address<TAccountConfigExtension>;
-  funder: TransactionSigner<TAccountFunder>;
-  feeAuthority: TransactionSigner<TAccountFeeAuthority>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  config: TAccountConfig;
+  configExtension: TAccountConfigExtension;
+  funder: TAccountFunder;
+  feeAuthority: TAccountFeeAuthority;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getInitializeConfigExtensionInstruction<
-  TAccountConfig extends string,
-  TAccountConfigExtension extends string,
-  TAccountFunder extends string,
-  TAccountFeeAuthority extends string,
-  TAccountSystemProgram extends string,
+  TAccountConfig extends InstructionAccountInput,
+  TAccountConfigExtension extends InstructionAccountInput,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountFeeAuthority extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: InitializeConfigExtensionInput<
@@ -143,25 +148,65 @@ export function getInitializeConfigExtensionInstruction<
     TAccountFeeAuthority,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeConfigExtensionInstruction<
   TProgramAddress,
-  TAccountConfig,
-  TAccountConfigExtension,
-  TAccountFunder,
-  TAccountFeeAuthority,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountConfig,
+    InstructionAccountInputAddress<TAccountConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountConfigExtension,
+    InstructionAccountInputAddress<TAccountConfigExtension>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeAuthority,
+    InstructionAccountInputAddress<TAccountFeeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    config: { value: input.config ?? null, isWritable: false },
-    configExtension: { value: input.configExtension ?? null, isWritable: true },
-    funder: { value: input.funder ?? null, isWritable: true },
-    feeAuthority: { value: input.feeAuthority ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    config: { value: input.config ?? null, isSigner: false, isWritable: false },
+    configExtension: {
+      value: input.configExtension ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
+    feeAuthority: {
+      value: input.feeAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -174,7 +219,6 @@ export function getInitializeConfigExtensionInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("config", accounts.config),
@@ -187,11 +231,26 @@ export function getInitializeConfigExtensionInstruction<
     programAddress,
   } as InitializeConfigExtensionInstruction<
     TProgramAddress,
-    TAccountConfig,
-    TAccountConfigExtension,
-    TAccountFunder,
-    TAccountFeeAuthority,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountConfig,
+      InstructionAccountInputAddress<TAccountConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountConfigExtension,
+      InstructionAccountInputAddress<TAccountConfigExtension>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAuthority,
+      InstructionAccountInputAddress<TAccountFeeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

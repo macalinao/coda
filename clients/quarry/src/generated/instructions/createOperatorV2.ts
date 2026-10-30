@@ -29,14 +29,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findOperatorPda } from "../pdas/index.ts";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -122,31 +125,33 @@ export function getCreateOperatorV2InstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateOperatorV2AsyncInput<
-  TAccountBase extends string = string,
-  TAccountOperator extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOperator extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAdmin extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  operator?: Address<TAccountOperator>;
-  rewarder: Address<TAccountRewarder>;
-  admin: Address<TAccountAdmin>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  base: TAccountBase;
+  operator?: TAccountOperator;
+  rewarder: TAccountRewarder;
+  admin: TAccountAdmin;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  quarryMineProgram?: TAccountQuarryMineProgram;
 };
 
 export async function getCreateOperatorV2InstructionAsync<
-  TAccountBase extends string,
-  TAccountOperator extends string,
-  TAccountRewarder extends string,
-  TAccountAdmin extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountOperator extends InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountAdmin extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: CreateOperatorV2AsyncInput<
@@ -158,33 +163,79 @@ export async function getCreateOperatorV2InstructionAsync<
     TAccountSystemProgram,
     TAccountQuarryMineProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CreateOperatorV2Instruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    operator: { value: input.operator ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    operator: {
+      value: input.operator ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: false, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     quarryMineProgram: {
       value: input.quarryMineProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -214,7 +265,6 @@ export async function getCreateOperatorV2InstructionAsync<
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -229,42 +279,65 @@ export async function getCreateOperatorV2InstructionAsync<
     programAddress,
   } as CreateOperatorV2Instruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >
   >);
 }
 
 export type CreateOperatorV2Input<
-  TAccountBase extends string = string,
-  TAccountOperator extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountQuarryMineProgram extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOperator extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAdmin extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  operator: Address<TAccountOperator>;
-  rewarder: Address<TAccountRewarder>;
-  admin: Address<TAccountAdmin>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
+  base: TAccountBase;
+  operator: TAccountOperator;
+  rewarder: TAccountRewarder;
+  admin: TAccountAdmin;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  quarryMineProgram?: TAccountQuarryMineProgram;
 };
 
 export function getCreateOperatorV2Instruction<
-  TAccountBase extends string,
-  TAccountOperator extends string,
-  TAccountRewarder extends string,
-  TAccountAdmin extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountQuarryMineProgram extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountOperator extends InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountAdmin extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: CreateOperatorV2Input<
@@ -276,31 +349,77 @@ export function getCreateOperatorV2Instruction<
     TAccountSystemProgram,
     TAccountQuarryMineProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateOperatorV2Instruction<
   TProgramAddress,
-  TAccountBase,
-  TAccountOperator,
-  TAccountRewarder,
-  TAccountAdmin,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountQuarryMineProgram
+  ResolvedInstructionAccountMeta<
+    TAccountBase,
+    InstructionAccountInputAddress<TAccountBase>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOperator,
+    InstructionAccountInputAddress<TAccountOperator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAdmin,
+    InstructionAccountInputAddress<TAccountAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountQuarryMineProgram,
+    InstructionAccountInputAddress<TAccountQuarryMineProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    operator: { value: input.operator ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    operator: {
+      value: input.operator ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: false, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     quarryMineProgram: {
       value: input.quarryMineProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -319,7 +438,6 @@ export function getCreateOperatorV2Instruction<
       "QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB" as Address<"QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -334,13 +452,34 @@ export function getCreateOperatorV2Instruction<
     programAddress,
   } as CreateOperatorV2Instruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountOperator,
-    TAccountRewarder,
-    TAccountAdmin,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountQuarryMineProgram
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >
   >);
 }
 

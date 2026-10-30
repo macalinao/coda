@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -114,28 +117,31 @@ export function getDeleteTokenBadgeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DeleteTokenBadgeInput<
-  TAccountWhirlpoolsConfig extends string = string,
-  TAccountWhirlpoolsConfigExtension extends string = string,
-  TAccountTokenBadgeAuthority extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountTokenBadge extends string = string,
-  TAccountReceiver extends string = string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpoolsConfigExtension extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenBadgeAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenBadge extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReceiver extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
-  whirlpoolsConfigExtension: Address<TAccountWhirlpoolsConfigExtension>;
-  tokenBadgeAuthority: TransactionSigner<TAccountTokenBadgeAuthority>;
-  tokenMint: Address<TAccountTokenMint>;
-  tokenBadge: Address<TAccountTokenBadge>;
-  receiver: Address<TAccountReceiver>;
+  whirlpoolsConfig: TAccountWhirlpoolsConfig;
+  whirlpoolsConfigExtension: TAccountWhirlpoolsConfigExtension;
+  tokenBadgeAuthority: TAccountTokenBadgeAuthority;
+  tokenMint: TAccountTokenMint;
+  tokenBadge: TAccountTokenBadge;
+  receiver: TAccountReceiver;
 };
 
 export function getDeleteTokenBadgeInstruction<
-  TAccountWhirlpoolsConfig extends string,
-  TAccountWhirlpoolsConfigExtension extends string,
-  TAccountTokenBadgeAuthority extends string,
-  TAccountTokenMint extends string,
-  TAccountTokenBadge extends string,
-  TAccountReceiver extends string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput,
+  TAccountWhirlpoolsConfigExtension extends InstructionAccountInput,
+  TAccountTokenBadgeAuthority extends InstructionSignerInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountTokenBadge extends InstructionAccountInput,
+  TAccountReceiver extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: DeleteTokenBadgeInput<
@@ -146,43 +152,88 @@ export function getDeleteTokenBadgeInstruction<
     TAccountTokenBadge,
     TAccountReceiver
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DeleteTokenBadgeInstruction<
   TProgramAddress,
-  TAccountWhirlpoolsConfig,
-  TAccountWhirlpoolsConfigExtension,
-  TAccountTokenBadgeAuthority,
-  TAccountTokenMint,
-  TAccountTokenBadge,
-  TAccountReceiver
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfig,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfigExtension,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfigExtension>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBadgeAuthority,
+    InstructionAccountInputAddress<TAccountTokenBadgeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMint,
+    InstructionAccountInputAddress<TAccountTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBadge,
+    InstructionAccountInputAddress<TAccountTokenBadge>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReceiver,
+    InstructionAccountInputAddress<TAccountReceiver>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     whirlpoolsConfig: {
       value: input.whirlpoolsConfig ?? null,
+      isSigner: false,
       isWritable: false,
     },
     whirlpoolsConfigExtension: {
       value: input.whirlpoolsConfigExtension ?? null,
+      isSigner: false,
       isWritable: false,
     },
     tokenBadgeAuthority: {
       value: input.tokenBadgeAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    tokenBadge: { value: input.tokenBadge ?? null, isWritable: true },
-    receiver: { value: input.receiver ?? null, isWritable: true },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenBadge: {
+      value: input.tokenBadge ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    receiver: {
+      value: input.receiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
@@ -199,12 +250,30 @@ export function getDeleteTokenBadgeInstruction<
     programAddress,
   } as DeleteTokenBadgeInstruction<
     TProgramAddress,
-    TAccountWhirlpoolsConfig,
-    TAccountWhirlpoolsConfigExtension,
-    TAccountTokenBadgeAuthority,
-    TAccountTokenMint,
-    TAccountTokenBadge,
-    TAccountReceiver
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfig,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfigExtension,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfigExtension>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBadgeAuthority,
+      InstructionAccountInputAddress<TAccountTokenBadgeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBadge,
+      InstructionAccountInputAddress<TAccountTokenBadge>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReceiver,
+      InstructionAccountInputAddress<TAccountReceiver>
+    >
   >);
 }
 

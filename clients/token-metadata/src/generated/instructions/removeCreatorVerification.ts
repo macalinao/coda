@@ -26,12 +26,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -92,42 +95,67 @@ export function getRemoveCreatorVerificationInstructionDataCodec(): FixedSizeCod
 }
 
 export type RemoveCreatorVerificationInput<
-  TAccountMetadata extends string = string,
-  TAccountCreator extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCreator extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /** Metadata (pda of ['metadata', program id, mint id]) */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Creator */
-  creator: TransactionSigner<TAccountCreator>;
+  creator: TAccountCreator;
 };
 
 export function getRemoveCreatorVerificationInstruction<
-  TAccountMetadata extends string,
-  TAccountCreator extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountCreator extends InstructionSignerInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: RemoveCreatorVerificationInput<TAccountMetadata, TAccountCreator>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RemoveCreatorVerificationInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountCreator
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCreator,
+    InstructionAccountInputAddress<TAccountCreator>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    creator: { value: input.creator ?? null, isWritable: false },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    creator: {
+      value: input.creator ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -137,8 +165,14 @@ export function getRemoveCreatorVerificationInstruction<
     programAddress,
   } as RemoveCreatorVerificationInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountCreator
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCreator,
+      InstructionAccountInputAddress<TAccountCreator>
+    >
   >);
 }
 

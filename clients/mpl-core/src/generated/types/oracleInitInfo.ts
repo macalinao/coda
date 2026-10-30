@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -75,7 +76,7 @@ export type OracleInitInfo = {
 
 export type OracleInitInfoArgs = {
   /** The address of the oracle account, or the base address used to derive it. */
-  baseAddress: Address;
+  baseAddress: Address | HasAddress;
   /**
    * The authority to manage this adapter; defaults to the
    * adapter type's standard authority if omitted.

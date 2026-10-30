@@ -20,6 +20,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
@@ -42,8 +43,8 @@ export type StaticConfigParametersArgs = {
   poolFees: PoolFeeParametersArgs;
   sqrtMinPrice: number | bigint;
   sqrtMaxPrice: number | bigint;
-  vaultConfigKey: Address;
-  poolCreatorAuthority: Address;
+  vaultConfigKey: Address | HasAddress;
+  poolCreatorAuthority: Address | HasAddress;
   activationType: number;
   collectFeeMode: number;
 };

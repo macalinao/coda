@@ -12,22 +12,28 @@ import {
   getU64Encoder,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type TransientStakeSeeds = {
-  voteAccountAddress: Address;
-  stakePoolAddress: Address;
+  voteAccountAddress: Address | HasAddress;
+  stakePoolAddress: Address | HasAddress;
   seed: number | bigint;
 };
 
 export async function findTransientStakePda(
   seeds: TransientStakeSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">,
+    programAddress:
+      programAddressInput = "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

@@ -30,12 +30,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -105,34 +108,57 @@ export function getCloseDepositEntryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CloseDepositEntryInput<
-  TAccountVoter extends string = string,
-  TAccountVoterAuthority extends string = string,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
-  voter: Address<TAccountVoter>;
-  voterAuthority: TransactionSigner<TAccountVoterAuthority>;
+  voter: TAccountVoter;
+  voterAuthority: TAccountVoterAuthority;
   depositEntryIndex: CloseDepositEntryInstructionDataArgs["depositEntryIndex"];
 };
 
 export function getCloseDepositEntryInstruction<
-  TAccountVoter extends string,
-  TAccountVoterAuthority extends string,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVoterAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: CloseDepositEntryInput<TAccountVoter, TAccountVoterAuthority>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CloseDepositEntryInstruction<
   TProgramAddress,
-  TAccountVoter,
-  TAccountVoterAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterAuthority,
+    InstructionAccountInputAddress<TAccountVoterAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    voter: { value: input.voter ?? null, isWritable: true },
-    voterAuthority: { value: input.voterAuthority ?? null, isWritable: false },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    voterAuthority: {
+      value: input.voterAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -142,7 +168,6 @@ export function getCloseDepositEntryInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("voter", accounts.voter),
@@ -154,8 +179,14 @@ export function getCloseDepositEntryInstruction<
     programAddress,
   } as CloseDepositEntryInstruction<
     TProgramAddress,
-    TAccountVoter,
-    TAccountVoterAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterAuthority,
+      InstructionAccountInputAddress<TAccountVoterAuthority>
+    >
   >);
 }
 

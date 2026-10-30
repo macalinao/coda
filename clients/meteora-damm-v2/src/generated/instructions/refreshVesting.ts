@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -102,23 +105,24 @@ export function getRefreshVestingInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefreshVestingInput<
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
+  pool: TAccountPool;
+  position: TAccountPosition;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
-  owner: Address<TAccountOwner>;
+  positionNftAccount: TAccountPositionNftAccount;
+  owner: TAccountOwner;
 };
 
 export function getRefreshVestingInstruction<
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: RefreshVestingInput<
@@ -127,33 +131,61 @@ export function getRefreshVestingInstruction<
     TAccountPositionNftAccount,
     TAccountOwner
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshVestingInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountPosition,
-  TAccountPositionNftAccount,
-  TAccountOwner
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftAccount,
+    InstructionAccountInputAddress<TAccountPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     positionNftAccount: {
       value: input.positionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -165,10 +197,22 @@ export function getRefreshVestingInstruction<
     programAddress,
   } as RefreshVestingInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPosition,
-    TAccountPositionNftAccount,
-    TAccountOwner
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >
   >);
 }
 

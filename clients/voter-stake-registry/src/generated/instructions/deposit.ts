@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -128,30 +131,33 @@ export function getDepositInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DepositInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVault extends string = string,
-  TAccountDepositToken extends string = string,
-  TAccountDepositAuthority extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDepositToken extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDepositAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
-  vault: Address<TAccountVault>;
-  depositToken: Address<TAccountDepositToken>;
-  depositAuthority: TransactionSigner<TAccountDepositAuthority>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
+  vault: TAccountVault;
+  depositToken: TAccountDepositToken;
+  depositAuthority: TAccountDepositAuthority;
+  tokenProgram?: TAccountTokenProgram;
   depositEntryIndex: DepositInstructionDataArgs["depositEntryIndex"];
   amount: DepositInstructionDataArgs["amount"];
 };
 
 export function getDepositInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVault extends string,
-  TAccountDepositToken extends string,
-  TAccountDepositAuthority extends string,
-  TAccountTokenProgram extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVault extends InstructionAccountInput,
+  TAccountDepositToken extends InstructionAccountInput,
+  TAccountDepositAuthority extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: DepositInput<
@@ -162,31 +168,74 @@ export function getDepositInstruction<
     TAccountDepositAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DepositInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVault,
-  TAccountDepositToken,
-  TAccountDepositAuthority,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVault,
+    InstructionAccountInputAddress<TAccountVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDepositToken,
+    InstructionAccountInputAddress<TAccountDepositToken>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDepositAuthority,
+    InstructionAccountInputAddress<TAccountDepositAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: true },
-    vault: { value: input.vault ?? null, isWritable: true },
-    depositToken: { value: input.depositToken ?? null, isWritable: true },
-    depositAuthority: {
-      value: input.depositAuthority ?? null,
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: true },
+    vault: { value: input.vault ?? null, isSigner: false, isWritable: true },
+    depositToken: {
+      value: input.depositToken ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    depositAuthority: {
+      value: input.depositAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -202,7 +251,6 @@ export function getDepositInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -218,12 +266,30 @@ export function getDepositInstruction<
     programAddress,
   } as DepositInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVault,
-    TAccountDepositToken,
-    TAccountDepositAuthority,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVault,
+      InstructionAccountInputAddress<TAccountVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDepositToken,
+      InstructionAccountInputAddress<TAccountDepositToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDepositAuthority,
+      InstructionAccountInputAddress<TAccountDepositAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

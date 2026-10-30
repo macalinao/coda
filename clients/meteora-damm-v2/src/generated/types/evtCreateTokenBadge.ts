@@ -16,11 +16,12 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtCreateTokenBadge = { tokenMint: Address };
 
-export type EvtCreateTokenBadgeArgs = EvtCreateTokenBadge;
+export type EvtCreateTokenBadgeArgs = { tokenMint: Address | HasAddress };
 
 export function getEvtCreateTokenBadgeEncoder(): FixedSizeEncoder<EvtCreateTokenBadgeArgs> {
   return getStructEncoder([["tokenMint", getAddressEncoder()]]);

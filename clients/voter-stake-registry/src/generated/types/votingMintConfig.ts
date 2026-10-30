@@ -24,6 +24,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type VotingMintConfig = {
@@ -38,8 +39,8 @@ export type VotingMintConfig = {
 };
 
 export type VotingMintConfigArgs = {
-  mint: Address;
-  grantAuthority: Address;
+  mint: Address | HasAddress;
+  grantAuthority: Address | HasAddress;
   baselineVoteWeightScaledFactor: number | bigint;
   maxExtraLockupVoteWeightScaledFactor: number | bigint;
   lockupSaturationSecs: number | bigint;

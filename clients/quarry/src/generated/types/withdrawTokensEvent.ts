@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type WithdrawTokensEvent = {
@@ -29,10 +30,10 @@ export type WithdrawTokensEvent = {
 };
 
 export type WithdrawTokensEventArgs = {
-  pool: Address;
-  mm: Address;
-  owner: Address;
-  mint: Address;
+  pool: Address | HasAddress;
+  mm: Address | HasAddress;
+  owner: Address | HasAddress;
+  mint: Address | HasAddress;
   amount: number | bigint;
 };
 

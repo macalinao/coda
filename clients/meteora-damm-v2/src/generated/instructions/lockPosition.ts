@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.ts";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -143,40 +146,43 @@ export function getLockPositionInstructionDataCodec(): Codec<
 }
 
 export type LockPositionAsyncInput<
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountVesting extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVesting extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
-  vesting: TransactionSigner<TAccountVesting>;
+  pool: TAccountPool;
+  position: TAccountPosition;
+  vesting: TAccountVesting;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  owner: TAccountOwner;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
   params: LockPositionInstructionDataArgs["params"];
 };
 
 export async function getLockPositionInstructionAsync<
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountVesting extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountVesting extends InstructionSignerInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: LockPositionAsyncInput<
@@ -190,38 +196,94 @@ export async function getLockPositionInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   LockPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPosition,
-    TAccountVesting,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVesting,
+      InstructionAccountInputAddress<TAccountVesting>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
-    vesting: { value: input.vesting ?? null, isWritable: true },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    vesting: { value: input.vesting ?? null, isSigner: true, isWritable: true },
     positionNftAccount: {
       value: input.positionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -246,7 +308,6 @@ export async function getLockPositionInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -265,53 +326,83 @@ export async function getLockPositionInstructionAsync<
     programAddress,
   } as LockPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPosition,
-    TAccountVesting,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVesting,
+      InstructionAccountInputAddress<TAccountVesting>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type LockPositionInput<
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountVesting extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVesting extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
-  vesting: TransactionSigner<TAccountVesting>;
+  pool: TAccountPool;
+  position: TAccountPosition;
+  vesting: TAccountVesting;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  owner: TAccountOwner;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
   params: LockPositionInstructionDataArgs["params"];
 };
 
 export function getLockPositionInstruction<
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountVesting extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountVesting extends InstructionSignerInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: LockPositionInput<
@@ -325,36 +416,92 @@ export function getLockPositionInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): LockPositionInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountPosition,
-  TAccountVesting,
-  TAccountPositionNftAccount,
-  TAccountOwner,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVesting,
+    InstructionAccountInputAddress<TAccountVesting>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftAccount,
+    InstructionAccountInputAddress<TAccountPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
-    vesting: { value: input.vesting ?? null, isWritable: true },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    vesting: { value: input.vesting ?? null, isSigner: true, isWritable: true },
     positionNftAccount: {
       value: input.positionNftAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -374,7 +521,6 @@ export function getLockPositionInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -393,15 +539,42 @@ export function getLockPositionInstruction<
     programAddress,
   } as LockPositionInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountPosition,
-    TAccountVesting,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVesting,
+      InstructionAccountInputAddress<TAccountVesting>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

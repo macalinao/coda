@@ -9,6 +9,7 @@
 import {
   isProgramError,
   type Address,
+  type HasAddress,
   type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM,
   type SolanaError,
 } from "@solana/kit";
@@ -213,12 +214,19 @@ export function isSplStakePoolError<
     instructions: Record<number, { programAddress: Address }>;
   },
   code?: TProgramErrorCode,
+  config: { programAddress?: Address | HasAddress } = {},
 ): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> &
   Readonly<{ context: Readonly<{ code: TProgramErrorCode }> }> {
+  const programAddressInput =
+    config.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return isProgramError<TProgramErrorCode>(
     error,
     transactionMessage,
-    SPL_STAKE_POOL_PROGRAM_ADDRESS,
+    programAddress,
     code,
   );
 }

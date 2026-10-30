@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -127,46 +130,50 @@ export function getDeprecatedMintPrintingTokensViaTokenInstructionDataCodec(): F
 }
 
 export type DeprecatedMintPrintingTokensViaTokenInput<
-  TAccountDestination extends string = string,
-  TAccountToken extends string = string,
-  TAccountOneTimePrintingAuthorizationMint extends string = string,
-  TAccountPrintingMint extends string = string,
-  TAccountBurnAuthority extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountMasterEdition extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOneTimePrintingAuthorizationMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPrintingMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBurnAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Destination account */
-  destination: Address<TAccountDestination>;
+  destination: TAccountDestination;
   /** Token account containing one time authorization token */
-  token: Address<TAccountToken>;
+  token: TAccountToken;
   /** One time authorization mint */
-  oneTimePrintingAuthorizationMint: Address<TAccountOneTimePrintingAuthorizationMint>;
+  oneTimePrintingAuthorizationMint: TAccountOneTimePrintingAuthorizationMint;
   /** Printing mint */
-  printingMint: Address<TAccountPrintingMint>;
+  printingMint: TAccountPrintingMint;
   /** Burn authority */
-  burnAuthority: TransactionSigner<TAccountBurnAuthority>;
+  burnAuthority: TAccountBurnAuthority;
   /** Metadata key (pda of ['metadata', program id, mint id]) */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition']) */
-  masterEdition: Address<TAccountMasterEdition>;
+  masterEdition: TAccountMasterEdition;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Rent */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
 };
 
 export function getDeprecatedMintPrintingTokensViaTokenInstruction<
-  TAccountDestination extends string,
-  TAccountToken extends string,
-  TAccountOneTimePrintingAuthorizationMint extends string,
-  TAccountPrintingMint extends string,
-  TAccountBurnAuthority extends string,
-  TAccountMetadata extends string,
-  TAccountMasterEdition extends string,
-  TAccountTokenProgram extends string,
-  TAccountRent extends string,
+  TAccountDestination extends InstructionAccountInput,
+  TAccountToken extends InstructionAccountInput,
+  TAccountOneTimePrintingAuthorizationMint extends InstructionAccountInput,
+  TAccountPrintingMint extends InstructionAccountInput,
+  TAccountBurnAuthority extends InstructionSignerInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: DeprecatedMintPrintingTokensViaTokenInput<
@@ -180,37 +187,101 @@ export function getDeprecatedMintPrintingTokensViaTokenInstruction<
     TAccountTokenProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DeprecatedMintPrintingTokensViaTokenInstruction<
   TProgramAddress,
-  TAccountDestination,
-  TAccountToken,
-  TAccountOneTimePrintingAuthorizationMint,
-  TAccountPrintingMint,
-  TAccountBurnAuthority,
-  TAccountMetadata,
-  TAccountMasterEdition,
-  TAccountTokenProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountDestination,
+    InstructionAccountInputAddress<TAccountDestination>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountToken,
+    InstructionAccountInputAddress<TAccountToken>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOneTimePrintingAuthorizationMint,
+    InstructionAccountInputAddress<TAccountOneTimePrintingAuthorizationMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPrintingMint,
+    InstructionAccountInputAddress<TAccountPrintingMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBurnAuthority,
+    InstructionAccountInputAddress<TAccountBurnAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEdition,
+    InstructionAccountInputAddress<TAccountMasterEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    destination: { value: input.destination ?? null, isWritable: true },
-    token: { value: input.token ?? null, isWritable: true },
-    oneTimePrintingAuthorizationMint: {
-      value: input.oneTimePrintingAuthorizationMint ?? null,
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    printingMint: { value: input.printingMint ?? null, isWritable: true },
-    burnAuthority: { value: input.burnAuthority ?? null, isWritable: false },
-    metadata: { value: input.metadata ?? null, isWritable: false },
-    masterEdition: { value: input.masterEdition ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    token: { value: input.token ?? null, isSigner: false, isWritable: true },
+    oneTimePrintingAuthorizationMint: {
+      value: input.oneTimePrintingAuthorizationMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    printingMint: {
+      value: input.printingMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    burnAuthority: {
+      value: input.burnAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    masterEdition: {
+      value: input.masterEdition ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -227,7 +298,6 @@ export function getDeprecatedMintPrintingTokensViaTokenInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("destination", accounts.destination),
@@ -249,15 +319,42 @@ export function getDeprecatedMintPrintingTokensViaTokenInstruction<
     programAddress,
   } as DeprecatedMintPrintingTokensViaTokenInstruction<
     TProgramAddress,
-    TAccountDestination,
-    TAccountToken,
-    TAccountOneTimePrintingAuthorizationMint,
-    TAccountPrintingMint,
-    TAccountBurnAuthority,
-    TAccountMetadata,
-    TAccountMasterEdition,
-    TAccountTokenProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken,
+      InstructionAccountInputAddress<TAccountToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOneTimePrintingAuthorizationMint,
+      InstructionAccountInputAddress<TAccountOneTimePrintingAuthorizationMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPrintingMint,
+      InstructionAccountInputAddress<TAccountPrintingMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBurnAuthority,
+      InstructionAccountInputAddress<TAccountBurnAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Arguments for `removeAssetsFromGroupV1`. */
@@ -26,7 +27,10 @@ export type RemoveAssetsFromGroupV1Args = {
   assets: Array<Address>;
 };
 
-export type RemoveAssetsFromGroupV1ArgsArgs = RemoveAssetsFromGroupV1Args;
+export type RemoveAssetsFromGroupV1ArgsArgs = {
+  /** The addresses of the assets to remove from the group. */
+  assets: Array<Address | HasAddress>;
+};
 
 export function getRemoveAssetsFromGroupV1ArgsEncoder(): Encoder<RemoveAssetsFromGroupV1ArgsArgs> {
   return getStructEncoder([["assets", getArrayEncoder(getAddressEncoder())]]);

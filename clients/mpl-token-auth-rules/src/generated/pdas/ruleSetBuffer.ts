@@ -11,22 +11,28 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type RuleSetBufferSeeds = {
   /** The owner (creator) of the rule set */
-  owner: Address;
+  owner: Address | HasAddress;
 };
 
 /** Buffer PDA used to assemble large rule sets before applying */
 export async function findRuleSetBufferPda(
   seeds: RuleSetBufferSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">,
+    programAddress:
+      programAddressInput = "auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg" as Address<"auth9SigNpDKz4sJJ1DfCTuZrZNSAgh9sFD3rboVmgg">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

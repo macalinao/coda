@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findTreeConfigPda } from "../pdas/index.ts";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -112,31 +115,34 @@ export function getSetTreeDelegateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetTreeDelegateAsyncInput<
-  TAccountTreeAuthority extends string = string,
-  TAccountTreeCreator extends string = string,
-  TAccountNewTreeDelegate extends string = string,
-  TAccountMerkleTree extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewTreeDelegate extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority?: Address<TAccountTreeAuthority>;
+  treeAuthority?: TAccountTreeAuthority;
   /**
    * Creator of the tree, recorded in `TreeConfig` when the tree was
    * created.
    */
-  treeCreator: TransactionSigner<TAccountTreeCreator>;
+  treeCreator: TAccountTreeCreator;
   /** New delegate authority to set for the tree. */
-  newTreeDelegate: Address<TAccountNewTreeDelegate>;
+  newTreeDelegate: TAccountNewTreeDelegate;
   /**
    * The concurrent Merkle tree account storing the compressed leaves,
    * owned by the account compression program.
    */
-  merkleTree: Address<TAccountMerkleTree>;
+  merkleTree: TAccountMerkleTree;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
 };
 
 /**
@@ -147,11 +153,11 @@ export type SetTreeDelegateAsyncInput<
  * behalf.
  */
 export async function getSetTreeDelegateInstructionAsync<
-  TAccountTreeAuthority extends string,
-  TAccountTreeCreator extends string,
-  TAccountNewTreeDelegate extends string,
-  TAccountMerkleTree extends string,
-  TAccountSystemProgram extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput,
+  TAccountNewTreeDelegate extends InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: SetTreeDelegateAsyncInput<
@@ -161,30 +167,75 @@ export async function getSetTreeDelegateInstructionAsync<
     TAccountMerkleTree,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   SetTreeDelegateInstruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountTreeCreator,
-    TAccountNewTreeDelegate,
-    TAccountMerkleTree,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreeCreator,
+      InstructionAccountInputAddress<TAccountTreeCreator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewTreeDelegate,
+      InstructionAccountInputAddress<TAccountNewTreeDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    treeCreator: { value: input.treeCreator ?? null, isWritable: false },
-    newTreeDelegate: {
-      value: input.newTreeDelegate ?? null,
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    treeCreator: {
+      value: input.treeCreator ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    merkleTree: { value: input.merkleTree ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    newTreeDelegate: {
+      value: input.newTreeDelegate ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    merkleTree: {
+      value: input.merkleTree ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -208,7 +259,6 @@ export async function getSetTreeDelegateInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -221,40 +271,58 @@ export async function getSetTreeDelegateInstructionAsync<
     programAddress,
   } as SetTreeDelegateInstruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountTreeCreator,
-    TAccountNewTreeDelegate,
-    TAccountMerkleTree,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreeCreator,
+      InstructionAccountInputAddress<TAccountTreeCreator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewTreeDelegate,
+      InstructionAccountInputAddress<TAccountNewTreeDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type SetTreeDelegateInput<
-  TAccountTreeAuthority extends string = string,
-  TAccountTreeCreator extends string = string,
-  TAccountNewTreeDelegate extends string = string,
-  TAccountMerkleTree extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewTreeDelegate extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority: Address<TAccountTreeAuthority>;
+  treeAuthority: TAccountTreeAuthority;
   /**
    * Creator of the tree, recorded in `TreeConfig` when the tree was
    * created.
    */
-  treeCreator: TransactionSigner<TAccountTreeCreator>;
+  treeCreator: TAccountTreeCreator;
   /** New delegate authority to set for the tree. */
-  newTreeDelegate: Address<TAccountNewTreeDelegate>;
+  newTreeDelegate: TAccountNewTreeDelegate;
   /**
    * The concurrent Merkle tree account storing the compressed leaves,
    * owned by the account compression program.
    */
-  merkleTree: Address<TAccountMerkleTree>;
+  merkleTree: TAccountMerkleTree;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
 };
 
 /**
@@ -265,11 +333,11 @@ export type SetTreeDelegateInput<
  * behalf.
  */
 export function getSetTreeDelegateInstruction<
-  TAccountTreeAuthority extends string,
-  TAccountTreeCreator extends string,
-  TAccountNewTreeDelegate extends string,
-  TAccountMerkleTree extends string,
-  TAccountSystemProgram extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountTreeCreator extends InstructionSignerInput,
+  TAccountNewTreeDelegate extends InstructionAccountInput,
+  TAccountMerkleTree extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: SetTreeDelegateInput<
@@ -279,28 +347,73 @@ export function getSetTreeDelegateInstruction<
     TAccountMerkleTree,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetTreeDelegateInstruction<
   TProgramAddress,
-  TAccountTreeAuthority,
-  TAccountTreeCreator,
-  TAccountNewTreeDelegate,
-  TAccountMerkleTree,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountTreeAuthority,
+    InstructionAccountInputAddress<TAccountTreeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTreeCreator,
+    InstructionAccountInputAddress<TAccountTreeCreator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewTreeDelegate,
+    InstructionAccountInputAddress<TAccountNewTreeDelegate>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMerkleTree,
+    InstructionAccountInputAddress<TAccountMerkleTree>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    treeCreator: { value: input.treeCreator ?? null, isWritable: false },
-    newTreeDelegate: {
-      value: input.newTreeDelegate ?? null,
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    treeCreator: {
+      value: input.treeCreator ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    merkleTree: { value: input.merkleTree ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    newTreeDelegate: {
+      value: input.newTreeDelegate ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    merkleTree: {
+      value: input.merkleTree ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -313,7 +426,6 @@ export function getSetTreeDelegateInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -326,11 +438,26 @@ export function getSetTreeDelegateInstruction<
     programAddress,
   } as SetTreeDelegateInstruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountTreeCreator,
-    TAccountNewTreeDelegate,
-    TAccountMerkleTree,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreeCreator,
+      InstructionAccountInputAddress<TAccountTreeCreator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewTreeDelegate,
+      InstructionAccountInputAddress<TAccountNewTreeDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMerkleTree,
+      InstructionAccountInputAddress<TAccountMerkleTree>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

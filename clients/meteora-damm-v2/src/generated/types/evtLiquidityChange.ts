@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtLiquidityChange = {
@@ -41,9 +42,9 @@ export type EvtLiquidityChange = {
 };
 
 export type EvtLiquidityChangeArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
   tokenAAmount: number | bigint;
   tokenBAmount: number | bigint;
   transferFeeIncludedTokenAAmount: number | bigint;

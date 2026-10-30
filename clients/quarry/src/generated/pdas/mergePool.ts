@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type MergePoolSeeds = {
-  primaryMint: Address;
+  primaryMint: Address | HasAddress;
 };
 
 /** Merge pool that allows staking multiple quarry rewards as one */
 export async function findMergePoolPda(
   seeds: MergePoolSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">,
+    programAddress:
+      programAddressInput = "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

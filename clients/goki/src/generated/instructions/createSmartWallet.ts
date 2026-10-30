@@ -33,19 +33,23 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SMART_WALLET_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -99,7 +103,7 @@ export type CreateSmartWalletInstructionData = {
 export type CreateSmartWalletInstructionDataArgs = {
   bump: number;
   maxOwners: number;
-  owners: Array<Address>;
+  owners: Array<Address | HasAddress>;
   threshold: number | bigint;
   minimumDelay: number | bigint;
 };
@@ -140,15 +144,16 @@ export function getCreateSmartWalletInstructionDataCodec(): Codec<
 }
 
 export type CreateSmartWalletInput<
-  TAccountBase extends string = string,
-  TAccountSmartWallet extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSmartWallet extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  smartWallet: Address<TAccountSmartWallet>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  base: TAccountBase;
+  smartWallet: TAccountSmartWallet;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: CreateSmartWalletInstructionDataArgs["bump"];
   maxOwners: CreateSmartWalletInstructionDataArgs["maxOwners"];
   owners: CreateSmartWalletInstructionDataArgs["owners"];
@@ -157,10 +162,10 @@ export type CreateSmartWalletInput<
 };
 
 export function getCreateSmartWalletInstruction<
-  TAccountBase extends string,
-  TAccountSmartWallet extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountSmartWallet extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SMART_WALLET_PROGRAM_ADDRESS,
 >(
   input: CreateSmartWalletInput<
@@ -169,23 +174,56 @@ export function getCreateSmartWalletInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateSmartWalletInstruction<
   TProgramAddress,
-  TAccountBase,
-  TAccountSmartWallet,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountBase,
+    InstructionAccountInputAddress<TAccountBase>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSmartWallet,
+    InstructionAccountInputAddress<TAccountSmartWallet>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? SMART_WALLET_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    smartWallet: { value: input.smartWallet ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    smartWallet: {
+      value: input.smartWallet ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -201,7 +239,6 @@ export function getCreateSmartWalletInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -215,10 +252,22 @@ export function getCreateSmartWalletInstruction<
     programAddress,
   } as CreateSmartWalletInstruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountSmartWallet,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSmartWallet,
+      InstructionAccountInputAddress<TAccountSmartWallet>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

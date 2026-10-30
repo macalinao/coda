@@ -29,7 +29,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -91,21 +94,24 @@ export function getRefundProposalDepositInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefundProposalDepositInput<
-  TAccountProposalAccount extends string = string,
-  TAccountProposalDepositAccount extends string = string,
-  TAccountProposalDepositPayer extends string = string,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalDepositAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalDepositPayer extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  proposalAccount: Address<TAccountProposalAccount>;
+  proposalAccount: TAccountProposalAccount;
   /** PDA Seeds: ['proposal-deposit', proposal, deposit payer] */
-  proposalDepositAccount: Address<TAccountProposalDepositAccount>;
+  proposalDepositAccount: TAccountProposalDepositAccount;
   /** Proposal Deposit Payer (beneficiary) account */
-  proposalDepositPayer: Address<TAccountProposalDepositPayer>;
+  proposalDepositPayer: TAccountProposalDepositPayer;
 };
 
 export function getRefundProposalDepositInstruction<
-  TAccountProposalAccount extends string,
-  TAccountProposalDepositAccount extends string,
-  TAccountProposalDepositPayer extends string,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountProposalDepositAccount extends InstructionAccountInput,
+  TAccountProposalDepositPayer extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: RefundProposalDepositInput<
@@ -113,29 +119,53 @@ export function getRefundProposalDepositInstruction<
     TAccountProposalDepositAccount,
     TAccountProposalDepositPayer
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefundProposalDepositInstruction<
   TProgramAddress,
-  TAccountProposalAccount,
-  TAccountProposalDepositAccount,
-  TAccountProposalDepositPayer
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalDepositAccount,
+    InstructionAccountInputAddress<TAccountProposalDepositAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalDepositPayer,
+    InstructionAccountInputAddress<TAccountProposalDepositPayer>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     proposalAccount: {
       value: input.proposalAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     proposalDepositAccount: {
       value: input.proposalDepositAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     proposalDepositPayer: {
       value: input.proposalDepositPayer ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -144,7 +174,6 @@ export function getRefundProposalDepositInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("proposalAccount", accounts.proposalAccount),
@@ -155,9 +184,18 @@ export function getRefundProposalDepositInstruction<
     programAddress,
   } as RefundProposalDepositInstruction<
     TProgramAddress,
-    TAccountProposalAccount,
-    TAccountProposalDepositAccount,
-    TAccountProposalDepositPayer
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalDepositAccount,
+      InstructionAccountInputAddress<TAccountProposalDepositAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalDepositPayer,
+      InstructionAccountInputAddress<TAccountProposalDepositPayer>
+    >
   >);
 }
 

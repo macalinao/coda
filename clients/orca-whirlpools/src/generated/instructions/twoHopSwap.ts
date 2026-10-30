@@ -35,12 +35,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -208,47 +211,65 @@ export function getTwoHopSwapInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TwoHopSwapInput<
-  TAccountTokenProgram extends string = string,
-  TAccountTokenAuthority extends string = string,
-  TAccountWhirlpoolOne extends string = string,
-  TAccountWhirlpoolTwo extends string = string,
-  TAccountTokenOwnerAccountOneA extends string = string,
-  TAccountTokenVaultOneA extends string = string,
-  TAccountTokenOwnerAccountOneB extends string = string,
-  TAccountTokenVaultOneB extends string = string,
-  TAccountTokenOwnerAccountTwoA extends string = string,
-  TAccountTokenVaultTwoA extends string = string,
-  TAccountTokenOwnerAccountTwoB extends string = string,
-  TAccountTokenVaultTwoB extends string = string,
-  TAccountTickArrayOne0 extends string = string,
-  TAccountTickArrayOne1 extends string = string,
-  TAccountTickArrayOne2 extends string = string,
-  TAccountTickArrayTwo0 extends string = string,
-  TAccountTickArrayTwo1 extends string = string,
-  TAccountTickArrayTwo2 extends string = string,
-  TAccountOracleOne extends string = string,
-  TAccountOracleTwo extends string = string,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountWhirlpoolOne extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpoolTwo extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerAccountOneA extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenVaultOneA extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerAccountOneB extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenVaultOneB extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerAccountTwoA extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenVaultTwoA extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerAccountTwoB extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenVaultTwoB extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayOne0 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayOne1 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayOne2 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayTwo0 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayTwo1 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTickArrayTwo2 extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOracleOne extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracleTwo extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  tokenProgram?: Address<TAccountTokenProgram>;
-  tokenAuthority: TransactionSigner<TAccountTokenAuthority>;
-  whirlpoolOne: Address<TAccountWhirlpoolOne>;
-  whirlpoolTwo: Address<TAccountWhirlpoolTwo>;
-  tokenOwnerAccountOneA: Address<TAccountTokenOwnerAccountOneA>;
-  tokenVaultOneA: Address<TAccountTokenVaultOneA>;
-  tokenOwnerAccountOneB: Address<TAccountTokenOwnerAccountOneB>;
-  tokenVaultOneB: Address<TAccountTokenVaultOneB>;
-  tokenOwnerAccountTwoA: Address<TAccountTokenOwnerAccountTwoA>;
-  tokenVaultTwoA: Address<TAccountTokenVaultTwoA>;
-  tokenOwnerAccountTwoB: Address<TAccountTokenOwnerAccountTwoB>;
-  tokenVaultTwoB: Address<TAccountTokenVaultTwoB>;
-  tickArrayOne0: Address<TAccountTickArrayOne0>;
-  tickArrayOne1: Address<TAccountTickArrayOne1>;
-  tickArrayOne2: Address<TAccountTickArrayOne2>;
-  tickArrayTwo0: Address<TAccountTickArrayTwo0>;
-  tickArrayTwo1: Address<TAccountTickArrayTwo1>;
-  tickArrayTwo2: Address<TAccountTickArrayTwo2>;
-  oracleOne: Address<TAccountOracleOne>;
-  oracleTwo: Address<TAccountOracleTwo>;
+  tokenProgram?: TAccountTokenProgram;
+  tokenAuthority: TAccountTokenAuthority;
+  whirlpoolOne: TAccountWhirlpoolOne;
+  whirlpoolTwo: TAccountWhirlpoolTwo;
+  tokenOwnerAccountOneA: TAccountTokenOwnerAccountOneA;
+  tokenVaultOneA: TAccountTokenVaultOneA;
+  tokenOwnerAccountOneB: TAccountTokenOwnerAccountOneB;
+  tokenVaultOneB: TAccountTokenVaultOneB;
+  tokenOwnerAccountTwoA: TAccountTokenOwnerAccountTwoA;
+  tokenVaultTwoA: TAccountTokenVaultTwoA;
+  tokenOwnerAccountTwoB: TAccountTokenOwnerAccountTwoB;
+  tokenVaultTwoB: TAccountTokenVaultTwoB;
+  tickArrayOne0: TAccountTickArrayOne0;
+  tickArrayOne1: TAccountTickArrayOne1;
+  tickArrayOne2: TAccountTickArrayOne2;
+  tickArrayTwo0: TAccountTickArrayTwo0;
+  tickArrayTwo1: TAccountTickArrayTwo1;
+  tickArrayTwo2: TAccountTickArrayTwo2;
+  oracleOne: TAccountOracleOne;
+  oracleTwo: TAccountOracleTwo;
   amount: TwoHopSwapInstructionDataArgs["amount"];
   otherAmountThreshold: TwoHopSwapInstructionDataArgs["otherAmountThreshold"];
   amountSpecifiedIsInput: TwoHopSwapInstructionDataArgs["amountSpecifiedIsInput"];
@@ -259,26 +280,26 @@ export type TwoHopSwapInput<
 };
 
 export function getTwoHopSwapInstruction<
-  TAccountTokenProgram extends string,
-  TAccountTokenAuthority extends string,
-  TAccountWhirlpoolOne extends string,
-  TAccountWhirlpoolTwo extends string,
-  TAccountTokenOwnerAccountOneA extends string,
-  TAccountTokenVaultOneA extends string,
-  TAccountTokenOwnerAccountOneB extends string,
-  TAccountTokenVaultOneB extends string,
-  TAccountTokenOwnerAccountTwoA extends string,
-  TAccountTokenVaultTwoA extends string,
-  TAccountTokenOwnerAccountTwoB extends string,
-  TAccountTokenVaultTwoB extends string,
-  TAccountTickArrayOne0 extends string,
-  TAccountTickArrayOne1 extends string,
-  TAccountTickArrayOne2 extends string,
-  TAccountTickArrayTwo0 extends string,
-  TAccountTickArrayTwo1 extends string,
-  TAccountTickArrayTwo2 extends string,
-  TAccountOracleOne extends string,
-  TAccountOracleTwo extends string,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountTokenAuthority extends InstructionSignerInput,
+  TAccountWhirlpoolOne extends InstructionAccountInput,
+  TAccountWhirlpoolTwo extends InstructionAccountInput,
+  TAccountTokenOwnerAccountOneA extends InstructionAccountInput,
+  TAccountTokenVaultOneA extends InstructionAccountInput,
+  TAccountTokenOwnerAccountOneB extends InstructionAccountInput,
+  TAccountTokenVaultOneB extends InstructionAccountInput,
+  TAccountTokenOwnerAccountTwoA extends InstructionAccountInput,
+  TAccountTokenVaultTwoA extends InstructionAccountInput,
+  TAccountTokenOwnerAccountTwoB extends InstructionAccountInput,
+  TAccountTokenVaultTwoB extends InstructionAccountInput,
+  TAccountTickArrayOne0 extends InstructionAccountInput,
+  TAccountTickArrayOne1 extends InstructionAccountInput,
+  TAccountTickArrayOne2 extends InstructionAccountInput,
+  TAccountTickArrayTwo0 extends InstructionAccountInput,
+  TAccountTickArrayTwo1 extends InstructionAccountInput,
+  TAccountTickArrayTwo2 extends InstructionAccountInput,
+  TAccountOracleOne extends InstructionAccountInput,
+  TAccountOracleTwo extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: TwoHopSwapInput<
@@ -303,67 +324,208 @@ export function getTwoHopSwapInstruction<
     TAccountOracleOne,
     TAccountOracleTwo
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TwoHopSwapInstruction<
   TProgramAddress,
-  TAccountTokenProgram,
-  TAccountTokenAuthority,
-  TAccountWhirlpoolOne,
-  TAccountWhirlpoolTwo,
-  TAccountTokenOwnerAccountOneA,
-  TAccountTokenVaultOneA,
-  TAccountTokenOwnerAccountOneB,
-  TAccountTokenVaultOneB,
-  TAccountTokenOwnerAccountTwoA,
-  TAccountTokenVaultTwoA,
-  TAccountTokenOwnerAccountTwoB,
-  TAccountTokenVaultTwoB,
-  TAccountTickArrayOne0,
-  TAccountTickArrayOne1,
-  TAccountTickArrayOne2,
-  TAccountTickArrayTwo0,
-  TAccountTickArrayTwo1,
-  TAccountTickArrayTwo2,
-  TAccountOracleOne,
-  TAccountOracleTwo
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAuthority,
+    InstructionAccountInputAddress<TAccountTokenAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolOne,
+    InstructionAccountInputAddress<TAccountWhirlpoolOne>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolTwo,
+    InstructionAccountInputAddress<TAccountWhirlpoolTwo>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerAccountOneA,
+    InstructionAccountInputAddress<TAccountTokenOwnerAccountOneA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultOneA,
+    InstructionAccountInputAddress<TAccountTokenVaultOneA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerAccountOneB,
+    InstructionAccountInputAddress<TAccountTokenOwnerAccountOneB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultOneB,
+    InstructionAccountInputAddress<TAccountTokenVaultOneB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerAccountTwoA,
+    InstructionAccountInputAddress<TAccountTokenOwnerAccountTwoA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultTwoA,
+    InstructionAccountInputAddress<TAccountTokenVaultTwoA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerAccountTwoB,
+    InstructionAccountInputAddress<TAccountTokenOwnerAccountTwoB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultTwoB,
+    InstructionAccountInputAddress<TAccountTokenVaultTwoB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayOne0,
+    InstructionAccountInputAddress<TAccountTickArrayOne0>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayOne1,
+    InstructionAccountInputAddress<TAccountTickArrayOne1>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayOne2,
+    InstructionAccountInputAddress<TAccountTickArrayOne2>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayTwo0,
+    InstructionAccountInputAddress<TAccountTickArrayTwo0>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayTwo1,
+    InstructionAccountInputAddress<TAccountTickArrayTwo1>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTickArrayTwo2,
+    InstructionAccountInputAddress<TAccountTickArrayTwo2>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOracleOne,
+    InstructionAccountInputAddress<TAccountOracleOne>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOracleTwo,
+    InstructionAccountInputAddress<TAccountOracleTwo>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    tokenAuthority: { value: input.tokenAuthority ?? null, isWritable: false },
-    whirlpoolOne: { value: input.whirlpoolOne ?? null, isWritable: true },
-    whirlpoolTwo: { value: input.whirlpoolTwo ?? null, isWritable: true },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenAuthority: {
+      value: input.tokenAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    whirlpoolOne: {
+      value: input.whirlpoolOne ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    whirlpoolTwo: {
+      value: input.whirlpoolTwo ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerAccountOneA: {
       value: input.tokenOwnerAccountOneA ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenVaultOneA: { value: input.tokenVaultOneA ?? null, isWritable: true },
+    tokenVaultOneA: {
+      value: input.tokenVaultOneA ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerAccountOneB: {
       value: input.tokenOwnerAccountOneB ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenVaultOneB: { value: input.tokenVaultOneB ?? null, isWritable: true },
+    tokenVaultOneB: {
+      value: input.tokenVaultOneB ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerAccountTwoA: {
       value: input.tokenOwnerAccountTwoA ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenVaultTwoA: { value: input.tokenVaultTwoA ?? null, isWritable: true },
+    tokenVaultTwoA: {
+      value: input.tokenVaultTwoA ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerAccountTwoB: {
       value: input.tokenOwnerAccountTwoB ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenVaultTwoB: { value: input.tokenVaultTwoB ?? null, isWritable: true },
-    tickArrayOne0: { value: input.tickArrayOne0 ?? null, isWritable: true },
-    tickArrayOne1: { value: input.tickArrayOne1 ?? null, isWritable: true },
-    tickArrayOne2: { value: input.tickArrayOne2 ?? null, isWritable: true },
-    tickArrayTwo0: { value: input.tickArrayTwo0 ?? null, isWritable: true },
-    tickArrayTwo1: { value: input.tickArrayTwo1 ?? null, isWritable: true },
-    tickArrayTwo2: { value: input.tickArrayTwo2 ?? null, isWritable: true },
-    oracleOne: { value: input.oracleOne ?? null, isWritable: false },
-    oracleTwo: { value: input.oracleTwo ?? null, isWritable: false },
+    tokenVaultTwoB: {
+      value: input.tokenVaultTwoB ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayOne0: {
+      value: input.tickArrayOne0 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayOne1: {
+      value: input.tickArrayOne1 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayOne2: {
+      value: input.tickArrayOne2 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayTwo0: {
+      value: input.tickArrayTwo0 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayTwo1: {
+      value: input.tickArrayTwo1 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tickArrayTwo2: {
+      value: input.tickArrayTwo2 ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    oracleOne: {
+      value: input.oracleOne ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    oracleTwo: {
+      value: input.oracleTwo ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -379,7 +541,6 @@ export function getTwoHopSwapInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("tokenProgram", accounts.tokenProgram),
@@ -409,26 +570,86 @@ export function getTwoHopSwapInstruction<
     programAddress,
   } as TwoHopSwapInstruction<
     TProgramAddress,
-    TAccountTokenProgram,
-    TAccountTokenAuthority,
-    TAccountWhirlpoolOne,
-    TAccountWhirlpoolTwo,
-    TAccountTokenOwnerAccountOneA,
-    TAccountTokenVaultOneA,
-    TAccountTokenOwnerAccountOneB,
-    TAccountTokenVaultOneB,
-    TAccountTokenOwnerAccountTwoA,
-    TAccountTokenVaultTwoA,
-    TAccountTokenOwnerAccountTwoB,
-    TAccountTokenVaultTwoB,
-    TAccountTickArrayOne0,
-    TAccountTickArrayOne1,
-    TAccountTickArrayOne2,
-    TAccountTickArrayTwo0,
-    TAccountTickArrayTwo1,
-    TAccountTickArrayTwo2,
-    TAccountOracleOne,
-    TAccountOracleTwo
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAuthority,
+      InstructionAccountInputAddress<TAccountTokenAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolOne,
+      InstructionAccountInputAddress<TAccountWhirlpoolOne>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolTwo,
+      InstructionAccountInputAddress<TAccountWhirlpoolTwo>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerAccountOneA,
+      InstructionAccountInputAddress<TAccountTokenOwnerAccountOneA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultOneA,
+      InstructionAccountInputAddress<TAccountTokenVaultOneA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerAccountOneB,
+      InstructionAccountInputAddress<TAccountTokenOwnerAccountOneB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultOneB,
+      InstructionAccountInputAddress<TAccountTokenVaultOneB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerAccountTwoA,
+      InstructionAccountInputAddress<TAccountTokenOwnerAccountTwoA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultTwoA,
+      InstructionAccountInputAddress<TAccountTokenVaultTwoA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerAccountTwoB,
+      InstructionAccountInputAddress<TAccountTokenOwnerAccountTwoB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultTwoB,
+      InstructionAccountInputAddress<TAccountTokenVaultTwoB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayOne0,
+      InstructionAccountInputAddress<TAccountTickArrayOne0>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayOne1,
+      InstructionAccountInputAddress<TAccountTickArrayOne1>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayOne2,
+      InstructionAccountInputAddress<TAccountTickArrayOne2>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayTwo0,
+      InstructionAccountInputAddress<TAccountTickArrayTwo0>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayTwo1,
+      InstructionAccountInputAddress<TAccountTickArrayTwo1>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTickArrayTwo2,
+      InstructionAccountInputAddress<TAccountTickArrayTwo2>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOne,
+      InstructionAccountInputAddress<TAccountOracleOne>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleTwo,
+      InstructionAccountInputAddress<TAccountOracleTwo>
+    >
   >);
 }
 

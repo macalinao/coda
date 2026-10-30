@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.ts";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -148,42 +151,48 @@ export function getDepositSolWithSlippageInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DepositSolWithSlippageAsyncInput<
-  TAccountStakePool extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountReserveStake extends string = string,
-  TAccountPayer extends string = string,
-  TAccountUserPoolTokenAccount extends string = string,
-  TAccountFeeAccount extends string = string,
-  TAccountReferralFeeAccount extends string = string,
-  TAccountPoolMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSolDepositAuthority extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserPoolTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReferralFeeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSolDepositAuthority extends
+    | InstructionAccountInput
+    | InstructionSignerInput = InstructionAccountInput | InstructionSignerInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Stake pool withdraw authority */
-  withdrawAuthority?: Address<TAccountWithdrawAuthority>;
+  withdrawAuthority?: TAccountWithdrawAuthority;
   /** Reserve stake */
-  reserveStake: Address<TAccountReserveStake>;
+  reserveStake: TAccountReserveStake;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** User pool token account */
-  userPoolTokenAccount: Address<TAccountUserPoolTokenAccount>;
+  userPoolTokenAccount: TAccountUserPoolTokenAccount;
   /** Fee account */
-  feeAccount: Address<TAccountFeeAccount>;
+  feeAccount: TAccountFeeAccount;
   /** Referral fee account */
-  referralFeeAccount: Address<TAccountReferralFeeAccount>;
+  referralFeeAccount: TAccountReferralFeeAccount;
   /** Pool mint */
-  poolMint: Address<TAccountPoolMint>;
+  poolMint: TAccountPoolMint;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Stake pool sol deposit authority */
-  solDepositAuthority:
-    | Address<TAccountSolDepositAuthority>
-    | TransactionSigner<TAccountSolDepositAuthority>;
+  solDepositAuthority: TAccountSolDepositAuthority;
   lamportsIn: DepositSolWithSlippageInstructionDataArgs["lamportsIn"];
   minimumPoolTokensOut: DepositSolWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
 };
@@ -206,17 +215,19 @@ export type DepositSolWithSlippageAsyncInput<
  * 10. `[s]` (Optional) Stake pool sol deposit authority.
  */
 export async function getDepositSolWithSlippageInstructionAsync<
-  TAccountStakePool extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountReserveStake extends string,
-  TAccountPayer extends string,
-  TAccountUserPoolTokenAccount extends string,
-  TAccountFeeAccount extends string,
-  TAccountReferralFeeAccount extends string,
-  TAccountPoolMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountSolDepositAuthority extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountUserPoolTokenAccount extends InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput,
+  TAccountReferralFeeAccount extends InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSolDepositAuthority extends
+    | InstructionAccountInput
+    | InstructionSignerInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: DepositSolWithSlippageAsyncInput<
@@ -232,53 +243,129 @@ export async function getDepositSolWithSlippageInstructionAsync<
     TAccountTokenProgram,
     TAccountSolDepositAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   DepositSolWithSlippageInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountReserveStake,
-    TAccountPayer,
-    TAccountUserPoolTokenAccount,
-    TAccountFeeAccount,
-    TAccountReferralFeeAccount,
-    TAccountPoolMint,
-    TAccountSystemProgram,
-    TAccountTokenProgram,
-    (typeof input)["solDepositAuthority"] extends TransactionSigner<TAccountSolDepositAuthority>
-      ? ReadonlySignerAccount<TAccountSolDepositAuthority> &
-          AccountSignerMeta<TAccountSolDepositAuthority>
-      : TAccountSolDepositAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserPoolTokenAccount,
+      InstructionAccountInputAddress<TAccountUserPoolTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferralFeeAccount,
+      InstructionAccountInputAddress<TAccountReferralFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSolDepositAuthority,
+      InstructionAccountInputAddress<TAccountSolDepositAuthority>,
+      ReadonlySignerAccount<
+        InstructionAccountInputAddress<TAccountSolDepositAuthority>
+      > &
+        AccountSignerMeta<
+          InstructionAccountInputAddress<TAccountSolDepositAuthority>
+        >
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    reserveStake: { value: input.reserveStake ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: false },
+    reserveStake: {
+      value: input.reserveStake ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
     userPoolTokenAccount: {
       value: input.userPoolTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    feeAccount: { value: input.feeAccount ?? null, isWritable: true },
+    feeAccount: {
+      value: input.feeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     referralFeeAccount: {
       value: input.referralFeeAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    poolMint: { value: input.poolMint ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    poolMint: {
+      value: input.poolMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     solDepositAuthority: {
       value: input.solDepositAuthority ?? null,
+      isSigner: "either",
       isWritable: false,
     },
   };
@@ -311,7 +398,6 @@ export async function getDepositSolWithSlippageInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -332,60 +418,102 @@ export async function getDepositSolWithSlippageInstructionAsync<
     programAddress,
   } as DepositSolWithSlippageInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountReserveStake,
-    TAccountPayer,
-    TAccountUserPoolTokenAccount,
-    TAccountFeeAccount,
-    TAccountReferralFeeAccount,
-    TAccountPoolMint,
-    TAccountSystemProgram,
-    TAccountTokenProgram,
-    (typeof input)["solDepositAuthority"] extends TransactionSigner<TAccountSolDepositAuthority>
-      ? ReadonlySignerAccount<TAccountSolDepositAuthority> &
-          AccountSignerMeta<TAccountSolDepositAuthority>
-      : TAccountSolDepositAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserPoolTokenAccount,
+      InstructionAccountInputAddress<TAccountUserPoolTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferralFeeAccount,
+      InstructionAccountInputAddress<TAccountReferralFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSolDepositAuthority,
+      InstructionAccountInputAddress<TAccountSolDepositAuthority>,
+      ReadonlySignerAccount<
+        InstructionAccountInputAddress<TAccountSolDepositAuthority>
+      > &
+        AccountSignerMeta<
+          InstructionAccountInputAddress<TAccountSolDepositAuthority>
+        >
+    >
   >);
 }
 
 export type DepositSolWithSlippageInput<
-  TAccountStakePool extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountReserveStake extends string = string,
-  TAccountPayer extends string = string,
-  TAccountUserPoolTokenAccount extends string = string,
-  TAccountFeeAccount extends string = string,
-  TAccountReferralFeeAccount extends string = string,
-  TAccountPoolMint extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSolDepositAuthority extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserPoolTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReferralFeeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSolDepositAuthority extends
+    | InstructionAccountInput
+    | InstructionSignerInput = InstructionAccountInput | InstructionSignerInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Stake pool withdraw authority */
-  withdrawAuthority: Address<TAccountWithdrawAuthority>;
+  withdrawAuthority: TAccountWithdrawAuthority;
   /** Reserve stake */
-  reserveStake: Address<TAccountReserveStake>;
+  reserveStake: TAccountReserveStake;
   /** Payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** User pool token account */
-  userPoolTokenAccount: Address<TAccountUserPoolTokenAccount>;
+  userPoolTokenAccount: TAccountUserPoolTokenAccount;
   /** Fee account */
-  feeAccount: Address<TAccountFeeAccount>;
+  feeAccount: TAccountFeeAccount;
   /** Referral fee account */
-  referralFeeAccount: Address<TAccountReferralFeeAccount>;
+  referralFeeAccount: TAccountReferralFeeAccount;
   /** Pool mint */
-  poolMint: Address<TAccountPoolMint>;
+  poolMint: TAccountPoolMint;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Stake pool sol deposit authority */
-  solDepositAuthority:
-    | Address<TAccountSolDepositAuthority>
-    | TransactionSigner<TAccountSolDepositAuthority>;
+  solDepositAuthority: TAccountSolDepositAuthority;
   lamportsIn: DepositSolWithSlippageInstructionDataArgs["lamportsIn"];
   minimumPoolTokensOut: DepositSolWithSlippageInstructionDataArgs["minimumPoolTokensOut"];
 };
@@ -408,17 +536,19 @@ export type DepositSolWithSlippageInput<
  * 10. `[s]` (Optional) Stake pool sol deposit authority.
  */
 export function getDepositSolWithSlippageInstruction<
-  TAccountStakePool extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountReserveStake extends string,
-  TAccountPayer extends string,
-  TAccountUserPoolTokenAccount extends string,
-  TAccountFeeAccount extends string,
-  TAccountReferralFeeAccount extends string,
-  TAccountPoolMint extends string,
-  TAccountSystemProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountSolDepositAuthority extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountUserPoolTokenAccount extends InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput,
+  TAccountReferralFeeAccount extends InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSolDepositAuthority extends
+    | InstructionAccountInput
+    | InstructionSignerInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: DepositSolWithSlippageInput<
@@ -434,51 +564,127 @@ export function getDepositSolWithSlippageInstruction<
     TAccountTokenProgram,
     TAccountSolDepositAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DepositSolWithSlippageInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountWithdrawAuthority,
-  TAccountReserveStake,
-  TAccountPayer,
-  TAccountUserPoolTokenAccount,
-  TAccountFeeAccount,
-  TAccountReferralFeeAccount,
-  TAccountPoolMint,
-  TAccountSystemProgram,
-  TAccountTokenProgram,
-  (typeof input)["solDepositAuthority"] extends TransactionSigner<TAccountSolDepositAuthority>
-    ? ReadonlySignerAccount<TAccountSolDepositAuthority> &
-        AccountSignerMeta<TAccountSolDepositAuthority>
-    : TAccountSolDepositAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawAuthority,
+    InstructionAccountInputAddress<TAccountWithdrawAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveStake,
+    InstructionAccountInputAddress<TAccountReserveStake>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserPoolTokenAccount,
+    InstructionAccountInputAddress<TAccountUserPoolTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeAccount,
+    InstructionAccountInputAddress<TAccountFeeAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferralFeeAccount,
+    InstructionAccountInputAddress<TAccountReferralFeeAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPoolMint,
+    InstructionAccountInputAddress<TAccountPoolMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSolDepositAuthority,
+    InstructionAccountInputAddress<TAccountSolDepositAuthority>,
+    ReadonlySignerAccount<
+      InstructionAccountInputAddress<TAccountSolDepositAuthority>
+    > &
+      AccountSignerMeta<
+        InstructionAccountInputAddress<TAccountSolDepositAuthority>
+      >
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    reserveStake: { value: input.reserveStake ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: false },
+    reserveStake: {
+      value: input.reserveStake ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
     userPoolTokenAccount: {
       value: input.userPoolTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    feeAccount: { value: input.feeAccount ?? null, isWritable: true },
+    feeAccount: {
+      value: input.feeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     referralFeeAccount: {
       value: input.referralFeeAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    poolMint: { value: input.poolMint ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    poolMint: {
+      value: input.poolMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     solDepositAuthority: {
       value: input.solDepositAuthority ?? null,
+      isSigner: "either",
       isWritable: false,
     },
   };
@@ -500,7 +706,6 @@ export function getDepositSolWithSlippageInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -521,20 +726,56 @@ export function getDepositSolWithSlippageInstruction<
     programAddress,
   } as DepositSolWithSlippageInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountReserveStake,
-    TAccountPayer,
-    TAccountUserPoolTokenAccount,
-    TAccountFeeAccount,
-    TAccountReferralFeeAccount,
-    TAccountPoolMint,
-    TAccountSystemProgram,
-    TAccountTokenProgram,
-    (typeof input)["solDepositAuthority"] extends TransactionSigner<TAccountSolDepositAuthority>
-      ? ReadonlySignerAccount<TAccountSolDepositAuthority> &
-          AccountSignerMeta<TAccountSolDepositAuthority>
-      : TAccountSolDepositAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserPoolTokenAccount,
+      InstructionAccountInputAddress<TAccountUserPoolTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferralFeeAccount,
+      InstructionAccountInputAddress<TAccountReferralFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSolDepositAuthority,
+      InstructionAccountInputAddress<TAccountSolDepositAuthority>,
+      ReadonlySignerAccount<
+        InstructionAccountInputAddress<TAccountSolDepositAuthority>
+      > &
+        AccountSignerMeta<
+          InstructionAccountInputAddress<TAccountSolDepositAuthority>
+        >
+    >
   >);
 }
 

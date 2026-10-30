@@ -24,13 +24,16 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EscrowAuthority =
   | { __kind: "TokenOwner" }
   | { __kind: "Creator"; fields: readonly [Address] };
 
-export type EscrowAuthorityArgs = EscrowAuthority;
+export type EscrowAuthorityArgs =
+  | { __kind: "TokenOwner" }
+  | { __kind: "Creator"; fields: readonly [Address | HasAddress] };
 
 export function getEscrowAuthorityEncoder(): Encoder<EscrowAuthorityArgs> {
   return getDiscriminatedUnionEncoder([

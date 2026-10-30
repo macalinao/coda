@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -105,22 +108,24 @@ export function getUpdateVoterWeightRecordInstructionDataCodec(): FixedSizeCodec
 }
 
 export type UpdateVoterWeightRecordInput<
-  TAccountRegistrar extends string = string,
-  TAccountVoter extends string = string,
-  TAccountVoterWeightRecord extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  voter: Address<TAccountVoter>;
-  voterWeightRecord: Address<TAccountVoterWeightRecord>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  registrar: TAccountRegistrar;
+  voter: TAccountVoter;
+  voterWeightRecord: TAccountVoterWeightRecord;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getUpdateVoterWeightRecordInstruction<
-  TAccountRegistrar extends string,
-  TAccountVoter extends string,
-  TAccountVoterWeightRecord extends string,
-  TAccountSystemProgram extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountVoter extends InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: UpdateVoterWeightRecordInput<
@@ -129,27 +134,60 @@ export function getUpdateVoterWeightRecordInstruction<
     TAccountVoterWeightRecord,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateVoterWeightRecordInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountVoter,
-  TAccountVoterWeightRecord,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoter,
+    InstructionAccountInputAddress<TAccountVoter>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterWeightRecord,
+    InstructionAccountInputAddress<TAccountVoterWeightRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: false },
-    voter: { value: input.voter ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    voter: { value: input.voter ?? null, isSigner: false, isWritable: false },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -162,7 +200,6 @@ export function getUpdateVoterWeightRecordInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -174,10 +211,22 @@ export function getUpdateVoterWeightRecordInstruction<
     programAddress,
   } as UpdateVoterWeightRecordInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountVoter,
-    TAccountVoterWeightRecord,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoter,
+      InstructionAccountInputAddress<TAccountVoter>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

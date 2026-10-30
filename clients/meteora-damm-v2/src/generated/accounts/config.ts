@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -88,9 +92,9 @@ export type Config = {
 
 export type ConfigArgs = {
   /** Vault config key */
-  vaultConfigKey: Address;
+  vaultConfigKey: Address | HasAddress;
   /** Only pool_creator_authority can use the current config to initialize new pool. When it's Pubkey::default, it's a public config. */
-  poolCreatorAuthority: Address;
+  poolCreatorAuthority: Address | HasAddress;
   /** Pool fee */
   poolFees: PoolFeesConfigArgs;
   /** Activation type */
@@ -174,8 +178,10 @@ export function decodeConfig<TAddress extends string = string>(
 }
 
 export async function fetchConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Config, TAddress>> {
   const maybeAccount = await fetchMaybeConfig(rpc, address, config);
@@ -184,17 +190,25 @@ export async function fetchConfig<TAddress extends string = string>(
 }
 
 export async function fetchMaybeConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Config, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeConfig(maybeAccount);
 }
 
 export async function fetchAllConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Config>[]> {
   const maybeAccounts = await fetchAllMaybeConfig(rpc, addresses, config);
@@ -203,10 +217,16 @@ export async function fetchAllConfig(
 }
 
 export async function fetchAllMaybeConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Config>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeConfig(maybeAccount));
 }

@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type Lockup = {
@@ -55,7 +56,7 @@ export type LockupArgs = {
    * custodian signature on a transaction exempts the operation from
    * lockup constraints
    */
-  custodian: Address;
+  custodian: Address | HasAddress;
 };
 
 export function getLockupEncoder(): FixedSizeEncoder<LockupArgs> {

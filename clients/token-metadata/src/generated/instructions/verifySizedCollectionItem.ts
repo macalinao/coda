@@ -28,14 +28,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -126,38 +129,42 @@ export function getVerifySizedCollectionItemInstructionDataCodec(): FixedSizeCod
 }
 
 export type VerifySizedCollectionItemAsyncInput<
-  TAccountMetadata extends string = string,
-  TAccountCollectionAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountCollectionMint extends string = string,
-  TAccountCollection extends string = string,
-  TAccountCollectionMasterEditionAccount extends string = string,
-  TAccountCollectionAuthorityRecord extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollectionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountCollectionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollectionMasterEditionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Collection Update authority */
-  collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
+  collectionAuthority: TAccountCollectionAuthority;
   /** payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Mint of the Collection */
-  collectionMint: Address<TAccountCollectionMint>;
+  collectionMint: TAccountCollectionMint;
   /** Metadata Account of the Collection */
-  collection?: Address<TAccountCollection>;
+  collection?: TAccountCollection;
   /** MasterEdition2 Account of the Collection Token */
-  collectionMasterEditionAccount?: Address<TAccountCollectionMasterEditionAccount>;
+  collectionMasterEditionAccount?: TAccountCollectionMasterEditionAccount;
   /** Collection Authority Record PDA */
-  collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
+  collectionAuthorityRecord?: TAccountCollectionAuthorityRecord;
 };
 
 export async function getVerifySizedCollectionItemInstructionAsync<
-  TAccountMetadata extends string,
-  TAccountCollectionAuthority extends string,
-  TAccountPayer extends string,
-  TAccountCollectionMint extends string,
-  TAccountCollection extends string,
-  TAccountCollectionMasterEditionAccount extends string,
-  TAccountCollectionAuthorityRecord extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountCollectionAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountCollectionMint extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountCollectionMasterEditionAccount extends InstructionAccountInput,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: VerifySizedCollectionItemAsyncInput<
@@ -169,39 +176,87 @@ export async function getVerifySizedCollectionItemInstructionAsync<
     TAccountCollectionMasterEditionAccount,
     TAccountCollectionAuthorityRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   VerifySizedCollectionItemInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountCollectionAuthority,
-    TAccountPayer,
-    TAccountCollectionMint,
-    TAccountCollection,
-    TAccountCollectionMasterEditionAccount,
-    TAccountCollectionAuthorityRecord
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthority,
+      InstructionAccountInputAddress<TAccountCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMint,
+      InstructionAccountInputAddress<TAccountCollectionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMasterEditionAccount,
+      InstructionAccountInputAddress<TAccountCollectionMasterEditionAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     collectionAuthority: {
       value: input.collectionAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    collectionMint: { value: input.collectionMint ?? null, isWritable: false },
-    collection: { value: input.collection ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    collectionMint: {
+      value: input.collectionMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     collectionMasterEditionAccount: {
       value: input.collectionMasterEditionAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     collectionAuthorityRecord: {
       value: input.collectionAuthorityRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -236,7 +291,6 @@ export async function getVerifySizedCollectionItemInstructionAsync<
     );
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -257,49 +311,74 @@ export async function getVerifySizedCollectionItemInstructionAsync<
     programAddress,
   } as VerifySizedCollectionItemInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountCollectionAuthority,
-    TAccountPayer,
-    TAccountCollectionMint,
-    TAccountCollection,
-    TAccountCollectionMasterEditionAccount,
-    TAccountCollectionAuthorityRecord
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthority,
+      InstructionAccountInputAddress<TAccountCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMint,
+      InstructionAccountInputAddress<TAccountCollectionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMasterEditionAccount,
+      InstructionAccountInputAddress<TAccountCollectionMasterEditionAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >
   >);
 }
 
 export type VerifySizedCollectionItemInput<
-  TAccountMetadata extends string = string,
-  TAccountCollectionAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountCollectionMint extends string = string,
-  TAccountCollection extends string = string,
-  TAccountCollectionMasterEditionAccount extends string = string,
-  TAccountCollectionAuthorityRecord extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollectionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountCollectionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollectionMasterEditionAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Collection Update authority */
-  collectionAuthority: TransactionSigner<TAccountCollectionAuthority>;
+  collectionAuthority: TAccountCollectionAuthority;
   /** payer */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** Mint of the Collection */
-  collectionMint: Address<TAccountCollectionMint>;
+  collectionMint: TAccountCollectionMint;
   /** Metadata Account of the Collection */
-  collection: Address<TAccountCollection>;
+  collection: TAccountCollection;
   /** MasterEdition2 Account of the Collection Token */
-  collectionMasterEditionAccount: Address<TAccountCollectionMasterEditionAccount>;
+  collectionMasterEditionAccount: TAccountCollectionMasterEditionAccount;
   /** Collection Authority Record PDA */
-  collectionAuthorityRecord?: Address<TAccountCollectionAuthorityRecord>;
+  collectionAuthorityRecord?: TAccountCollectionAuthorityRecord;
 };
 
 export function getVerifySizedCollectionItemInstruction<
-  TAccountMetadata extends string,
-  TAccountCollectionAuthority extends string,
-  TAccountPayer extends string,
-  TAccountCollectionMint extends string,
-  TAccountCollection extends string,
-  TAccountCollectionMasterEditionAccount extends string,
-  TAccountCollectionAuthorityRecord extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountCollectionAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountCollectionMint extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountCollectionMasterEditionAccount extends InstructionAccountInput,
+  TAccountCollectionAuthorityRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: VerifySizedCollectionItemInput<
@@ -311,37 +390,85 @@ export function getVerifySizedCollectionItemInstruction<
     TAccountCollectionMasterEditionAccount,
     TAccountCollectionAuthorityRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): VerifySizedCollectionItemInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountCollectionAuthority,
-  TAccountPayer,
-  TAccountCollectionMint,
-  TAccountCollection,
-  TAccountCollectionMasterEditionAccount,
-  TAccountCollectionAuthorityRecord
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionAuthority,
+    InstructionAccountInputAddress<TAccountCollectionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionMint,
+    InstructionAccountInputAddress<TAccountCollectionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionMasterEditionAccount,
+    InstructionAccountInputAddress<TAccountCollectionMasterEditionAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectionAuthorityRecord,
+    InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     collectionAuthority: {
       value: input.collectionAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    collectionMint: { value: input.collectionMint ?? null, isWritable: false },
-    collection: { value: input.collection ?? null, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    collectionMint: {
+      value: input.collectionMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     collectionMasterEditionAccount: {
       value: input.collectionMasterEditionAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     collectionAuthorityRecord: {
       value: input.collectionAuthorityRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -350,7 +477,6 @@ export function getVerifySizedCollectionItemInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -371,13 +497,34 @@ export function getVerifySizedCollectionItemInstruction<
     programAddress,
   } as VerifySizedCollectionItemInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountCollectionAuthority,
-    TAccountPayer,
-    TAccountCollectionMint,
-    TAccountCollection,
-    TAccountCollectionMasterEditionAccount,
-    TAccountCollectionAuthorityRecord
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthority,
+      InstructionAccountInputAddress<TAccountCollectionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMint,
+      InstructionAccountInputAddress<TAccountCollectionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionMasterEditionAccount,
+      InstructionAccountInputAddress<TAccountCollectionMasterEditionAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectionAuthorityRecord,
+      InstructionAccountInputAddress<TAccountCollectionAuthorityRecord>
+    >
   >);
 }
 

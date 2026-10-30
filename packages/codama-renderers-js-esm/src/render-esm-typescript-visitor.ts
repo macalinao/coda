@@ -3,6 +3,7 @@ import { getRenderMapVisitor } from "@codama/renderers-js";
 import type { InstructionNode, ProgramNode, RootNode } from "codama";
 import { rootNodeVisitor, visit } from "codama";
 import { makeSyntaxErasable } from "./erasable-syntax.ts";
+import { allowUndefinedProgramAddress } from "./exact-optional-program-address.ts";
 
 /**
  * Renders an instruction's `docs` as a top-level JSDoc block. Returns an empty
@@ -89,8 +90,12 @@ export function renderESMTypeScriptVisitor(
     renderMap = mapRenderMapContent(renderMap, (code) => {
       // The upstream renderer emits `enum` declarations and an angle-bracket
       // assertion on the program plugin, neither of which survives
-      // `erasableSyntaxOnly` or Node.js type stripping.
-      return makeSyntaxErasable(injectInstructionDocs(code, instructions));
+      // `erasableSyntaxOnly` or Node.js type stripping. The plugin also
+      // forwards `programAddress: undefined` to instruction builders, which
+      // `exactOptionalPropertyTypes` rejects unless they accept it.
+      return allowUndefinedProgramAddress(
+        makeSyntaxErasable(injectInstructionDocs(code, instructions)),
+      );
     });
 
     writeRenderMap(renderMap, path);

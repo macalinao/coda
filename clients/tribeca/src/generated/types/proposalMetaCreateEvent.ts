@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ProposalMetaCreateEvent = {
@@ -31,7 +32,12 @@ export type ProposalMetaCreateEvent = {
   descriptionLink: string;
 };
 
-export type ProposalMetaCreateEventArgs = ProposalMetaCreateEvent;
+export type ProposalMetaCreateEventArgs = {
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
+  title: string;
+  descriptionLink: string;
+};
 
 export function getProposalMetaCreateEventEncoder(): Encoder<ProposalMetaCreateEventArgs> {
   return getStructEncoder([

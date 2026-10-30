@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -527,49 +528,62 @@ export type LockedVoterPluginAccounts = {
 export type LockedVoterPluginInstructions = {
   newLocker: (
     input: MakeOptional<NewLockerInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewLockerInstruction> & SelfPlanAndSendFunctions;
   newEscrow: (
     input: MakeOptional<NewEscrowInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewEscrowInstruction> & SelfPlanAndSendFunctions;
   lock: (
     input: LockInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockInstruction> & SelfPlanAndSendFunctions;
   lockWithWhitelist: (
     input: LockWithWhitelistInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockWithWhitelistInstruction> &
     SelfPlanAndSendFunctions;
   lockWithWhitelistEntry: (
     input: LockWithWhitelistEntryInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockWithWhitelistEntryInstruction> &
     SelfPlanAndSendFunctions;
   lockPermissionless: (
     input: LockPermissionlessInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLockPermissionlessInstruction> &
     SelfPlanAndSendFunctions;
   exit: (
     input: MakeOptional<ExitInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getExitInstruction> & SelfPlanAndSendFunctions;
   activateProposal: (
     input: ActivateProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getActivateProposalInstruction> &
     SelfPlanAndSendFunctions;
   castVote: (
     input: CastVoteInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCastVoteInstruction> & SelfPlanAndSendFunctions;
   setVoteDelegate: (
     input: SetVoteDelegateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetVoteDelegateInstruction> &
     SelfPlanAndSendFunctions;
   setLockerParams: (
     input: SetLockerParamsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetLockerParamsInstruction> &
     SelfPlanAndSendFunctions;
   approveProgramLockPrivilege: (
     input: MakeOptional<ApproveProgramLockPrivilegeInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getApproveProgramLockPrivilegeInstruction> &
     SelfPlanAndSendFunctions;
   revokeProgramLockPrivilege: (
     input: MakeOptional<RevokeProgramLockPrivilegeInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRevokeProgramLockPrivilegeInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -587,7 +601,9 @@ export type LockedVoterPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function lockedVoterProgram() {
+export function lockedVoterProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends LockedVoterPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { lockedVoter: LockedVoterPlugin }> => {
@@ -602,85 +618,142 @@ export function lockedVoterProgram() {
           escrow: addSelfFetchFunctions(client, getEscrowCodec()),
         },
         instructions: {
-          newLocker: (input) =>
+          newLocker: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewLockerInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getNewLockerInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          newEscrow: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewEscrowInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          lock: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getLockInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newEscrow: (input) =>
+          lockWithWhitelist: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewEscrowInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getLockWithWhitelistInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          lock: (input) =>
-            addSelfPlanAndSendFunctions(client, getLockInstruction(input)),
-          lockWithWhitelist: (input) =>
+          lockWithWhitelistEntry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getLockWithWhitelistInstruction(input),
-            ),
-          lockWithWhitelistEntry: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getLockWithWhitelistEntryInstruction(input),
-            ),
-          lockPermissionless: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getLockPermissionlessInstruction(input),
-            ),
-          exit: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getExitInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getLockWithWhitelistEntryInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          activateProposal: (input) =>
+          lockPermissionless: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getActivateProposalInstruction(input),
-            ),
-          castVote: (input) =>
-            addSelfPlanAndSendFunctions(client, getCastVoteInstruction(input)),
-          setVoteDelegate: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetVoteDelegateInstruction(input),
-            ),
-          setLockerParams: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetLockerParamsInstruction(input),
-            ),
-          approveProgramLockPrivilege: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getApproveProgramLockPrivilegeInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getLockPermissionlessInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          revokeProgramLockPrivilege: (input) =>
+          exit: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRevokeProgramLockPrivilegeInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getExitInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          activateProposal: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getActivateProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
+            ),
+          castVote: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCastVoteInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setVoteDelegate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetVoteDelegateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          setLockerParams: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getSetLockerParamsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          approveProgramLockPrivilege: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getApproveProgramLockPrivilegeInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          revokeProgramLockPrivilege: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRevokeProgramLockPrivilegeInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
         pdas: {
-          locker: findLockerPda,
-          escrow: findEscrowPda,
-          whitelist: findWhitelistPda,
+          locker: (seeds, pdaConfig) =>
+            findLockerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          escrow: (seeds, pdaConfig) =>
+            findEscrowPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          whitelist: (seeds, pdaConfig) =>
+            findWhitelistPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyLockedVoterAccount,
         identifyInstruction: identifyLockedVoterInstruction,

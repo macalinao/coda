@@ -26,6 +26,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 
 /**
@@ -38,7 +39,16 @@ export type RuleSet =
   | { __kind: "ProgramAllowList"; fields: readonly [Array<Address>] }
   | { __kind: "ProgramDenyList"; fields: readonly [Array<Address>] };
 
-export type RuleSetArgs = RuleSet;
+export type RuleSetArgs =
+  | { __kind: "None" }
+  | {
+      __kind: "ProgramAllowList";
+      fields: readonly [Array<Address | HasAddress>];
+    }
+  | {
+      __kind: "ProgramDenyList";
+      fields: readonly [Array<Address | HasAddress>];
+    };
 
 export function getRuleSetEncoder(): Encoder<RuleSetArgs> {
   return getDiscriminatedUnionEncoder([

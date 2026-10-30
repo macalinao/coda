@@ -33,12 +33,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findEventAuthorityPda } from "../pdas/index.ts";
 import { CP_AMM_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -125,24 +128,25 @@ export function getUpdateRewardDurationInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateRewardDurationAsyncInput<
-  TAccountPool extends string = string,
-  TAccountSigner extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  signer: TransactionSigner<TAccountSigner>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  pool: TAccountPool;
+  signer: TAccountSigner;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
   rewardIndex: UpdateRewardDurationInstructionDataArgs["rewardIndex"];
   newDuration: UpdateRewardDurationInstructionDataArgs["newDuration"];
 };
 
 export async function getUpdateRewardDurationInstructionAsync<
-  TAccountPool extends string,
-  TAccountSigner extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: UpdateRewardDurationAsyncInput<
@@ -151,25 +155,57 @@ export async function getUpdateRewardDurationInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   UpdateRewardDurationInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountSigner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    signer: { value: input.signer ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: false },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -190,7 +226,6 @@ export async function getUpdateRewardDurationInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -204,32 +239,45 @@ export async function getUpdateRewardDurationInstructionAsync<
     programAddress,
   } as UpdateRewardDurationInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountSigner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type UpdateRewardDurationInput<
-  TAccountPool extends string = string,
-  TAccountSigner extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  signer: TransactionSigner<TAccountSigner>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  pool: TAccountPool;
+  signer: TAccountSigner;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
   rewardIndex: UpdateRewardDurationInstructionDataArgs["rewardIndex"];
   newDuration: UpdateRewardDurationInstructionDataArgs["newDuration"];
 };
 
 export function getUpdateRewardDurationInstruction<
-  TAccountPool extends string,
-  TAccountSigner extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountSigner extends InstructionSignerInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: UpdateRewardDurationInput<
@@ -238,23 +286,55 @@ export function getUpdateRewardDurationInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateRewardDurationInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountSigner,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSigner,
+    InstructionAccountInputAddress<TAccountSigner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: true },
-    signer: { value: input.signer ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: true },
+    signer: { value: input.signer ?? null, isSigner: true, isWritable: false },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -270,7 +350,6 @@ export function getUpdateRewardDurationInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -284,10 +363,22 @@ export function getUpdateRewardDurationInstruction<
     programAddress,
   } as UpdateRewardDurationInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountSigner,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSigner,
+      InstructionAccountInputAddress<TAccountSigner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

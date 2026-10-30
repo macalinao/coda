@@ -11,22 +11,28 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type EscrowSeeds = {
-  locker: Address;
-  authority: Address;
+  locker: Address | HasAddress;
+  authority: Address | HasAddress;
 };
 
 /** Escrow account that holds locked tokens for a user */
 export async function findEscrowPda(
   seeds: EscrowSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
+    programAddress:
+      programAddressInput = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

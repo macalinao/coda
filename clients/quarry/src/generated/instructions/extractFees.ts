@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -101,22 +104,25 @@ export function getExtractFeesInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ExtractFeesInput<
-  TAccountRewarder extends string = string,
-  TAccountClaimFeeTokenAccount extends string = string,
-  TAccountFeeToTokenAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeToTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  rewarder: Address<TAccountRewarder>;
-  claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
-  feeToTokenAccount: Address<TAccountFeeToTokenAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  rewarder: TAccountRewarder;
+  claimFeeTokenAccount: TAccountClaimFeeTokenAccount;
+  feeToTokenAccount: TAccountFeeToTokenAccount;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getExtractFeesInstruction<
-  TAccountRewarder extends string,
-  TAccountClaimFeeTokenAccount extends string,
-  TAccountFeeToTokenAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput,
+  TAccountFeeToTokenAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: ExtractFeesInput<
@@ -125,29 +131,64 @@ export function getExtractFeesInstruction<
     TAccountFeeToTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ExtractFeesInstruction<
   TProgramAddress,
-  TAccountRewarder,
-  TAccountClaimFeeTokenAccount,
-  TAccountFeeToTokenAccount,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountClaimFeeTokenAccount,
+    InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeToTokenAccount,
+    InstructionAccountInputAddress<TAccountFeeToTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    rewarder: { value: input.rewarder ?? null, isWritable: false },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     claimFeeTokenAccount: {
       value: input.claimFeeTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     feeToTokenAccount: {
       value: input.feeToTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -160,7 +201,6 @@ export function getExtractFeesInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("rewarder", accounts.rewarder),
@@ -172,10 +212,22 @@ export function getExtractFeesInstruction<
     programAddress,
   } as ExtractFeesInstruction<
     TProgramAddress,
-    TAccountRewarder,
-    TAccountClaimFeeTokenAccount,
-    TAccountFeeToTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeTokenAccount,
+      InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeToTokenAccount,
+      InstructionAccountInputAddress<TAccountFeeToTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

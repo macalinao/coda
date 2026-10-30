@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** A single creator entry recorded by the `VerifiedCreators` plugin. */
@@ -28,7 +29,12 @@ export type VerifiedCreatorsSignature = {
   verified: boolean;
 };
 
-export type VerifiedCreatorsSignatureArgs = VerifiedCreatorsSignature;
+export type VerifiedCreatorsSignatureArgs = {
+  /** The creator's address. */
+  address: Address | HasAddress;
+  /** Whether this creator has signed to verify their inclusion. */
+  verified: boolean;
+};
 
 export function getVerifiedCreatorsSignatureEncoder(): FixedSizeEncoder<VerifiedCreatorsSignatureArgs> {
   return getStructEncoder([

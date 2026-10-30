@@ -28,13 +28,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findLendingGlobalConfigStatePda } from "../pdas/index.ts";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -112,25 +115,27 @@ export function getInitGlobalConfigInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitGlobalConfigAsyncInput<
-  TAccountPayer extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountProgramData extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  payer: TransactionSigner<TAccountPayer>;
-  globalConfig?: Address<TAccountGlobalConfig>;
-  programData: Address<TAccountProgramData>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  payer: TAccountPayer;
+  globalConfig?: TAccountGlobalConfig;
+  programData: TAccountProgramData;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export async function getInitGlobalConfigInstructionAsync<
-  TAccountPayer extends string,
-  TAccountGlobalConfig extends string,
-  TAccountProgramData extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitGlobalConfigAsyncInput<
@@ -140,28 +145,67 @@ export async function getInitGlobalConfigInstructionAsync<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   InitGlobalConfigInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountGlobalConfig,
-    TAccountProgramData,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
-    programData: { value: input.programData ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    programData: {
+      value: input.programData ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -183,7 +227,6 @@ export async function getInitGlobalConfigInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -196,34 +239,51 @@ export async function getInitGlobalConfigInstructionAsync<
     programAddress,
   } as InitGlobalConfigInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountGlobalConfig,
-    TAccountProgramData,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 
 export type InitGlobalConfigInput<
-  TAccountPayer extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountProgramData extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  payer: TransactionSigner<TAccountPayer>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  programData: Address<TAccountProgramData>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  payer: TAccountPayer;
+  globalConfig: TAccountGlobalConfig;
+  programData: TAccountProgramData;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export function getInitGlobalConfigInstruction<
-  TAccountPayer extends string,
-  TAccountGlobalConfig extends string,
-  TAccountProgramData extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitGlobalConfigInput<
@@ -233,26 +293,65 @@ export function getInitGlobalConfigInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitGlobalConfigInstruction<
   TProgramAddress,
-  TAccountPayer,
-  TAccountGlobalConfig,
-  TAccountProgramData,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgramData,
+    InstructionAccountInputAddress<TAccountProgramData>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: true },
-    programData: { value: input.programData ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    programData: {
+      value: input.programData ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -269,7 +368,6 @@ export function getInitGlobalConfigInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -282,11 +380,26 @@ export function getInitGlobalConfigInstruction<
     programAddress,
   } as InitGlobalConfigInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountGlobalConfig,
-    TAccountProgramData,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

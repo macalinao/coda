@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getBigFractionBytesDecoder,
@@ -50,7 +51,7 @@ export type ObligationLiquidity = {
 
 export type ObligationLiquidityArgs = {
   /** Reserve liquidity is borrowed from */
-  borrowReserve: Address;
+  borrowReserve: Address | HasAddress;
   /** Borrow rate used for calculating interest (big scaled fraction) */
   cumulativeBorrowRateBsf: BigFractionBytesArgs;
   padding: number | bigint;

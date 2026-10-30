@@ -30,6 +30,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -90,7 +91,7 @@ export type MetadataArgsV2Args = {
   /** Creator array */
   creators: Array<CreatorArgs>;
   /** Collection.  Note in V2 its just a `Pubkey` and is always considered verified. */
-  collection: OptionOrNullable<Address>;
+  collection: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getMetadataArgsV2Encoder(): Encoder<MetadataArgsV2Args> {

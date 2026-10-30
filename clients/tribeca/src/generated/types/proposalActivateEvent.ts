@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ProposalActivateEvent = {
@@ -27,8 +28,8 @@ export type ProposalActivateEvent = {
 };
 
 export type ProposalActivateEventArgs = {
-  governor: Address;
-  proposal: Address;
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
   votingEndsAt: number | bigint;
 };
 

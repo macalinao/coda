@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ProposalAccountMeta = {
@@ -26,7 +27,11 @@ export type ProposalAccountMeta = {
   isWritable: boolean;
 };
 
-export type ProposalAccountMetaArgs = ProposalAccountMeta;
+export type ProposalAccountMetaArgs = {
+  pubkey: Address | HasAddress;
+  isSigner: boolean;
+  isWritable: boolean;
+};
 
 export function getProposalAccountMetaEncoder(): FixedSizeEncoder<ProposalAccountMetaArgs> {
   return getStructEncoder([

@@ -30,6 +30,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -45,7 +46,13 @@ export type Seed =
   | { __kind: "Address"; fields: readonly [Address] }
   | { __kind: "Bytes"; fields: readonly [ReadonlyUint8Array] };
 
-export type SeedArgs = Seed;
+export type SeedArgs =
+  | { __kind: "Collection" }
+  | { __kind: "Owner" }
+  | { __kind: "Recipient" }
+  | { __kind: "Asset" }
+  | { __kind: "Address"; fields: readonly [Address | HasAddress] }
+  | { __kind: "Bytes"; fields: readonly [ReadonlyUint8Array] };
 
 export function getSeedEncoder(): Encoder<SeedArgs> {
   return getDiscriminatedUnionEncoder([

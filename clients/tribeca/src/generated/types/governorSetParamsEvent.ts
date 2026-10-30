@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getGovernanceParametersDecoder,
@@ -31,7 +32,7 @@ export type GovernorSetParamsEvent = {
 };
 
 export type GovernorSetParamsEventArgs = {
-  governor: Address;
+  governor: Address | HasAddress;
   prevParams: GovernanceParametersArgs;
   params: GovernanceParametersArgs;
 };

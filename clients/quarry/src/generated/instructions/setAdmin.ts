@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -98,45 +101,73 @@ export function getSetAdminInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetAdminInput<
-  TAccountOperator extends string = string,
-  TAccountAdmin extends string = string,
-  TAccountDelegate extends string = string,
+  TAccountOperator extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountDelegate extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  operator: Address<TAccountOperator>;
-  admin: TransactionSigner<TAccountAdmin>;
-  delegate: Address<TAccountDelegate>;
+  operator: TAccountOperator;
+  admin: TAccountAdmin;
+  delegate: TAccountDelegate;
 };
 
 export function getSetAdminInstruction<
-  TAccountOperator extends string,
-  TAccountAdmin extends string,
-  TAccountDelegate extends string,
+  TAccountOperator extends InstructionAccountInput,
+  TAccountAdmin extends InstructionSignerInput,
+  TAccountDelegate extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: SetAdminInput<TAccountOperator, TAccountAdmin, TAccountDelegate>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetAdminInstruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountAdmin,
-  TAccountDelegate
+  ResolvedInstructionAccountMeta<
+    TAccountOperator,
+    InstructionAccountInputAddress<TAccountOperator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAdmin,
+    InstructionAccountInputAddress<TAccountAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDelegate,
+    InstructionAccountInputAddress<TAccountDelegate>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    admin: { value: input.admin ?? null, isWritable: false },
-    delegate: { value: input.delegate ?? null, isWritable: false },
+    operator: {
+      value: input.operator ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    admin: { value: input.admin ?? null, isSigner: true, isWritable: false },
+    delegate: {
+      value: input.delegate ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("operator", accounts.operator),
@@ -147,9 +178,18 @@ export function getSetAdminInstruction<
     programAddress,
   } as SetAdminInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountAdmin,
-    TAccountDelegate
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAdmin,
+      InstructionAccountInputAddress<TAccountAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegate,
+      InstructionAccountInputAddress<TAccountDelegate>
+    >
   >);
 }
 

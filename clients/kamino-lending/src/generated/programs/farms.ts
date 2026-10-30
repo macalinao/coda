@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -866,99 +867,124 @@ export type FarmsPluginAccounts = {
 export type FarmsPluginInstructions = {
   initializeGlobalConfig: (
     input: InitializeGlobalConfigAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeGlobalConfigInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateGlobalConfig: (
     input: UpdateGlobalConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateGlobalConfigInstruction> &
     SelfPlanAndSendFunctions;
   initializeFarm: (
     input: InitializeFarmAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeFarmInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeFarmDelegated: (
     input: InitializeFarmDelegatedAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeFarmDelegatedInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeReward: (
     input: InitializeRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   addRewards: (
     input: MakeOptional<AddRewardsAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAddRewardsInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateFarmConfig: (
     input: UpdateFarmConfigInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateFarmConfigInstruction> &
     SelfPlanAndSendFunctions;
   initializeUser: (
     input: MakeOptional<InitializeUserAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeUserInstructionAsync> &
     SelfPlanAndSendFunctions;
   transferOwnership: (
     input: TransferOwnershipInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferOwnershipInstruction> &
     SelfPlanAndSendFunctions;
   rewardUserOnce: (
     input: RewardUserOnceInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRewardUserOnceInstruction> &
     SelfPlanAndSendFunctions;
   refreshFarm: (
     input: RefreshFarmInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshFarmInstruction> & SelfPlanAndSendFunctions;
   stake: (
     input: StakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getStakeInstructionAsync> & SelfPlanAndSendFunctions;
   setStakeDelegated: (
     input: SetStakeDelegatedInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetStakeDelegatedInstruction> &
     SelfPlanAndSendFunctions;
   harvestReward: (
     input: HarvestRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getHarvestRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   unstake: (
     input: UnstakeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnstakeInstructionAsync> & SelfPlanAndSendFunctions;
   refreshUserState: (
     input: RefreshUserStateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRefreshUserStateInstruction> &
     SelfPlanAndSendFunctions;
   withdrawUnstakedDeposits: (
     input: WithdrawUnstakedDepositsAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawUnstakedDepositsInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawTreasury: (
     input: WithdrawTreasuryAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawTreasuryInstructionAsync> &
     SelfPlanAndSendFunctions;
   depositToFarmVault: (
     input: DepositToFarmVaultInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositToFarmVaultInstruction> &
     SelfPlanAndSendFunctions;
   withdrawFromFarmVault: (
     input: WithdrawFromFarmVaultAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawFromFarmVaultInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawSlashedAmount: (
     input: WithdrawSlashedAmountAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawSlashedAmountInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateFarmAdmin: (
     input: UpdateFarmAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateFarmAdminInstruction> &
     SelfPlanAndSendFunctions;
   updateGlobalConfigAdmin: (
     input: UpdateGlobalConfigAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateGlobalConfigAdminInstruction> &
     SelfPlanAndSendFunctions;
   withdrawReward: (
     input: WithdrawRewardAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawRewardInstructionAsync> &
     SelfPlanAndSendFunctions;
   farmsIdlMissingTypes: (
     input: FarmsIdlMissingTypesInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getFarmsIdlMissingTypesInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -979,7 +1005,9 @@ export type FarmsPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function farmsProgram() {
+export function farmsProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends FarmsPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { farms: FarmsPlugin }> => {
@@ -998,145 +1026,244 @@ export function farmsProgram() {
           oraclePrices: addSelfFetchFunctions(client, getOraclePricesCodec()),
         },
         instructions: {
-          initializeGlobalConfig: (input) =>
+          initializeGlobalConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeGlobalConfigInstructionAsync(input),
-            ),
-          updateGlobalConfig: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUpdateGlobalConfigInstruction(input),
-            ),
-          initializeFarm: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitializeFarmInstructionAsync(input),
-            ),
-          initializeFarmDelegated: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitializeFarmDelegatedInstructionAsync(input),
-            ),
-          initializeReward: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitializeRewardInstructionAsync(input),
-            ),
-          addRewards: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getAddRewardsInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getInitializeGlobalConfigInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          updateFarmConfig: (input) =>
+          updateGlobalConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateFarmConfigInstruction(input),
-            ),
-          initializeUser: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getInitializeUserInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUpdateGlobalConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          transferOwnership: (input) =>
+          initializeFarm: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferOwnershipInstruction(input),
+              getInitializeFarmInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          rewardUserOnce: (input) =>
+          initializeFarmDelegated: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRewardUserOnceInstruction(input),
+              getInitializeFarmDelegatedInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          refreshFarm: (input) =>
+          initializeReward: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRefreshFarmInstruction(input),
+              getInitializeRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          stake: (input) =>
+          addRewards: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getStakeInstructionAsync(input),
+              getAddRewardsInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          setStakeDelegated: (input) =>
+          updateFarmConfig: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetStakeDelegatedInstruction(input),
+              getUpdateFarmConfigInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          harvestReward: (input) =>
+          initializeUser: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getHarvestRewardInstructionAsync(input),
+              getInitializeUserInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          unstake: (input) =>
+          transferOwnership: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnstakeInstructionAsync(input),
+              getTransferOwnershipInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          refreshUserState: (input) =>
+          rewardUserOnce: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRefreshUserStateInstruction(input),
+              getRewardUserOnceInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawUnstakedDeposits: (input) =>
+          refreshFarm: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawUnstakedDepositsInstructionAsync(input),
+              getRefreshFarmInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawTreasury: (input) =>
+          stake: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawTreasuryInstructionAsync(input),
+              getStakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          depositToFarmVault: (input) =>
+          setStakeDelegated: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getDepositToFarmVaultInstruction(input),
+              getSetStakeDelegatedInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawFromFarmVault: (input) =>
+          harvestReward: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawFromFarmVaultInstructionAsync(input),
+              getHarvestRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawSlashedAmount: (input) =>
+          unstake: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawSlashedAmountInstructionAsync(input),
+              getUnstakeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateFarmAdmin: (input) =>
+          refreshUserState: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateFarmAdminInstruction(input),
+              getRefreshUserStateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateGlobalConfigAdmin: (input) =>
+          withdrawUnstakedDeposits: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateGlobalConfigAdminInstruction(input),
+              getWithdrawUnstakedDepositsInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawReward: (input) =>
+          withdrawTreasury: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawRewardInstructionAsync(input),
+              getWithdrawTreasuryInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          farmsIdlMissingTypes: (input) =>
+          depositToFarmVault: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getFarmsIdlMissingTypesInstruction(input),
+              getDepositToFarmVaultInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawFromFarmVault: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawFromFarmVaultInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawSlashedAmount: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawSlashedAmountInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateFarmAdmin: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateFarmAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          updateGlobalConfigAdmin: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getUpdateGlobalConfigAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          withdrawReward: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getWithdrawRewardInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
+            ),
+          farmsIdlMissingTypes: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getFarmsIdlMissingTypesInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          rewardTreasuryVault: findRewardTreasuryVaultPda,
-          treasuryVaultsAuthority: findTreasuryVaultsAuthorityPda,
-          farmVaultsAuthority: findFarmVaultsAuthorityPda,
-          farmVault: findFarmVaultPda,
-          rewardVault: findRewardVaultPda,
-          farmsUserState: findFarmsUserStatePda,
+          rewardTreasuryVault: (seeds, pdaConfig) =>
+            findRewardTreasuryVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          treasuryVaultsAuthority: (seeds, pdaConfig) =>
+            findTreasuryVaultsAuthorityPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          farmVaultsAuthority: (seeds, pdaConfig) =>
+            findFarmVaultsAuthorityPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          farmVault: (seeds, pdaConfig) =>
+            findFarmVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          rewardVault: (seeds, pdaConfig) =>
+            findRewardVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          farmsUserState: (seeds, pdaConfig) =>
+            findFarmsUserStatePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyFarmsAccount,
         identifyInstruction: identifyFarmsInstruction,

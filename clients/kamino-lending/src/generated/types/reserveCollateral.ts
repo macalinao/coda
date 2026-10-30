@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Reserve collateral */
@@ -38,11 +39,11 @@ export type ReserveCollateral = {
 
 export type ReserveCollateralArgs = {
   /** Reserve collateral mint address */
-  mintPubkey: Address;
+  mintPubkey: Address | HasAddress;
   /** Reserve collateral mint supply, used for exchange rate */
   mintTotalSupply: number | bigint;
   /** Reserve collateral supply address */
-  supplyVault: Address;
+  supplyVault: Address | HasAddress;
   padding1: Array<number | bigint>;
   padding2: Array<number | bigint>;
 };

@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -112,16 +115,17 @@ export function getSetFundingAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetFundingAuthorityInput<
-  TAccountStakePool extends string = string,
-  TAccountManager extends string = string,
-  TAccountNewAuthorityPubkey extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewAuthorityPubkey extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Manager */
-  manager: TransactionSigner<TAccountManager>;
+  manager: TAccountManager;
   /** New authority pubkey */
-  newAuthorityPubkey: Address<TAccountNewAuthorityPubkey>;
+  newAuthorityPubkey: TAccountNewAuthorityPubkey;
   fundingType: SetFundingAuthorityInstructionDataArgs["fundingType"];
 };
 
@@ -133,9 +137,9 @@ export type SetFundingAuthorityInput<
  * 2. '[]` New authority pubkey or none
  */
 export function getSetFundingAuthorityInstruction<
-  TAccountStakePool extends string,
-  TAccountManager extends string,
-  TAccountNewAuthorityPubkey extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput,
+  TAccountNewAuthorityPubkey extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: SetFundingAuthorityInput<
@@ -143,23 +147,53 @@ export function getSetFundingAuthorityInstruction<
     TAccountManager,
     TAccountNewAuthorityPubkey
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetFundingAuthorityInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountManager,
-  TAccountNewAuthorityPubkey
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountManager,
+    InstructionAccountInputAddress<TAccountManager>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewAuthorityPubkey,
+    InstructionAccountInputAddress<TAccountNewAuthorityPubkey>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    manager: { value: input.manager ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    manager: {
+      value: input.manager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     newAuthorityPubkey: {
       value: input.newAuthorityPubkey ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -171,7 +205,6 @@ export function getSetFundingAuthorityInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -184,9 +217,18 @@ export function getSetFundingAuthorityInstruction<
     programAddress,
   } as SetFundingAuthorityInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountManager,
-    TAccountNewAuthorityPubkey
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewAuthorityPubkey,
+      InstructionAccountInputAddress<TAccountNewAuthorityPubkey>
+    >
   >);
 }
 

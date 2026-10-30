@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type SetVoteDelegateEvent = {
@@ -24,7 +25,11 @@ export type SetVoteDelegateEvent = {
   newDelegate: Address;
 };
 
-export type SetVoteDelegateEventArgs = SetVoteDelegateEvent;
+export type SetVoteDelegateEventArgs = {
+  escrowOwner: Address | HasAddress;
+  oldDelegate: Address | HasAddress;
+  newDelegate: Address | HasAddress;
+};
 
 export function getSetVoteDelegateEventEncoder(): FixedSizeEncoder<SetVoteDelegateEventArgs> {
   return getStructEncoder([

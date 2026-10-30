@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -126,34 +129,39 @@ export function getCollectProtocolFeesInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CollectProtocolFeesInput<
-  TAccountWhirlpoolsConfig extends string = string,
-  TAccountWhirlpool extends string = string,
-  TAccountCollectProtocolFeesAuthority extends string = string,
-  TAccountTokenVaultA extends string = string,
-  TAccountTokenVaultB extends string = string,
-  TAccountTokenDestinationA extends string = string,
-  TAccountTokenDestinationB extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollectProtocolFeesAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenVaultA extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenVaultB extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenDestinationA extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenDestinationB extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  whirlpoolsConfig: Address<TAccountWhirlpoolsConfig>;
-  whirlpool: Address<TAccountWhirlpool>;
-  collectProtocolFeesAuthority: TransactionSigner<TAccountCollectProtocolFeesAuthority>;
-  tokenVaultA: Address<TAccountTokenVaultA>;
-  tokenVaultB: Address<TAccountTokenVaultB>;
-  tokenDestinationA: Address<TAccountTokenDestinationA>;
-  tokenDestinationB: Address<TAccountTokenDestinationB>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  whirlpoolsConfig: TAccountWhirlpoolsConfig;
+  whirlpool: TAccountWhirlpool;
+  collectProtocolFeesAuthority: TAccountCollectProtocolFeesAuthority;
+  tokenVaultA: TAccountTokenVaultA;
+  tokenVaultB: TAccountTokenVaultB;
+  tokenDestinationA: TAccountTokenDestinationA;
+  tokenDestinationB: TAccountTokenDestinationB;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getCollectProtocolFeesInstruction<
-  TAccountWhirlpoolsConfig extends string,
-  TAccountWhirlpool extends string,
-  TAccountCollectProtocolFeesAuthority extends string,
-  TAccountTokenVaultA extends string,
-  TAccountTokenVaultB extends string,
-  TAccountTokenDestinationA extends string,
-  TAccountTokenDestinationB extends string,
-  TAccountTokenProgram extends string,
+  TAccountWhirlpoolsConfig extends InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountCollectProtocolFeesAuthority extends InstructionSignerInput,
+  TAccountTokenVaultA extends InstructionAccountInput,
+  TAccountTokenVaultB extends InstructionAccountInput,
+  TAccountTokenDestinationA extends InstructionAccountInput,
+  TAccountTokenDestinationB extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: CollectProtocolFeesInput<
@@ -166,43 +174,100 @@ export function getCollectProtocolFeesInstruction<
     TAccountTokenDestinationB,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CollectProtocolFeesInstruction<
   TProgramAddress,
-  TAccountWhirlpoolsConfig,
-  TAccountWhirlpool,
-  TAccountCollectProtocolFeesAuthority,
-  TAccountTokenVaultA,
-  TAccountTokenVaultB,
-  TAccountTokenDestinationA,
-  TAccountTokenDestinationB,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpoolsConfig,
+    InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollectProtocolFeesAuthority,
+    InstructionAccountInputAddress<TAccountCollectProtocolFeesAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultA,
+    InstructionAccountInputAddress<TAccountTokenVaultA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenVaultB,
+    InstructionAccountInputAddress<TAccountTokenVaultB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenDestinationA,
+    InstructionAccountInputAddress<TAccountTokenDestinationA>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenDestinationB,
+    InstructionAccountInputAddress<TAccountTokenDestinationB>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     whirlpoolsConfig: {
       value: input.whirlpoolsConfig ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    whirlpool: { value: input.whirlpool ?? null, isWritable: true },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     collectProtocolFeesAuthority: {
       value: input.collectProtocolFeesAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    tokenVaultA: { value: input.tokenVaultA ?? null, isWritable: true },
-    tokenVaultB: { value: input.tokenVaultB ?? null, isWritable: true },
+    tokenVaultA: {
+      value: input.tokenVaultA ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenVaultB: {
+      value: input.tokenVaultB ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenDestinationA: {
       value: input.tokenDestinationA ?? null,
+      isSigner: false,
       isWritable: true,
     },
     tokenDestinationB: {
       value: input.tokenDestinationB ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -215,7 +280,6 @@ export function getCollectProtocolFeesInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("whirlpoolsConfig", accounts.whirlpoolsConfig),
@@ -234,14 +298,38 @@ export function getCollectProtocolFeesInstruction<
     programAddress,
   } as CollectProtocolFeesInstruction<
     TProgramAddress,
-    TAccountWhirlpoolsConfig,
-    TAccountWhirlpool,
-    TAccountCollectProtocolFeesAuthority,
-    TAccountTokenVaultA,
-    TAccountTokenVaultB,
-    TAccountTokenDestinationA,
-    TAccountTokenDestinationB,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpoolsConfig,
+      InstructionAccountInputAddress<TAccountWhirlpoolsConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollectProtocolFeesAuthority,
+      InstructionAccountInputAddress<TAccountCollectProtocolFeesAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultA,
+      InstructionAccountInputAddress<TAccountTokenVaultA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenVaultB,
+      InstructionAccountInputAddress<TAccountTokenVaultB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenDestinationA,
+      InstructionAccountInputAddress<TAccountTokenDestinationA>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenDestinationB,
+      InstructionAccountInputAddress<TAccountTokenDestinationB>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

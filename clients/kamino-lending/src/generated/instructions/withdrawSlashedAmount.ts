@@ -28,14 +28,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findFarmVaultsAuthorityPda } from "../pdas/index.ts";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -120,28 +123,31 @@ export function getWithdrawSlashedAmountInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type WithdrawSlashedAmountAsyncInput<
-  TAccountCrank extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountSlashedAmountSpillAddress extends string = string,
-  TAccountFarmVault extends string = string,
-  TAccountFarmVaultsAuthority extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountCrank extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSlashedAmountSpillAddress extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  crank: TransactionSigner<TAccountCrank>;
-  farmState: Address<TAccountFarmState>;
-  slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
-  farmVault: Address<TAccountFarmVault>;
-  farmVaultsAuthority?: Address<TAccountFarmVaultsAuthority>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  crank: TAccountCrank;
+  farmState: TAccountFarmState;
+  slashedAmountSpillAddress: TAccountSlashedAmountSpillAddress;
+  farmVault: TAccountFarmVault;
+  farmVaultsAuthority?: TAccountFarmVaultsAuthority;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export async function getWithdrawSlashedAmountInstructionAsync<
-  TAccountCrank extends string,
-  TAccountFarmState extends string,
-  TAccountSlashedAmountSpillAddress extends string,
-  TAccountFarmVault extends string,
-  TAccountFarmVaultsAuthority extends string,
-  TAccountTokenProgram extends string,
+  TAccountCrank extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountSlashedAmountSpillAddress extends InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: WithdrawSlashedAmountAsyncInput<
@@ -152,35 +158,79 @@ export async function getWithdrawSlashedAmountInstructionAsync<
     TAccountFarmVaultsAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   WithdrawSlashedAmountInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountFarmState,
-    TAccountSlashedAmountSpillAddress,
-    TAccountFarmVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSlashedAmountSpillAddress,
+      InstructionAccountInputAddress<TAccountSlashedAmountSpillAddress>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    crank: { value: input.crank ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    slashedAmountSpillAddress: {
-      value: input.slashedAmountSpillAddress ?? null,
+    crank: { value: input.crank ?? null, isSigner: true, isWritable: true },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    slashedAmountSpillAddress: {
+      value: input.slashedAmountSpillAddress ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmVault: {
+      value: input.farmVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     farmVaultsAuthority: {
       value: input.farmVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -204,7 +254,6 @@ export async function getWithdrawSlashedAmountInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("crank", accounts.crank),
@@ -221,38 +270,59 @@ export async function getWithdrawSlashedAmountInstructionAsync<
     programAddress,
   } as WithdrawSlashedAmountInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountFarmState,
-    TAccountSlashedAmountSpillAddress,
-    TAccountFarmVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSlashedAmountSpillAddress,
+      InstructionAccountInputAddress<TAccountSlashedAmountSpillAddress>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type WithdrawSlashedAmountInput<
-  TAccountCrank extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountSlashedAmountSpillAddress extends string = string,
-  TAccountFarmVault extends string = string,
-  TAccountFarmVaultsAuthority extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountCrank extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSlashedAmountSpillAddress extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  crank: TransactionSigner<TAccountCrank>;
-  farmState: Address<TAccountFarmState>;
-  slashedAmountSpillAddress: Address<TAccountSlashedAmountSpillAddress>;
-  farmVault: Address<TAccountFarmVault>;
-  farmVaultsAuthority: Address<TAccountFarmVaultsAuthority>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  crank: TAccountCrank;
+  farmState: TAccountFarmState;
+  slashedAmountSpillAddress: TAccountSlashedAmountSpillAddress;
+  farmVault: TAccountFarmVault;
+  farmVaultsAuthority: TAccountFarmVaultsAuthority;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getWithdrawSlashedAmountInstruction<
-  TAccountCrank extends string,
-  TAccountFarmState extends string,
-  TAccountSlashedAmountSpillAddress extends string,
-  TAccountFarmVault extends string,
-  TAccountFarmVaultsAuthority extends string,
-  TAccountTokenProgram extends string,
+  TAccountCrank extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountSlashedAmountSpillAddress extends InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput,
+  TAccountFarmVaultsAuthority extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: WithdrawSlashedAmountInput<
@@ -263,33 +333,77 @@ export function getWithdrawSlashedAmountInstruction<
     TAccountFarmVaultsAuthority,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WithdrawSlashedAmountInstruction<
   TProgramAddress,
-  TAccountCrank,
-  TAccountFarmState,
-  TAccountSlashedAmountSpillAddress,
-  TAccountFarmVault,
-  TAccountFarmVaultsAuthority,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountCrank,
+    InstructionAccountInputAddress<TAccountCrank>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSlashedAmountSpillAddress,
+    InstructionAccountInputAddress<TAccountSlashedAmountSpillAddress>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmVault,
+    InstructionAccountInputAddress<TAccountFarmVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmVaultsAuthority,
+    InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    crank: { value: input.crank ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    slashedAmountSpillAddress: {
-      value: input.slashedAmountSpillAddress ?? null,
+    crank: { value: input.crank ?? null, isSigner: true, isWritable: true },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    farmVault: { value: input.farmVault ?? null, isWritable: true },
+    slashedAmountSpillAddress: {
+      value: input.slashedAmountSpillAddress ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmVault: {
+      value: input.farmVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     farmVaultsAuthority: {
       value: input.farmVaultsAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -302,7 +416,6 @@ export function getWithdrawSlashedAmountInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("crank", accounts.crank),
@@ -319,12 +432,30 @@ export function getWithdrawSlashedAmountInstruction<
     programAddress,
   } as WithdrawSlashedAmountInstruction<
     TProgramAddress,
-    TAccountCrank,
-    TAccountFarmState,
-    TAccountSlashedAmountSpillAddress,
-    TAccountFarmVault,
-    TAccountFarmVaultsAuthority,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCrank,
+      InstructionAccountInputAddress<TAccountCrank>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSlashedAmountSpillAddress,
+      InstructionAccountInputAddress<TAccountSlashedAmountSpillAddress>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVaultsAuthority,
+      InstructionAccountInputAddress<TAccountFarmVaultsAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

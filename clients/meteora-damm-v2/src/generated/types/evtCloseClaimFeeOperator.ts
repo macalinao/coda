@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtCloseClaimFeeOperator = {
@@ -23,7 +24,10 @@ export type EvtCloseClaimFeeOperator = {
   operator: Address;
 };
 
-export type EvtCloseClaimFeeOperatorArgs = EvtCloseClaimFeeOperator;
+export type EvtCloseClaimFeeOperatorArgs = {
+  claimFeeOperator: Address | HasAddress;
+  operator: Address | HasAddress;
+};
 
 export function getEvtCloseClaimFeeOperatorEncoder(): FixedSizeEncoder<EvtCloseClaimFeeOperatorArgs> {
   return getStructEncoder([

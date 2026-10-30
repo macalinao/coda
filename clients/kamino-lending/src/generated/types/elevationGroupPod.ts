@@ -24,6 +24,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type ElevationGroupPod = {
@@ -48,7 +49,7 @@ export type ElevationGroupPodArgs = {
   maxReservesAsCollateral: number;
   padding0: number;
   /** Mandatory debt reserve for this elevation group */
-  debtReserve: Address;
+  debtReserve: Address | HasAddress;
   padding1: Array<number | bigint>;
 };
 

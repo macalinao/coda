@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -372,32 +373,40 @@ export type QuarryMintWrapperPluginAccounts = {
 export type QuarryMintWrapperPluginInstructions = {
   newWrapper: (
     input: MakeOptional<NewWrapperAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewWrapperInstructionAsync> &
     SelfPlanAndSendFunctions;
   newWrapperV2: (
     input: MakeOptional<NewWrapperV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewWrapperV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   transferAdmin: (
     input: TransferAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getTransferAdminInstruction> &
     SelfPlanAndSendFunctions;
   acceptAdmin: (
     input: AcceptAdminInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getAcceptAdminInstruction> & SelfPlanAndSendFunctions;
   newMinter: (
     input: MakeOptional<NewMinterAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewMinterInstructionAsync> &
     SelfPlanAndSendFunctions;
   newMinterV2: (
     input: MakeOptional<NewMinterV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewMinterV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   minterUpdate: (
     input: MinterUpdateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getMinterUpdateInstruction> & SelfPlanAndSendFunctions;
   performMint: (
     input: PerformMintInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPerformMintInstruction> & SelfPlanAndSendFunctions;
 };
 
@@ -413,7 +422,9 @@ export type QuarryMintWrapperPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryMintWrapperProgram() {
+export function quarryMintWrapperProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryMintWrapperPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryMintWrapper: QuarryMintWrapperPlugin }> => {
@@ -424,60 +435,95 @@ export function quarryMintWrapperProgram() {
           minter: addSelfFetchFunctions(client, getMinterCodec()),
         },
         instructions: {
-          newWrapper: (input) =>
+          newWrapper: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewWrapperInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getNewWrapperInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          newWrapperV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewWrapperV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          transferAdmin: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getTransferAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newWrapperV2: (input) =>
+          acceptAdmin: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewWrapperV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getAcceptAdminInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          transferAdmin: (input) =>
+          newMinter: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getTransferAdminInstruction(input),
+              getNewMinterInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          acceptAdmin: (input) =>
+          newMinterV2: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getAcceptAdminInstruction(input),
+              getNewMinterV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          newMinter: (input) =>
+          minterUpdate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewMinterInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getMinterUpdateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newMinterV2: (input) =>
+          performMint: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewMinterV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getPerformMintInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
-            ),
-          minterUpdate: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getMinterUpdateInstruction(input),
-            ),
-          performMint: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getPerformMintInstruction(input),
             ),
         },
-        pdas: { mintWrapper: findMintWrapperPda, minter: findMinterPda },
+        pdas: {
+          mintWrapper: (seeds, pdaConfig) =>
+            findMintWrapperPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          minter: (seeds, pdaConfig) =>
+            findMinterPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyAccount: identifyQuarryMintWrapperAccount,
         identifyInstruction: identifyQuarryMintWrapperInstruction,
         parseInstruction: parseQuarryMintWrapperInstruction,

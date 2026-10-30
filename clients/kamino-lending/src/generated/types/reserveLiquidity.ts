@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getBigFractionBytesDecoder,
@@ -76,11 +77,11 @@ export type ReserveLiquidity = {
 
 export type ReserveLiquidityArgs = {
   /** Reserve liquidity mint address */
-  mintPubkey: Address;
+  mintPubkey: Address | HasAddress;
   /** Reserve liquidity supply address */
-  supplyVault: Address;
+  supplyVault: Address | HasAddress;
   /** Reserve liquidity fee collection address */
-  feeVault: Address;
+  feeVault: Address | HasAddress;
   /** Reserve liquidity available */
   availableAmount: number | bigint;
   /** Reserve liquidity borrowed (scaled fraction) */
@@ -112,7 +113,7 @@ export type ReserveLiquidityArgs = {
   /** Reserve referrer fee absolute rate calculated at each refresh_reserve operation (scaled fraction) */
   absoluteReferralRateSf: number | bigint;
   /** Token program of the liquidity mint */
-  tokenProgram: Address;
+  tokenProgram: Address | HasAddress;
   padding2: Array<number | bigint>;
   padding3: Array<number | bigint>;
 };

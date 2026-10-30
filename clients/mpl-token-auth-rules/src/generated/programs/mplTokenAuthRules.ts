@@ -22,6 +22,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -190,17 +191,21 @@ export type MplTokenAuthRulesPluginAccounts = {
 export type MplTokenAuthRulesPluginInstructions = {
   createOrUpdate: (
     input: MakeOptional<CreateOrUpdateAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateOrUpdateInstructionAsync> &
     SelfPlanAndSendFunctions;
   validate: (
     input: ValidateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getValidateInstruction> & SelfPlanAndSendFunctions;
   writeToBuffer: (
     input: MakeOptional<WriteToBufferAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWriteToBufferInstructionAsync> &
     SelfPlanAndSendFunctions;
   puffRuleSet: (
     input: MakeOptional<PuffRuleSetInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getPuffRuleSetInstruction> & SelfPlanAndSendFunctions;
 };
 
@@ -216,7 +221,9 @@ export type MplTokenAuthRulesPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function mplTokenAuthRulesProgram() {
+export function mplTokenAuthRulesProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends MplTokenAuthRulesPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { mplTokenAuthRules: MplTokenAuthRulesPlugin }> => {
@@ -229,34 +236,60 @@ export function mplTokenAuthRulesProgram() {
           ),
         },
         instructions: {
-          createOrUpdate: (input) =>
+          createOrUpdate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateOrUpdateInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateOrUpdateInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          validate: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getValidateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          validate: (input) =>
-            addSelfPlanAndSendFunctions(client, getValidateInstruction(input)),
-          writeToBuffer: (input) =>
+          writeToBuffer: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWriteToBufferInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getWriteToBufferInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          puffRuleSet: (input) =>
+          puffRuleSet: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getPuffRuleSetInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
-              }),
+              getPuffRuleSetInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
-        pdas: { ruleSet: findRuleSetPda, ruleSetBuffer: findRuleSetBufferPda },
+        pdas: {
+          ruleSet: (seeds, pdaConfig) =>
+            findRuleSetPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          ruleSetBuffer: (seeds, pdaConfig) =>
+            findRuleSetBufferPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyInstruction: identifyMplTokenAuthRulesInstruction,
         parseInstruction: parseMplTokenAuthRulesInstruction,
       } as MplTokenAuthRulesPlugin,

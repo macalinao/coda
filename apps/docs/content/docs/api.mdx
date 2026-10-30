@@ -55,46 +55,50 @@ Each generated client provides a consistent API structure:
 
 ### Instructions
 
-Every instruction from the program IDL is available as a typed function:
+Every instruction from the program IDL is available as a typed builder. Builders for instructions with async defaults (such as PDAs) also get an `*Async` variant:
 
 ```typescript
-// Pattern: create{InstructionName}Instruction
-export function createTransferInstruction(
-  input: TransferInstructionInput,
-): TransactionInstruction;
+// Pattern: get{InstructionName}Instruction / get{InstructionName}InstructionAsync
+export function getCreateMetadataAccountV3Instruction(
+  input: CreateMetadataAccountV3Input,
+  config?: {
+    programAddress?: TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
+): CreateMetadataAccountV3Instruction;
 ```
+
+Account inputs accept any `InstructionAccountInput` — an `Address`, a `ProgramDerivedAddress`, anything with an `address` property (`HasAddress`), or an account meta such as `{ address, role: AccountRole.WRITABLE }` to override the IDL role. Signer accounts accept a `TransactionSigner` or an `AccountSignerMeta`.
 
 ### Accounts
 
-Account types include decoders and fetchers:
+Account types include codecs, decoders, and fetchers. Fetchers take either an RPC or a Kit client with an `rpc` property, and either an `Address` or anything with an `address` property:
 
 ```typescript
-// Decode account data
-export function decodeMetadata(data: Uint8Array): Metadata;
-
 // Fetch and decode account
-export async function fetchMetadata(
-  rpc: Rpc,
-  address: Address,
-): Promise<Metadata>;
+export async function fetchMetadata<TAddress extends string = string>(
+  rpc: Rpc<GetAccountInfoApi> | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
+  config?: FetchAccountConfig,
+): Promise<Account<Metadata, TAddress>>;
 
 // Fetch multiple accounts
 export async function fetchAllMetadata(
-  rpc: Rpc,
-  addresses: Address[],
-): Promise<Metadata[]>;
+  rpc: Rpc<GetMultipleAccountsApi> | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: (Address | HasAddress)[],
+  config?: FetchAccountsConfig,
+): Promise<Account<Metadata>[]>;
 ```
 
 ### Program Derived Addresses (PDAs)
 
-Helper functions for finding PDAs:
+Helper functions for finding PDAs. Address seeds accept an `Address` or anything with an `address` property:
 
 ```typescript
 // Pattern: find{PdaName}Pda
-export function findMetadataPda(seeds: {
-  mint: Address;
-  programId?: Address;
-}): [Address, number]; // Returns [address, bump]
+export async function findMetadataPda(
+  seeds: { programId: Address | HasAddress; mint: Address | HasAddress },
+  config?: { programAddress?: Address | HasAddress | undefined },
+): Promise<ProgramDerivedAddress>; // [address, bump]
 ```
 
 ### Types

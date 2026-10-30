@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type WalletChangeThresholdEvent = {
@@ -29,7 +30,7 @@ export type WalletChangeThresholdEvent = {
 };
 
 export type WalletChangeThresholdEventArgs = {
-  smartWallet: Address;
+  smartWallet: Address | HasAddress;
   threshold: number | bigint;
   timestamp: number | bigint;
 };

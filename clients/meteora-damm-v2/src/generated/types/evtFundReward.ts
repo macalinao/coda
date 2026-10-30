@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtFundReward = {
@@ -37,9 +38,9 @@ export type EvtFundReward = {
 };
 
 export type EvtFundRewardArgs = {
-  pool: Address;
-  funder: Address;
-  mintReward: Address;
+  pool: Address | HasAddress;
+  funder: Address | HasAddress;
+  mintReward: Address | HasAddress;
   rewardIndex: number;
   amount: number | bigint;
   transferFeeExcludedAmountIn: number | bigint;

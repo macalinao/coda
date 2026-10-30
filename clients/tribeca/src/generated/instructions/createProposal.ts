@@ -33,13 +33,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { GOVERN_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -134,27 +137,28 @@ export function getCreateProposalInstructionDataCodec(): Codec<
 }
 
 export type CreateProposalInput<
-  TAccountGovernor extends string = string,
-  TAccountProposal extends string = string,
-  TAccountProposer extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  governor: Address<TAccountGovernor>;
-  proposal: Address<TAccountProposal>;
-  proposer: TransactionSigner<TAccountProposer>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  governor: TAccountGovernor;
+  proposal: TAccountProposal;
+  proposer: TAccountProposer;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: CreateProposalInstructionDataArgs["bump"];
   instructions: CreateProposalInstructionDataArgs["instructions"];
 };
 
 export function getCreateProposalInstruction<
-  TAccountGovernor extends string,
-  TAccountProposal extends string,
-  TAccountProposer extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountProposer extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof GOVERN_PROGRAM_ADDRESS,
 >(
   input: CreateProposalInput<
@@ -164,25 +168,68 @@ export function getCreateProposalInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateProposalInstruction<
   TProgramAddress,
-  TAccountGovernor,
-  TAccountProposal,
-  TAccountProposer,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposer,
+    InstructionAccountInputAddress<TAccountProposer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? GOVERN_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    governor: { value: input.governor ?? null, isWritable: true },
-    proposal: { value: input.proposal ?? null, isWritable: true },
-    proposer: { value: input.proposer ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    proposer: {
+      value: input.proposer ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -198,7 +245,6 @@ export function getCreateProposalInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governor", accounts.governor),
@@ -213,11 +259,26 @@ export function getCreateProposalInstruction<
     programAddress,
   } as CreateProposalInstruction<
     TProgramAddress,
-    TAccountGovernor,
-    TAccountProposal,
-    TAccountProposer,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposer,
+      InstructionAccountInputAddress<TAccountProposer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

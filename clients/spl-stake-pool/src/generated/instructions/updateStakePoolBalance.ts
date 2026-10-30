@@ -30,7 +30,10 @@ import {
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.ts";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -110,21 +113,25 @@ export function getUpdateStakePoolBalanceInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateStakePoolBalanceAsyncInput<
-  TAccountStakePool extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountValidatorList extends string = string,
-  TAccountReserveStake extends string = string,
-  TAccountFeeAccount extends string = string,
-  TAccountPoolMint extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  withdrawAuthority?: Address<TAccountWithdrawAuthority>;
-  validatorList: Address<TAccountValidatorList>;
-  reserveStake: Address<TAccountReserveStake>;
-  feeAccount: Address<TAccountFeeAccount>;
-  poolMint: Address<TAccountPoolMint>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  stakePool: TAccountStakePool;
+  withdrawAuthority?: TAccountWithdrawAuthority;
+  validatorList: TAccountValidatorList;
+  reserveStake: TAccountReserveStake;
+  feeAccount: TAccountFeeAccount;
+  poolMint: TAccountPoolMint;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 /**
@@ -139,13 +146,13 @@ export type UpdateStakePoolBalanceAsyncInput<
  * 6. `[]` Pool token program
  */
 export async function getUpdateStakePoolBalanceInstructionAsync<
-  TAccountStakePool extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountValidatorList extends string,
-  TAccountReserveStake extends string,
-  TAccountFeeAccount extends string,
-  TAccountPoolMint extends string,
-  TAccountTokenProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: UpdateStakePoolBalanceAsyncInput<
@@ -157,35 +164,93 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
     TAccountPoolMint,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   UpdateStakePoolBalanceInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountValidatorList,
-    TAccountReserveStake,
-    TAccountFeeAccount,
-    TAccountPoolMint,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorList,
+      InstructionAccountInputAddress<TAccountValidatorList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    validatorList: { value: input.validatorList ?? null, isWritable: true },
-    reserveStake: { value: input.reserveStake ?? null, isWritable: false },
-    feeAccount: { value: input.feeAccount ?? null, isWritable: true },
-    poolMint: { value: input.poolMint ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    validatorList: {
+      value: input.validatorList ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    reserveStake: {
+      value: input.reserveStake ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    feeAccount: {
+      value: input.feeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    poolMint: {
+      value: input.poolMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -209,7 +274,6 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -224,32 +288,57 @@ export async function getUpdateStakePoolBalanceInstructionAsync<
     programAddress,
   } as UpdateStakePoolBalanceInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountValidatorList,
-    TAccountReserveStake,
-    TAccountFeeAccount,
-    TAccountPoolMint,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorList,
+      InstructionAccountInputAddress<TAccountValidatorList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type UpdateStakePoolBalanceInput<
-  TAccountStakePool extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountValidatorList extends string = string,
-  TAccountReserveStake extends string = string,
-  TAccountFeeAccount extends string = string,
-  TAccountPoolMint extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  withdrawAuthority: Address<TAccountWithdrawAuthority>;
-  validatorList: Address<TAccountValidatorList>;
-  reserveStake: Address<TAccountReserveStake>;
-  feeAccount: Address<TAccountFeeAccount>;
-  poolMint: Address<TAccountPoolMint>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  stakePool: TAccountStakePool;
+  withdrawAuthority: TAccountWithdrawAuthority;
+  validatorList: TAccountValidatorList;
+  reserveStake: TAccountReserveStake;
+  feeAccount: TAccountFeeAccount;
+  poolMint: TAccountPoolMint;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 /**
@@ -264,13 +353,13 @@ export type UpdateStakePoolBalanceInput<
  * 6. `[]` Pool token program
  */
 export function getUpdateStakePoolBalanceInstruction<
-  TAccountStakePool extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountValidatorList extends string,
-  TAccountReserveStake extends string,
-  TAccountFeeAccount extends string,
-  TAccountPoolMint extends string,
-  TAccountTokenProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput,
+  TAccountReserveStake extends InstructionAccountInput,
+  TAccountFeeAccount extends InstructionAccountInput,
+  TAccountPoolMint extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: UpdateStakePoolBalanceInput<
@@ -282,33 +371,91 @@ export function getUpdateStakePoolBalanceInstruction<
     TAccountPoolMint,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateStakePoolBalanceInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountWithdrawAuthority,
-  TAccountValidatorList,
-  TAccountReserveStake,
-  TAccountFeeAccount,
-  TAccountPoolMint,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawAuthority,
+    InstructionAccountInputAddress<TAccountWithdrawAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountValidatorList,
+    InstructionAccountInputAddress<TAccountValidatorList>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveStake,
+    InstructionAccountInputAddress<TAccountReserveStake>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeeAccount,
+    InstructionAccountInputAddress<TAccountFeeAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPoolMint,
+    InstructionAccountInputAddress<TAccountPoolMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    validatorList: { value: input.validatorList ?? null, isWritable: true },
-    reserveStake: { value: input.reserveStake ?? null, isWritable: false },
-    feeAccount: { value: input.feeAccount ?? null, isWritable: true },
-    poolMint: { value: input.poolMint ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    validatorList: {
+      value: input.validatorList ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    reserveStake: {
+      value: input.reserveStake ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    feeAccount: {
+      value: input.feeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    poolMint: {
+      value: input.poolMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -321,7 +468,6 @@ export function getUpdateStakePoolBalanceInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -336,13 +482,34 @@ export function getUpdateStakePoolBalanceInstruction<
     programAddress,
   } as UpdateStakePoolBalanceInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountWithdrawAuthority,
-    TAccountValidatorList,
-    TAccountReserveStake,
-    TAccountFeeAccount,
-    TAccountPoolMint,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorList,
+      InstructionAccountInputAddress<TAccountValidatorList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStake,
+      InstructionAccountInputAddress<TAccountReserveStake>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeeAccount,
+      InstructionAccountInputAddress<TAccountFeeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPoolMint,
+      InstructionAccountInputAddress<TAccountPoolMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

@@ -26,12 +26,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -96,22 +99,24 @@ export function getDeprecatedSetReservationListInstructionDataCodec(): FixedSize
 }
 
 export type DeprecatedSetReservationListInput<
-  TAccountMasterEdition extends string = string,
-  TAccountReservationList extends string = string,
-  TAccountResource extends string = string,
+  TAccountMasterEdition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReservationList extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountResource extends InstructionSignerInput = InstructionSignerInput,
 > = {
   /** Master Edition V1 key (pda of ['metadata', program id, mint id, 'edition']) */
-  masterEdition: Address<TAccountMasterEdition>;
+  masterEdition: TAccountMasterEdition;
   /** PDA for ReservationList of ['metadata', program id, master edition key, 'reservation', resource-key] */
-  reservationList: Address<TAccountReservationList>;
+  reservationList: TAccountReservationList;
   /** The resource you tied the reservation list too */
-  resource: TransactionSigner<TAccountResource>;
+  resource: TAccountResource;
 };
 
 export function getDeprecatedSetReservationListInstruction<
-  TAccountMasterEdition extends string,
-  TAccountReservationList extends string,
-  TAccountResource extends string,
+  TAccountMasterEdition extends InstructionAccountInput,
+  TAccountReservationList extends InstructionAccountInput,
+  TAccountResource extends InstructionSignerInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: DeprecatedSetReservationListInput<
@@ -119,29 +124,61 @@ export function getDeprecatedSetReservationListInstruction<
     TAccountReservationList,
     TAccountResource
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DeprecatedSetReservationListInstruction<
   TProgramAddress,
-  TAccountMasterEdition,
-  TAccountReservationList,
-  TAccountResource
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEdition,
+    InstructionAccountInputAddress<TAccountMasterEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReservationList,
+    InstructionAccountInputAddress<TAccountReservationList>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountResource,
+    InstructionAccountInputAddress<TAccountResource>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
-    reservationList: { value: input.reservationList ?? null, isWritable: true },
-    resource: { value: input.resource ?? null, isWritable: false },
+    masterEdition: {
+      value: input.masterEdition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    reservationList: {
+      value: input.reservationList ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    resource: {
+      value: input.resource ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("masterEdition", accounts.masterEdition),
@@ -152,9 +189,18 @@ export function getDeprecatedSetReservationListInstruction<
     programAddress,
   } as DeprecatedSetReservationListInstruction<
     TProgramAddress,
-    TAccountMasterEdition,
-    TAccountReservationList,
-    TAccountResource
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReservationList,
+      InstructionAccountInputAddress<TAccountReservationList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountResource,
+      InstructionAccountInputAddress<TAccountResource>
+    >
   >);
 }
 

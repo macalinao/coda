@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type VoteSetEvent = {
@@ -32,10 +33,10 @@ export type VoteSetEvent = {
 };
 
 export type VoteSetEventArgs = {
-  governor: Address;
-  proposal: Address;
-  voter: Address;
-  vote: Address;
+  governor: Address | HasAddress;
+  proposal: Address | HasAddress;
+  voter: Address | HasAddress;
+  vote: Address | HasAddress;
   side: number;
   weight: number | bigint;
 };

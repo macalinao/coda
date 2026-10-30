@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -100,33 +103,38 @@ export function getSignOffProposalInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SignOffProposalInput<
-  TAccountRealmAccount extends string = string,
-  TAccountGovernanceAccount extends string = string,
-  TAccountProposalAccount extends string = string,
-  TAccountSignatoryAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSignatoryAccount extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
-  governanceAccount: Address<TAccountGovernanceAccount>;
-  proposalAccount: Address<TAccountProposalAccount>;
+  realmAccount: TAccountRealmAccount;
+  governanceAccount: TAccountGovernanceAccount;
+  proposalAccount: TAccountProposalAccount;
   /**
    * Signatory account signing off the Proposal.
    *     Or Proposal owner if the owner hasn't appointed any signatories
    */
-  signatoryAccount: TransactionSigner<TAccountSignatoryAccount>;
+  signatoryAccount: TAccountSignatoryAccount;
   /**
    * TokenOwnerRecord for the Proposal owner, required when the owner signs off the Proposal.
    *         Or `[writable]` SignatoryRecord account, required when non owner signs off the Proposal
    */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
 };
 
 export function getSignOffProposalInstruction<
-  TAccountRealmAccount extends string,
-  TAccountGovernanceAccount extends string,
-  TAccountProposalAccount extends string,
-  TAccountSignatoryAccount extends string,
-  TAccountTokenOwnerRecord extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountGovernanceAccount extends InstructionAccountInput,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountSignatoryAccount extends InstructionSignerInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: SignOffProposalInput<
@@ -136,33 +144,71 @@ export function getSignOffProposalInstruction<
     TAccountSignatoryAccount,
     TAccountTokenOwnerRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SignOffProposalInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountGovernanceAccount,
-  TAccountProposalAccount,
-  TAccountSignatoryAccount,
-  TAccountTokenOwnerRecord
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSignatoryAccount,
+    InstructionAccountInputAddress<TAccountSignatoryAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
-    governanceAccount: {
-      value: input.governanceAccount ?? null,
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    governanceAccount: {
+      value: input.governanceAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     signatoryAccount: {
       value: input.signatoryAccount ?? null,
+      isSigner: true,
       isWritable: false,
     },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
   };
@@ -171,7 +217,6 @@ export function getSignOffProposalInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -184,11 +229,26 @@ export function getSignOffProposalInstruction<
     programAddress,
   } as SignOffProposalInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGovernanceAccount,
-    TAccountProposalAccount,
-    TAccountSignatoryAccount,
-    TAccountTokenOwnerRecord
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSignatoryAccount,
+      InstructionAccountInputAddress<TAccountSignatoryAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >
   >);
 }
 

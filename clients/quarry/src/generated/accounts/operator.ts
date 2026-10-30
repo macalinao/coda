@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -64,13 +68,13 @@ export type Operator = {
 };
 
 export type OperatorArgs = {
-  base: Address;
+  base: Address | HasAddress;
   bump: number;
-  rewarder: Address;
-  admin: Address;
-  rateSetter: Address;
-  quarryCreator: Address;
-  shareAllocator: Address;
+  rewarder: Address | HasAddress;
+  admin: Address | HasAddress;
+  rateSetter: Address | HasAddress;
+  quarryCreator: Address | HasAddress;
+  shareAllocator: Address | HasAddress;
   lastModifiedTs: number | bigint;
   generation: number | bigint;
 };
@@ -131,8 +135,10 @@ export function decodeOperator<TAddress extends string = string>(
 }
 
 export async function fetchOperator<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Operator, TAddress>> {
   const maybeAccount = await fetchMaybeOperator(rpc, address, config);
@@ -141,17 +147,25 @@ export async function fetchOperator<TAddress extends string = string>(
 }
 
 export async function fetchMaybeOperator<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Operator, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeOperator(maybeAccount);
 }
 
 export async function fetchAllOperator(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Operator>[]> {
   const maybeAccounts = await fetchAllMaybeOperator(rpc, addresses, config);
@@ -160,18 +174,26 @@ export async function fetchAllOperator(
 }
 
 export async function fetchAllMaybeOperator(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Operator>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeOperator(maybeAccount));
 }
 
 export async function fetchOperatorFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: OperatorSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Operator>> {
   const maybeAccount = await fetchMaybeOperatorFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -179,9 +201,11 @@ export async function fetchOperatorFromSeeds(
 }
 
 export async function fetchMaybeOperatorFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: OperatorSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Operator>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findOperatorPda(seeds, { programAddress });

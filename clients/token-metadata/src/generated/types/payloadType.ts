@@ -24,6 +24,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getProofInfoDecoder,
@@ -43,7 +44,7 @@ export type PayloadType =
   | { __kind: "Number"; fields: readonly [bigint] };
 
 export type PayloadTypeArgs =
-  | { __kind: "Pubkey"; fields: readonly [Address] }
+  | { __kind: "Pubkey"; fields: readonly [Address | HasAddress] }
   | { __kind: "Seeds"; fields: readonly [SeedsVecArgs] }
   | { __kind: "MerkleProof"; fields: readonly [ProofInfoArgs] }
   | { __kind: "Number"; fields: readonly [number | bigint] };

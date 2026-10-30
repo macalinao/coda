@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -110,28 +113,31 @@ export function getRefreshReserveInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefreshReserveInput<
-  TAccountReserve extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountPythOracle extends string = string,
-  TAccountSwitchboardPriceOracle extends string = string,
-  TAccountSwitchboardTwapOracle extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPythOracle extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSwitchboardPriceOracle extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSwitchboardTwapOracle extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  reserve: Address<TAccountReserve>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  pythOracle?: Address<TAccountPythOracle>;
-  switchboardPriceOracle?: Address<TAccountSwitchboardPriceOracle>;
-  switchboardTwapOracle?: Address<TAccountSwitchboardTwapOracle>;
-  scopePrices?: Address<TAccountScopePrices>;
+  reserve: TAccountReserve;
+  lendingMarket: TAccountLendingMarket;
+  pythOracle?: TAccountPythOracle;
+  switchboardPriceOracle?: TAccountSwitchboardPriceOracle;
+  switchboardTwapOracle?: TAccountSwitchboardTwapOracle;
+  scopePrices?: TAccountScopePrices;
 };
 
 export function getRefreshReserveInstruction<
-  TAccountReserve extends string,
-  TAccountLendingMarket extends string,
-  TAccountPythOracle extends string,
-  TAccountSwitchboardPriceOracle extends string,
-  TAccountSwitchboardTwapOracle extends string,
-  TAccountScopePrices extends string,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountPythOracle extends InstructionAccountInput,
+  TAccountSwitchboardPriceOracle extends InstructionAccountInput,
+  TAccountSwitchboardTwapOracle extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: RefreshReserveInput<
@@ -142,41 +148,88 @@ export function getRefreshReserveInstruction<
     TAccountSwitchboardTwapOracle,
     TAccountScopePrices
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshReserveInstruction<
   TProgramAddress,
-  TAccountReserve,
-  TAccountLendingMarket,
-  TAccountPythOracle,
-  TAccountSwitchboardPriceOracle,
-  TAccountSwitchboardTwapOracle,
-  TAccountScopePrices
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPythOracle,
+    InstructionAccountInputAddress<TAccountPythOracle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSwitchboardPriceOracle,
+    InstructionAccountInputAddress<TAccountSwitchboardPriceOracle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSwitchboardTwapOracle,
+    InstructionAccountInputAddress<TAccountSwitchboardTwapOracle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    reserve: { value: input.reserve ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    pythOracle: { value: input.pythOracle ?? null, isWritable: false },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    pythOracle: {
+      value: input.pythOracle ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     switchboardPriceOracle: {
       value: input.switchboardPriceOracle ?? null,
+      isSigner: false,
       isWritable: false,
     },
     switchboardTwapOracle: {
       value: input.switchboardTwapOracle ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("reserve", accounts.reserve),
@@ -190,12 +243,30 @@ export function getRefreshReserveInstruction<
     programAddress,
   } as RefreshReserveInstruction<
     TProgramAddress,
-    TAccountReserve,
-    TAccountLendingMarket,
-    TAccountPythOracle,
-    TAccountSwitchboardPriceOracle,
-    TAccountSwitchboardTwapOracle,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPythOracle,
+      InstructionAccountInputAddress<TAccountPythOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSwitchboardPriceOracle,
+      InstructionAccountInputAddress<TAccountSwitchboardPriceOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSwitchboardTwapOracle,
+      InstructionAccountInputAddress<TAccountSwitchboardTwapOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 

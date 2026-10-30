@@ -31,7 +31,6 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
@@ -39,7 +38,11 @@ import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
   getResolvedInstructionAccountAsTransactionSigner,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findRewarderPda } from "../pdas/index.ts";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -138,38 +141,43 @@ export function getNewRewarderInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type NewRewarderAsyncInput<
-  TAccountBase extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountInitialAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountUnusedAccount extends string = string,
-  TAccountMintWrapper extends string = string,
-  TAccountRewardsTokenMint extends string = string,
-  TAccountClaimFeeTokenAccount extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountInitialAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUnusedAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMintWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardsTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  rewarder?: Address<TAccountRewarder>;
-  initialAuthority?: Address<TAccountInitialAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  unusedAccount: Address<TAccountUnusedAccount>;
-  mintWrapper: Address<TAccountMintWrapper>;
-  rewardsTokenMint: Address<TAccountRewardsTokenMint>;
-  claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
+  base: TAccountBase;
+  rewarder?: TAccountRewarder;
+  initialAuthority?: TAccountInitialAuthority;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  unusedAccount: TAccountUnusedAccount;
+  mintWrapper: TAccountMintWrapper;
+  rewardsTokenMint: TAccountRewardsTokenMint;
+  claimFeeTokenAccount: TAccountClaimFeeTokenAccount;
   bump: NewRewarderInstructionDataArgs["bump"];
 };
 
 export async function getNewRewarderInstructionAsync<
-  TAccountBase extends string,
-  TAccountRewarder extends string,
-  TAccountInitialAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountUnusedAccount extends string,
-  TAccountMintWrapper extends string,
-  TAccountRewardsTokenMint extends string,
-  TAccountClaimFeeTokenAccount extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountInitialAuthority extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountUnusedAccount extends InstructionAccountInput,
+  TAccountMintWrapper extends InstructionAccountInput,
+  TAccountRewardsTokenMint extends InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: NewRewarderAsyncInput<
@@ -183,42 +191,101 @@ export async function getNewRewarderInstructionAsync<
     TAccountRewardsTokenMint,
     TAccountClaimFeeTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   NewRewarderInstruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInitialAuthority,
+      InstructionAccountInputAddress<TAccountInitialAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintWrapper,
+      InstructionAccountInputAddress<TAccountMintWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardsTokenMint,
+      InstructionAccountInputAddress<TAccountRewardsTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeTokenAccount,
+      InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     initialAuthority: {
       value: input.initialAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    unusedAccount: {
+      value: input.unusedAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mintWrapper: {
+      value: input.mintWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     rewardsTokenMint: {
       value: input.rewardsTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     claimFeeTokenAccount: {
       value: input.claimFeeTokenAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -254,7 +321,6 @@ export async function getNewRewarderInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -273,51 +339,83 @@ export async function getNewRewarderInstructionAsync<
     programAddress,
   } as NewRewarderInstruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInitialAuthority,
+      InstructionAccountInputAddress<TAccountInitialAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintWrapper,
+      InstructionAccountInputAddress<TAccountMintWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardsTokenMint,
+      InstructionAccountInputAddress<TAccountRewardsTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeTokenAccount,
+      InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+    >
   >);
 }
 
 export type NewRewarderInput<
-  TAccountBase extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountInitialAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountUnusedAccount extends string = string,
-  TAccountMintWrapper extends string = string,
-  TAccountRewardsTokenMint extends string = string,
-  TAccountClaimFeeTokenAccount extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountInitialAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUnusedAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMintWrapper extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardsTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  rewarder: Address<TAccountRewarder>;
-  initialAuthority?: Address<TAccountInitialAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  unusedAccount: Address<TAccountUnusedAccount>;
-  mintWrapper: Address<TAccountMintWrapper>;
-  rewardsTokenMint: Address<TAccountRewardsTokenMint>;
-  claimFeeTokenAccount: Address<TAccountClaimFeeTokenAccount>;
+  base: TAccountBase;
+  rewarder: TAccountRewarder;
+  initialAuthority?: TAccountInitialAuthority;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
+  unusedAccount: TAccountUnusedAccount;
+  mintWrapper: TAccountMintWrapper;
+  rewardsTokenMint: TAccountRewardsTokenMint;
+  claimFeeTokenAccount: TAccountClaimFeeTokenAccount;
   bump: NewRewarderInstructionDataArgs["bump"];
 };
 
 export function getNewRewarderInstruction<
-  TAccountBase extends string,
-  TAccountRewarder extends string,
-  TAccountInitialAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
-  TAccountUnusedAccount extends string,
-  TAccountMintWrapper extends string,
-  TAccountRewardsTokenMint extends string,
-  TAccountClaimFeeTokenAccount extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountInitialAuthority extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountUnusedAccount extends InstructionAccountInput,
+  TAccountMintWrapper extends InstructionAccountInput,
+  TAccountRewardsTokenMint extends InstructionAccountInput,
+  TAccountClaimFeeTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: NewRewarderInput<
@@ -331,40 +429,99 @@ export function getNewRewarderInstruction<
     TAccountRewardsTokenMint,
     TAccountClaimFeeTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): NewRewarderInstruction<
   TProgramAddress,
-  TAccountBase,
-  TAccountRewarder,
-  TAccountInitialAuthority,
-  TAccountPayer,
-  TAccountSystemProgram,
-  TAccountUnusedAccount,
-  TAccountMintWrapper,
-  TAccountRewardsTokenMint,
-  TAccountClaimFeeTokenAccount
+  ResolvedInstructionAccountMeta<
+    TAccountBase,
+    InstructionAccountInputAddress<TAccountBase>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountInitialAuthority,
+    InstructionAccountInputAddress<TAccountInitialAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUnusedAccount,
+    InstructionAccountInputAddress<TAccountUnusedAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMintWrapper,
+    InstructionAccountInputAddress<TAccountMintWrapper>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardsTokenMint,
+    InstructionAccountInputAddress<TAccountRewardsTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountClaimFeeTokenAccount,
+    InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     initialAuthority: {
       value: input.initialAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
-    mintWrapper: { value: input.mintWrapper ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    unusedAccount: {
+      value: input.unusedAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    mintWrapper: {
+      value: input.mintWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     rewardsTokenMint: {
       value: input.rewardsTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     claimFeeTokenAccount: {
       value: input.claimFeeTokenAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -389,7 +546,6 @@ export function getNewRewarderInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -408,15 +564,42 @@ export function getNewRewarderInstruction<
     programAddress,
   } as NewRewarderInstruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountRewarder,
-    TAccountInitialAuthority,
-    TAccountPayer,
-    TAccountSystemProgram,
-    TAccountUnusedAccount,
-    TAccountMintWrapper,
-    TAccountRewardsTokenMint,
-    TAccountClaimFeeTokenAccount
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInitialAuthority,
+      InstructionAccountInputAddress<TAccountInitialAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintWrapper,
+      InstructionAccountInputAddress<TAccountMintWrapper>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardsTokenMint,
+      InstructionAccountInputAddress<TAccountRewardsTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClaimFeeTokenAccount,
+      InstructionAccountInputAddress<TAccountClaimFeeTokenAccount>
+    >
   >);
 }
 

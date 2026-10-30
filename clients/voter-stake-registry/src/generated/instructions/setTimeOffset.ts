@@ -30,12 +30,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -104,34 +107,61 @@ export function getSetTimeOffsetInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetTimeOffsetInput<
-  TAccountRegistrar extends string = string,
-  TAccountRealmAuthority extends string = string,
+  TAccountRegistrar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
-  registrar: Address<TAccountRegistrar>;
-  realmAuthority: TransactionSigner<TAccountRealmAuthority>;
+  registrar: TAccountRegistrar;
+  realmAuthority: TAccountRealmAuthority;
   timeOffset: SetTimeOffsetInstructionDataArgs["timeOffset"];
 };
 
 export function getSetTimeOffsetInstruction<
-  TAccountRegistrar extends string,
-  TAccountRealmAuthority extends string,
+  TAccountRegistrar extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput,
   TProgramAddress extends Address = typeof VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS,
 >(
   input: SetTimeOffsetInput<TAccountRegistrar, TAccountRealmAuthority>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetTimeOffsetInstruction<
   TProgramAddress,
-  TAccountRegistrar,
-  TAccountRealmAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountRegistrar,
+    InstructionAccountInputAddress<TAccountRegistrar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? VOTER_STAKE_REGISTRY_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    registrar: { value: input.registrar ?? null, isWritable: true },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
+    registrar: {
+      value: input.registrar ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -141,7 +171,6 @@ export function getSetTimeOffsetInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("registrar", accounts.registrar),
@@ -153,8 +182,14 @@ export function getSetTimeOffsetInstruction<
     programAddress,
   } as SetTimeOffsetInstruction<
     TProgramAddress,
-    TAccountRegistrar,
-    TAccountRealmAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountRegistrar,
+      InstructionAccountInputAddress<TAccountRegistrar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >
   >);
 }
 

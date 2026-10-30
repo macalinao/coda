@@ -25,12 +25,16 @@ import {
   getUtf8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from "@solana/kit";
@@ -65,7 +69,7 @@ export type CollectionV1Args = {
   /** Account discriminator; always `Key.CollectionV1`. */
   key: KeyArgs;
   /** The authority allowed to update the collection and manage its plugins. */
-  updateAuthority: Address;
+  updateAuthority: Address | HasAddress;
   /** The collection's display name. */
   name: string;
   /** The URI pointing to the collection's off-chain JSON metadata. */
@@ -121,8 +125,10 @@ export function decodeCollectionV1<TAddress extends string = string>(
 }
 
 export async function fetchCollectionV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<CollectionV1, TAddress>> {
   const maybeAccount = await fetchMaybeCollectionV1(rpc, address, config);
@@ -131,17 +137,25 @@ export async function fetchCollectionV1<TAddress extends string = string>(
 }
 
 export async function fetchMaybeCollectionV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<CollectionV1, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeCollectionV1(maybeAccount);
 }
 
 export async function fetchAllCollectionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<CollectionV1>[]> {
   const maybeAccounts = await fetchAllMaybeCollectionV1(rpc, addresses, config);
@@ -150,10 +164,16 @@ export async function fetchAllCollectionV1(
 }
 
 export async function fetchAllMaybeCollectionV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<CollectionV1>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeCollectionV1(maybeAccount));
 }

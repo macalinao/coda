@@ -34,12 +34,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -149,9 +153,9 @@ export type LendingMarketArgs = {
   /** Bump seed for derived authority address */
   bumpSeed: number | bigint;
   /** Owner authority which can add new reserves */
-  lendingMarketOwner: Address;
+  lendingMarketOwner: Address | HasAddress;
   /** Temporary cache of the lending market owner, used in update_lending_market_owner */
-  lendingMarketOwnerCached: Address;
+  lendingMarketOwnerCached: Address | HasAddress;
   /**
    * Currency market prices are quoted in
    * e.g. "USD" null padded (`*b"USD\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"`) or a SPL token mint pubkey
@@ -187,7 +191,7 @@ export type LendingMarketArgs = {
   /** Global maximum allowed borrow value allowed for any obligation */
   globalAllowedBorrowValue: number | bigint;
   /** The address of the risk council, in charge of making parameter and risk decisions on behalf of the protocol */
-  riskCouncil: Address;
+  riskCouncil: Address | HasAddress;
   /** [DEPRECATED] Reward points multiplier per obligation type */
   reserved1: Array<number>;
   /** Elevation groups are used to group together reserves that have the same risk parameters and can bump the ltv and liquidation threshold */
@@ -333,8 +337,10 @@ export function decodeLendingMarket<TAddress extends string = string>(
 }
 
 export async function fetchLendingMarket<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<LendingMarket, TAddress>> {
   const maybeAccount = await fetchMaybeLendingMarket(rpc, address, config);
@@ -343,17 +349,25 @@ export async function fetchLendingMarket<TAddress extends string = string>(
 }
 
 export async function fetchMaybeLendingMarket<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<LendingMarket, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeLendingMarket(maybeAccount);
 }
 
 export async function fetchAllLendingMarket(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LendingMarket>[]> {
   const maybeAccounts = await fetchAllMaybeLendingMarket(
@@ -366,10 +380,16 @@ export async function fetchAllLendingMarket(
 }
 
 export async function fetchAllMaybeLendingMarket(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LendingMarket>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeLendingMarket(maybeAccount));
 }

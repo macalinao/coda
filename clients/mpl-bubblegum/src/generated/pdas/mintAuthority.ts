@@ -10,22 +10,28 @@ import {
   getAddressEncoder,
   getProgramDerivedAddress,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type MintAuthoritySeeds = {
   /** The address of the decompressed mint account */
-  mint: Address;
+  mint: Address | HasAddress;
 };
 
 /** Mint authority PDA for a decompressed NFT mint */
 export async function findMintAuthorityPda(
   seeds: MintAuthoritySeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">,
+    programAddress:
+      programAddressInput = "BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY" as Address<"BGUMAp9Gq7iTEuizy4pqaxsTyUCBK68MDfK752saRPUY">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [getAddressEncoder().encode(seeds.mint)],

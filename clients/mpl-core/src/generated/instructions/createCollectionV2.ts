@@ -26,12 +26,15 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -125,19 +128,21 @@ export function getCreateCollectionV2InstructionDataCodec(): Codec<
 }
 
 export type CreateCollectionV2Input<
-  TAccountCollection extends string = string,
-  TAccountUpdateAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountCollection extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUpdateAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** The address of the new asset */
-  collection: TransactionSigner<TAccountCollection>;
+  collection: TAccountCollection;
   /** The authority of the new asset */
-  updateAuthority?: Address<TAccountUpdateAuthority>;
+  updateAuthority?: TAccountUpdateAuthority;
   /** The account paying for the storage fees */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The system program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   createCollectionV2Args: CreateCollectionV2InstructionDataArgs["createCollectionV2Args"];
 };
 
@@ -147,10 +152,10 @@ export type CreateCollectionV2Input<
  * `externalPluginAdapters`.
  */
 export function getCreateCollectionV2Instruction<
-  TAccountCollection extends string,
-  TAccountUpdateAuthority extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountCollection extends InstructionSignerInput,
+  TAccountUpdateAuthority extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: CreateCollectionV2Input<
@@ -159,27 +164,60 @@ export function getCreateCollectionV2Instruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateCollectionV2Instruction<
   TProgramAddress,
-  TAccountCollection,
-  TAccountUpdateAuthority,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUpdateAuthority,
+    InstructionAccountInputAddress<TAccountUpdateAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    collection: { value: input.collection ?? null, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
     updateAuthority: {
       value: input.updateAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -195,7 +233,6 @@ export function getCreateCollectionV2Instruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("collection", accounts.collection),
@@ -209,10 +246,22 @@ export function getCreateCollectionV2Instruction<
     programAddress,
   } as CreateCollectionV2Instruction<
     TProgramAddress,
-    TAccountCollection,
-    TAccountUpdateAuthority,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpdateAuthority,
+      InstructionAccountInputAddress<TAccountUpdateAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

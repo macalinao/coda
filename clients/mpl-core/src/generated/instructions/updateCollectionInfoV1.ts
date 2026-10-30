@@ -26,12 +26,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -109,13 +112,14 @@ export function getUpdateCollectionInfoV1InstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateCollectionInfoV1Input<
-  TAccountCollection extends string = string,
-  TAccountBubblegumSigner extends string = string,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountBubblegumSigner extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
   /** The address of the asset */
-  collection: Address<TAccountCollection>;
+  collection: TAccountCollection;
   /** Bubblegum PDA signer */
-  bubblegumSigner: TransactionSigner<TAccountBubblegumSigner>;
+  bubblegumSigner: TAccountBubblegumSigner;
   updateCollectionInfoV1Args: UpdateCollectionInfoV1InstructionDataArgs["updateCollectionInfoV1Args"];
 };
 
@@ -129,29 +133,52 @@ export type UpdateCollectionInfoV1Input<
  * Core account.
  */
 export function getUpdateCollectionInfoV1Instruction<
-  TAccountCollection extends string,
-  TAccountBubblegumSigner extends string,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountBubblegumSigner extends InstructionSignerInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: UpdateCollectionInfoV1Input<
     TAccountCollection,
     TAccountBubblegumSigner
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateCollectionInfoV1Instruction<
   TProgramAddress,
-  TAccountCollection,
-  TAccountBubblegumSigner
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBubblegumSigner,
+    InstructionAccountInputAddress<TAccountBubblegumSigner>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    collection: { value: input.collection ?? null, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     bubblegumSigner: {
       value: input.bubblegumSigner ?? null,
+      isSigner: true,
       isWritable: false,
     },
   };
@@ -163,7 +190,6 @@ export function getUpdateCollectionInfoV1Instruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("collection", accounts.collection),
@@ -175,8 +201,14 @@ export function getUpdateCollectionInfoV1Instruction<
     programAddress,
   } as UpdateCollectionInfoV1Instruction<
     TProgramAddress,
-    TAccountCollection,
-    TAccountBubblegumSigner
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBubblegumSigner,
+      InstructionAccountInputAddress<TAccountBubblegumSigner>
+    >
   >);
 }
 

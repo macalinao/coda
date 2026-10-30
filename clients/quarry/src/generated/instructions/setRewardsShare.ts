@@ -30,12 +30,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -107,20 +110,20 @@ export function getSetRewardsShareInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetRewardsShareInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarry extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
-  quarry: Address<TAccountQuarry>;
+  authority: TAccountAuthority;
+  rewarder: TAccountRewarder;
+  quarry: TAccountQuarry;
   newShare: SetRewardsShareInstructionDataArgs["newShare"];
 };
 
 export function getSetRewardsShareInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
-  TAccountQuarry extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: SetRewardsShareInput<
@@ -128,21 +131,51 @@ export function getSetRewardsShareInstruction<
     TAccountRewarder,
     TAccountQuarry
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetRewardsShareInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder,
-  TAccountQuarry
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountQuarry,
+    InstructionAccountInputAddress<TAccountQuarry>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarry: { value: input.quarry ?? null, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    quarry: { value: input.quarry ?? null, isSigner: false, isWritable: true },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -152,7 +185,6 @@ export function getSetRewardsShareInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -165,9 +197,18 @@ export function getSetRewardsShareInstruction<
     programAddress,
   } as SetRewardsShareInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder,
-    TAccountQuarry
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >
   >);
 }
 

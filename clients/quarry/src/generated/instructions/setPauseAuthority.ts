@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -101,19 +104,20 @@ export function getSetPauseAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetPauseAuthorityInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountNewPauseAuthority extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountNewPauseAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
-  newPauseAuthority: Address<TAccountNewPauseAuthority>;
+  authority: TAccountAuthority;
+  rewarder: TAccountRewarder;
+  newPauseAuthority: TAccountNewPauseAuthority;
 };
 
 export function getSetPauseAuthorityInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
-  TAccountNewPauseAuthority extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountNewPauseAuthority extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: SetPauseAuthorityInput<
@@ -121,22 +125,53 @@ export function getSetPauseAuthorityInstruction<
     TAccountRewarder,
     TAccountNewPauseAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetPauseAuthorityInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder,
-  TAccountNewPauseAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewPauseAuthority,
+    InstructionAccountInputAddress<TAccountNewPauseAuthority>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     newPauseAuthority: {
       value: input.newPauseAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -145,7 +180,6 @@ export function getSetPauseAuthorityInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -156,9 +190,18 @@ export function getSetPauseAuthorityInstruction<
     programAddress,
   } as SetPauseAuthorityInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder,
-    TAccountNewPauseAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewPauseAuthority,
+      InstructionAccountInputAddress<TAccountNewPauseAuthority>
+    >
   >);
 }
 

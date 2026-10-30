@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtUpdateRewardFunder = {
@@ -27,7 +28,12 @@ export type EvtUpdateRewardFunder = {
   newFunder: Address;
 };
 
-export type EvtUpdateRewardFunderArgs = EvtUpdateRewardFunder;
+export type EvtUpdateRewardFunderArgs = {
+  pool: Address | HasAddress;
+  rewardIndex: number;
+  oldFunder: Address | HasAddress;
+  newFunder: Address | HasAddress;
+};
 
 export function getEvtUpdateRewardFunderEncoder(): FixedSizeEncoder<EvtUpdateRewardFunderArgs> {
   return getStructEncoder([

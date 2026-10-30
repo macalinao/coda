@@ -26,13 +26,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -112,16 +115,17 @@ export function getPuffRuleSetInstructionDataCodec(): Codec<
 }
 
 export type PuffRuleSetInput<
-  TAccountPayer extends string = string,
-  TAccountRuleSetPda extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Payer and creator of the RuleSet */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The PDA account where the RuleSet is stored */
-  ruleSetPda: Address<TAccountRuleSetPda>;
+  ruleSetPda: TAccountRuleSetPda;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   puffRuleSetArgs: PuffRuleSetInstructionDataArgs["puffRuleSetArgs"];
 };
 
@@ -133,9 +137,9 @@ export type PuffRuleSetInput<
  * can only grow an account by a limited amount.
  */
 export function getPuffRuleSetInstruction<
-  TAccountPayer extends string,
-  TAccountRuleSetPda extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountRuleSetPda extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS,
 >(
   input: PuffRuleSetInput<
@@ -143,22 +147,51 @@ export function getPuffRuleSetInstruction<
     TAccountRuleSetPda,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): PuffRuleSetInstruction<
   TProgramAddress,
-  TAccountPayer,
-  TAccountRuleSetPda,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRuleSetPda,
+    InstructionAccountInputAddress<TAccountRuleSetPda>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_TOKEN_AUTH_RULES_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    ruleSetPda: { value: input.ruleSetPda ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    ruleSetPda: {
+      value: input.ruleSetPda ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -174,7 +207,6 @@ export function getPuffRuleSetInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -187,9 +219,18 @@ export function getPuffRuleSetInstruction<
     programAddress,
   } as PuffRuleSetInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountRuleSetPda,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRuleSetPda,
+      InstructionAccountInputAddress<TAccountRuleSetPda>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

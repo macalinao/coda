@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -99,9 +103,9 @@ export type ReserveArgs = {
   /** Last slot when supply and rates updated */
   lastUpdate: LastUpdateArgs;
   /** Lending market address */
-  lendingMarket: Address;
-  farmCollateral: Address;
-  farmDebt: Address;
+  lendingMarket: Address | HasAddress;
+  farmCollateral: Address | HasAddress;
+  farmDebt: Address | HasAddress;
   /** Reserve liquidity */
   liquidity: ReserveLiquidityArgs;
   reserveLiquidityPadding: Array<number | bigint>;
@@ -204,8 +208,10 @@ export function decodeReserve<TAddress extends string = string>(
 }
 
 export async function fetchReserve<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Reserve, TAddress>> {
   const maybeAccount = await fetchMaybeReserve(rpc, address, config);
@@ -214,17 +220,25 @@ export async function fetchReserve<TAddress extends string = string>(
 }
 
 export async function fetchMaybeReserve<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Reserve, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeReserve(maybeAccount);
 }
 
 export async function fetchAllReserve(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Reserve>[]> {
   const maybeAccounts = await fetchAllMaybeReserve(rpc, addresses, config);
@@ -233,10 +247,16 @@ export async function fetchAllReserve(
 }
 
 export async function fetchAllMaybeReserve(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Reserve>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeReserve(maybeAccount));
 }

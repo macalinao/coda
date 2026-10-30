@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -123,32 +126,33 @@ export function getCastVoteInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CastVoteInput<
-  TAccountLocker extends string = string,
-  TAccountEscrow extends string = string,
-  TAccountVoteDelegate extends string = string,
-  TAccountProposal extends string = string,
-  TAccountVote extends string = string,
-  TAccountGovernor extends string = string,
-  TAccountGovernProgram extends string = string,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoteDelegate extends InstructionSignerInput = InstructionSignerInput,
+  TAccountProposal extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVote extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  locker: Address<TAccountLocker>;
-  escrow: Address<TAccountEscrow>;
-  voteDelegate: TransactionSigner<TAccountVoteDelegate>;
-  proposal: Address<TAccountProposal>;
-  vote: Address<TAccountVote>;
-  governor: Address<TAccountGovernor>;
-  governProgram: Address<TAccountGovernProgram>;
+  locker: TAccountLocker;
+  escrow: TAccountEscrow;
+  voteDelegate: TAccountVoteDelegate;
+  proposal: TAccountProposal;
+  vote: TAccountVote;
+  governor: TAccountGovernor;
+  governProgram: TAccountGovernProgram;
   side: CastVoteInstructionDataArgs["side"];
 };
 
 export function getCastVoteInstruction<
-  TAccountLocker extends string,
-  TAccountEscrow extends string,
-  TAccountVoteDelegate extends string,
-  TAccountProposal extends string,
-  TAccountVote extends string,
-  TAccountGovernor extends string,
-  TAccountGovernProgram extends string,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountVoteDelegate extends InstructionSignerInput,
+  TAccountProposal extends InstructionAccountInput,
+  TAccountVote extends InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountGovernProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: CastVoteInput<
@@ -160,29 +164,79 @@ export function getCastVoteInstruction<
     TAccountGovernor,
     TAccountGovernProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CastVoteInstruction<
   TProgramAddress,
-  TAccountLocker,
-  TAccountEscrow,
-  TAccountVoteDelegate,
-  TAccountProposal,
-  TAccountVote,
-  TAccountGovernor,
-  TAccountGovernProgram
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoteDelegate,
+    InstructionAccountInputAddress<TAccountVoteDelegate>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProposal,
+    InstructionAccountInputAddress<TAccountProposal>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVote,
+    InstructionAccountInputAddress<TAccountVote>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernProgram,
+    InstructionAccountInputAddress<TAccountGovernProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    locker: { value: input.locker ?? null, isWritable: false },
-    escrow: { value: input.escrow ?? null, isWritable: false },
-    voteDelegate: { value: input.voteDelegate ?? null, isWritable: false },
-    proposal: { value: input.proposal ?? null, isWritable: true },
-    vote: { value: input.vote ?? null, isWritable: true },
-    governor: { value: input.governor ?? null, isWritable: false },
-    governProgram: { value: input.governProgram ?? null, isWritable: false },
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: false },
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: false },
+    voteDelegate: {
+      value: input.voteDelegate ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    proposal: {
+      value: input.proposal ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    vote: { value: input.vote ?? null, isSigner: false, isWritable: true },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    governProgram: {
+      value: input.governProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -192,7 +246,6 @@ export function getCastVoteInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("locker", accounts.locker),
@@ -209,13 +262,34 @@ export function getCastVoteInstruction<
     programAddress,
   } as CastVoteInstruction<
     TProgramAddress,
-    TAccountLocker,
-    TAccountEscrow,
-    TAccountVoteDelegate,
-    TAccountProposal,
-    TAccountVote,
-    TAccountGovernor,
-    TAccountGovernProgram
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoteDelegate,
+      InstructionAccountInputAddress<TAccountVoteDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProposal,
+      InstructionAccountInputAddress<TAccountProposal>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVote,
+      InstructionAccountInputAddress<TAccountVote>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernProgram,
+      InstructionAccountInputAddress<TAccountGovernProgram>
+    >
   >);
 }
 

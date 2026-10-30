@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -40,8 +41,8 @@ export type GoverningTokenConfig = {
 };
 
 export type GoverningTokenConfigArgs = {
-  voterWeightAddin: OptionOrNullable<Address>;
-  maxVoterWeightAddin: OptionOrNullable<Address>;
+  voterWeightAddin: OptionOrNullable<Address | HasAddress>;
+  maxVoterWeightAddin: OptionOrNullable<Address | HasAddress>;
   tokenType: GoverningTokenTypeArgs;
   reserved: Array<number>;
 };

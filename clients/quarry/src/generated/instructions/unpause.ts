@@ -28,12 +28,15 @@ import {
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -93,39 +96,66 @@ export function getUnpauseInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UnpauseInput<
-  TAccountPauseAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountPauseAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  pauseAuthority: TransactionSigner<TAccountPauseAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  pauseAuthority: TAccountPauseAuthority;
+  rewarder: TAccountRewarder;
 };
 
 export function getUnpauseInstruction<
-  TAccountPauseAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountPauseAuthority extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: UnpauseInput<TAccountPauseAuthority, TAccountRewarder>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UnpauseInstruction<
   TProgramAddress,
-  TAccountPauseAuthority,
-  TAccountRewarder
+  ResolvedInstructionAccountMeta<
+    TAccountPauseAuthority,
+    InstructionAccountInputAddress<TAccountPauseAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pauseAuthority: { value: input.pauseAuthority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    pauseAuthority: {
+      value: input.pauseAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pauseAuthority", accounts.pauseAuthority),
@@ -135,8 +165,14 @@ export function getUnpauseInstruction<
     programAddress,
   } as UnpauseInstruction<
     TProgramAddress,
-    TAccountPauseAuthority,
-    TAccountRewarder
+    ResolvedInstructionAccountMeta<
+      TAccountPauseAuthority,
+      InstructionAccountInputAddress<TAccountPauseAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >
   >);
 }
 

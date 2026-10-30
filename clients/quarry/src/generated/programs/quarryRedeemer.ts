@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -216,14 +217,17 @@ export type QuarryRedeemerPluginAccounts = {
 export type QuarryRedeemerPluginInstructions = {
   createRedeemer: (
     input: MakeOptional<CreateRedeemerAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateRedeemerInstructionAsync> &
     SelfPlanAndSendFunctions;
   redeemTokens: (
     input: RedeemTokensAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedeemTokensInstructionAsync> &
     SelfPlanAndSendFunctions;
   redeemAllTokens: (
     input: RedeemAllTokensAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRedeemAllTokensInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -237,7 +241,9 @@ export type QuarryRedeemerPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryRedeemerProgram() {
+export function quarryRedeemerProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryRedeemerPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryRedeemer: QuarryRedeemerPlugin }> => {
@@ -247,26 +253,41 @@ export function quarryRedeemerProgram() {
           redeemer: addSelfFetchFunctions(client, getRedeemerCodec()),
         },
         instructions: {
-          createRedeemer: (input) =>
+          createRedeemer: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateRedeemerInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateRedeemerInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          redeemTokens: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getRedeemTokensInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          redeemTokens: (input) =>
+          redeemAllTokens: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getRedeemTokensInstructionAsync(input),
-            ),
-          redeemAllTokens: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRedeemAllTokensInstructionAsync(input),
+              getRedeemAllTokensInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
-        pdas: { redeemer: findRedeemerPda },
+        pdas: {
+          redeemer: (seeds, pdaConfig) =>
+            findRedeemerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+        },
         identifyAccount: identifyQuarryRedeemerAccount,
         identifyInstruction: identifyQuarryRedeemerInstruction,
         parseInstruction: parseQuarryRedeemerInstruction,

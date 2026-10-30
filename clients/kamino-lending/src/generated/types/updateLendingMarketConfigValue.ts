@@ -34,6 +34,7 @@ import {
   type Encoder,
   type GetDiscriminatedUnionVariant,
   type GetDiscriminatedUnionVariantContent,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getElevationGroupDecoder,
@@ -60,7 +61,7 @@ export type UpdateLendingMarketConfigValueArgs =
   | { __kind: "U16"; fields: readonly [number] }
   | { __kind: "U64"; fields: readonly [number | bigint] }
   | { __kind: "U128"; fields: readonly [number | bigint] }
-  | { __kind: "Pubkey"; fields: readonly [Address] }
+  | { __kind: "Pubkey"; fields: readonly [Address | HasAddress] }
   | { __kind: "ElevationGroup"; fields: readonly [ElevationGroupArgs] }
   | { __kind: "Name"; fields: readonly [Array<number>] };
 

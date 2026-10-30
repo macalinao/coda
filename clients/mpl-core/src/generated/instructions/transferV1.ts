@@ -27,13 +27,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { MPL_CORE_PROGRAM_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -135,28 +138,29 @@ export function getTransferV1InstructionDataCodec(): Codec<
 }
 
 export type TransferV1Input<
-  TAccountAsset extends string = string,
-  TAccountCollection extends string = string,
-  TAccountPayer extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountNewOwner extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountLogWrapper extends string = string,
+  TAccountAsset extends InstructionAccountInput = InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** The address of the asset */
-  asset: Address<TAccountAsset>;
+  asset: TAccountAsset;
   /** The collection to which the asset belongs */
-  collection?: Address<TAccountCollection>;
+  collection?: TAccountCollection;
   /** The account paying for the storage fees */
-  payer: TransactionSigner<TAccountPayer>;
+  payer: TAccountPayer;
   /** The owner or delegate of the asset */
-  authority?: TransactionSigner<TAccountAuthority>;
+  authority?: TAccountAuthority;
   /** The new owner to which to transfer the asset */
-  newOwner: Address<TAccountNewOwner>;
+  newOwner: TAccountNewOwner;
   /** The system program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The SPL Noop Program */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   transferV1Args: TransferV1InstructionDataArgs["transferV1Args"];
 };
 
@@ -169,13 +173,13 @@ export type TransferV1Input<
  * `PermanentFreezeDelegate` plugin.
  */
 export function getTransferV1Instruction<
-  TAccountAsset extends string,
-  TAccountCollection extends string,
-  TAccountPayer extends string,
-  TAccountAuthority extends string,
-  TAccountNewOwner extends string,
-  TAccountSystemProgram extends string,
-  TAccountLogWrapper extends string,
+  TAccountAsset extends InstructionAccountInput,
+  TAccountCollection extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountNewOwner extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
   TProgramAddress extends Address = typeof MPL_CORE_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: TransferV1Input<
@@ -187,30 +191,83 @@ export function getTransferV1Instruction<
     TAccountSystemProgram,
     TAccountLogWrapper
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TransferV1Instruction<
   TProgramAddress,
-  TAccountAsset,
-  TAccountCollection,
-  TAccountPayer,
-  TAccountAuthority,
-  TAccountNewOwner,
-  TAccountSystemProgram,
-  TAccountLogWrapper
+  ResolvedInstructionAccountMeta<
+    TAccountAsset,
+    InstructionAccountInputAddress<TAccountAsset>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollection,
+    InstructionAccountInputAddress<TAccountCollection>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewOwner,
+    InstructionAccountInputAddress<TAccountNewOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLogWrapper,
+    InstructionAccountInputAddress<TAccountLogWrapper>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? MPL_CORE_PROGRAM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    asset: { value: input.asset ?? null, isWritable: true },
-    collection: { value: input.collection ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
-    newOwner: { value: input.newOwner ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isSigner: false, isWritable: true },
+    collection: {
+      value: input.collection ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    newOwner: {
+      value: input.newOwner ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -220,7 +277,6 @@ export function getTransferV1Instruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("asset", accounts.asset),
@@ -237,13 +293,34 @@ export function getTransferV1Instruction<
     programAddress,
   } as TransferV1Instruction<
     TProgramAddress,
-    TAccountAsset,
-    TAccountCollection,
-    TAccountPayer,
-    TAccountAuthority,
-    TAccountNewOwner,
-    TAccountSystemProgram,
-    TAccountLogWrapper
+    ResolvedInstructionAccountMeta<
+      TAccountAsset,
+      InstructionAccountInputAddress<TAccountAsset>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollection,
+      InstructionAccountInputAddress<TAccountCollection>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewOwner,
+      InstructionAccountInputAddress<TAccountNewOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >
   >);
 }
 

@@ -25,17 +25,21 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -73,7 +77,9 @@ export type TransferAuthorityInstructionData = {
   newAuthority: Address;
 };
 
-export type TransferAuthorityInstructionDataArgs = { newAuthority: Address };
+export type TransferAuthorityInstructionDataArgs = {
+  newAuthority: Address | HasAddress;
+};
 
 export function getTransferAuthorityInstructionDataEncoder(): FixedSizeEncoder<TransferAuthorityInstructionDataArgs> {
   return transformEncoder(
@@ -103,33 +109,60 @@ export function getTransferAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type TransferAuthorityInput<
-  TAccountAuthority extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
-  rewarder: Address<TAccountRewarder>;
+  authority: TAccountAuthority;
+  rewarder: TAccountRewarder;
   newAuthority: TransferAuthorityInstructionDataArgs["newAuthority"];
 };
 
 export function getTransferAuthorityInstruction<
-  TAccountAuthority extends string,
-  TAccountRewarder extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: TransferAuthorityInput<TAccountAuthority, TAccountRewarder>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): TransferAuthorityInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountRewarder
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -139,7 +172,6 @@ export function getTransferAuthorityInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -151,8 +183,14 @@ export function getTransferAuthorityInstruction<
     programAddress,
   } as TransferAuthorityInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRewarder
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >
   >);
 }
 

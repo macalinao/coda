@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type ProposalMetaSeeds = {
-  proposal: Address;
+  proposal: Address | HasAddress;
 };
 
 /** Proposal metadata account with additional information */
 export async function findProposalMetaPda(
   seeds: ProposalMetaSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">,
+    programAddress:
+      programAddressInput = "Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw" as Address<"Govz1VyoyLD5BL6CSCxUJLVLsQHRwjfFj1prNsdNg5Jw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

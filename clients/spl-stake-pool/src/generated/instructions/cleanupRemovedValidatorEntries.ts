@@ -29,7 +29,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -89,11 +92,12 @@ export function getCleanupRemovedValidatorEntriesInstructionDataCodec(): FixedSi
 }
 
 export type CleanupRemovedValidatorEntriesInput<
-  TAccountStakePool extends string = string,
-  TAccountValidatorList extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  validatorList: Address<TAccountValidatorList>;
+  stakePool: TAccountStakePool;
+  validatorList: TAccountValidatorList;
 };
 
 /**
@@ -102,35 +106,60 @@ export type CleanupRemovedValidatorEntriesInput<
  * 1. `[w]` Validator stake list storage account
  */
 export function getCleanupRemovedValidatorEntriesInstruction<
-  TAccountStakePool extends string,
-  TAccountValidatorList extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountValidatorList extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: CleanupRemovedValidatorEntriesInput<
     TAccountStakePool,
     TAccountValidatorList
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CleanupRemovedValidatorEntriesInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountValidatorList
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountValidatorList,
+    InstructionAccountInputAddress<TAccountValidatorList>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: false },
-    validatorList: { value: input.validatorList ?? null, isWritable: true },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    validatorList: {
+      value: input.validatorList ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -140,8 +169,14 @@ export function getCleanupRemovedValidatorEntriesInstruction<
     programAddress,
   } as CleanupRemovedValidatorEntriesInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountValidatorList
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorList,
+      InstructionAccountInputAddress<TAccountValidatorList>
+    >
   >);
 }
 

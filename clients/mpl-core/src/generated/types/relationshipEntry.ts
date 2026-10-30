@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getRelationshipKindDecoder,
@@ -45,7 +46,7 @@ export type RelationshipEntryArgs = {
    */
   kind: RelationshipKindArgs;
   /** The address of the related account. */
-  key: Address;
+  key: Address | HasAddress;
 };
 
 export function getRelationshipEntryEncoder(): FixedSizeEncoder<RelationshipEntryArgs> {

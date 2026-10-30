@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type Traded = {
@@ -38,7 +39,7 @@ export type Traded = {
 };
 
 export type TradedArgs = {
-  whirlpool: Address;
+  whirlpool: Address | HasAddress;
   aToB: boolean;
   preSqrtPrice: number | bigint;
   postSqrtPrice: number | bigint;

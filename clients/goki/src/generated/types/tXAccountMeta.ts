@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type TXAccountMeta = {
@@ -26,7 +27,11 @@ export type TXAccountMeta = {
   isWritable: boolean;
 };
 
-export type TXAccountMetaArgs = TXAccountMeta;
+export type TXAccountMetaArgs = {
+  pubkey: Address | HasAddress;
+  isSigner: boolean;
+  isWritable: boolean;
+};
 
 export function getTXAccountMetaEncoder(): FixedSizeEncoder<TXAccountMetaArgs> {
   return getStructEncoder([

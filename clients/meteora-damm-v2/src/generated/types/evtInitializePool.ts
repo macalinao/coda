@@ -22,6 +22,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getPoolFeeParametersDecoder,
@@ -55,12 +56,12 @@ export type EvtInitializePool = {
 };
 
 export type EvtInitializePoolArgs = {
-  pool: Address;
-  tokenAMint: Address;
-  tokenBMint: Address;
-  creator: Address;
-  payer: Address;
-  alphaVault: Address;
+  pool: Address | HasAddress;
+  tokenAMint: Address | HasAddress;
+  tokenBMint: Address | HasAddress;
+  creator: Address | HasAddress;
+  payer: Address | HasAddress;
+  alphaVault: Address | HasAddress;
   poolFees: PoolFeeParametersArgs;
   sqrtMinPrice: number | bigint;
   sqrtMaxPrice: number | bigint;

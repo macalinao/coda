@@ -31,14 +31,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findMasterEditionPda,
@@ -180,55 +183,62 @@ export function getDecompressV1InstructionDataCodec(): Codec<
 }
 
 export type DecompressV1AsyncInput<
-  TAccountVoucher extends string = string,
-  TAccountLeafOwner extends string = string,
-  TAccountTokenAccount extends string = string,
-  TAccountMint extends string = string,
-  TAccountMintAuthority extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountMasterEdition extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountSysvarRent extends string = string,
-  TAccountTokenMetadataProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountAssociatedTokenProgram extends string = string,
-  TAccountLogWrapper extends string = string,
+  TAccountVoucher extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLeafOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMintAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSysvarRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /**
    * Voucher PDA created by `redeem`; closed by this instruction once its
    * leaf data has been used to mint the decompressed NFT.
    */
-  voucher: Address<TAccountVoucher>;
+  voucher: TAccountVoucher;
   /** Owner of the compressed NFT leaf being operated on. */
-  leafOwner: TransactionSigner<TAccountLeafOwner>;
+  leafOwner: TAccountLeafOwner;
   /** Token account that will hold the decompressed NFT for `leafOwner`. */
-  tokenAccount?: Address<TAccountTokenAccount>;
+  tokenAccount?: TAccountTokenAccount;
   /** Mint account of the decompressed NFT, created fresh during decompression. */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** PDA mint authority for the decompressed NFT's mint. */
-  mintAuthority?: Address<TAccountMintAuthority>;
+  mintAuthority?: TAccountMintAuthority;
   /** Metadata account created for the decompressed NFT. */
-  metadata?: Address<TAccountMetadata>;
+  metadata?: TAccountMetadata;
   /** Master edition account created for the decompressed NFT. */
-  masterEdition?: Address<TAccountMasterEdition>;
+  masterEdition?: TAccountMasterEdition;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The Rent sysvar. */
-  sysvarRent?: Address<TAccountSysvarRent>;
+  sysvarRent?: TAccountSysvarRent;
   /**
    * The Token Metadata program, invoked to read or (un)verify the
    * legacy collection accounts.
    */
-  tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  tokenMetadataProgram?: TAccountTokenMetadataProgram;
   /** The SPL Token program. */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** The SPL Associated Token Account program. */
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   /**
    * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
    * can reconstruct the tree.
    */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   metadataArg: DecompressV1InstructionDataArgs["metadata"];
 };
 
@@ -242,19 +252,19 @@ export type DecompressV1AsyncInput<
  * NFT.
  */
 export async function getDecompressV1InstructionAsync<
-  TAccountVoucher extends string,
-  TAccountLeafOwner extends string,
-  TAccountTokenAccount extends string,
-  TAccountMint extends string,
-  TAccountMintAuthority extends string,
-  TAccountMetadata extends string,
-  TAccountMasterEdition extends string,
-  TAccountSystemProgram extends string,
-  TAccountSysvarRent extends string,
-  TAccountTokenMetadataProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountAssociatedTokenProgram extends string,
-  TAccountLogWrapper extends string,
+  TAccountVoucher extends InstructionAccountInput,
+  TAccountLeafOwner extends InstructionSignerInput,
+  TAccountTokenAccount extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountMintAuthority extends InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountSysvarRent extends InstructionAccountInput,
+  TAccountTokenMetadataProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: DecompressV1AsyncInput<
@@ -272,49 +282,143 @@ export async function getDecompressV1InstructionAsync<
     TAccountAssociatedTokenProgram,
     TAccountLogWrapper
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   DecompressV1Instruction<
     TProgramAddress,
-    TAccountVoucher,
-    TAccountLeafOwner,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountMintAuthority,
-    TAccountMetadata,
-    TAccountMasterEdition,
-    TAccountSystemProgram,
-    TAccountSysvarRent,
-    TAccountTokenMetadataProgram,
-    TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountLogWrapper
+    ResolvedInstructionAccountMeta<
+      TAccountVoucher,
+      InstructionAccountInputAddress<TAccountVoucher>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintAuthority,
+      InstructionAccountInputAddress<TAccountMintAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarRent,
+      InstructionAccountInputAddress<TAccountSysvarRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMetadataProgram,
+      InstructionAccountInputAddress<TAccountTokenMetadataProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    voucher: { value: input.voucher ?? null, isWritable: true },
-    leafOwner: { value: input.leafOwner ?? null, isWritable: true },
-    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    mintAuthority: { value: input.mintAuthority ?? null, isWritable: true },
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    sysvarRent: { value: input.sysvarRent ?? null, isWritable: false },
+    voucher: {
+      value: input.voucher ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    leafOwner: {
+      value: input.leafOwner ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    tokenAccount: {
+      value: input.tokenAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    mintAuthority: {
+      value: input.mintAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    masterEdition: {
+      value: input.masterEdition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    sysvarRent: {
+      value: input.sysvarRent ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     tokenMetadataProgram: {
       value: input.tokenMetadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     associatedTokenProgram: {
       value: input.associatedTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -399,7 +503,6 @@ export async function getDecompressV1InstructionAsync<
       "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("voucher", accounts.voucher),
@@ -422,72 +525,118 @@ export async function getDecompressV1InstructionAsync<
     programAddress,
   } as DecompressV1Instruction<
     TProgramAddress,
-    TAccountVoucher,
-    TAccountLeafOwner,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountMintAuthority,
-    TAccountMetadata,
-    TAccountMasterEdition,
-    TAccountSystemProgram,
-    TAccountSysvarRent,
-    TAccountTokenMetadataProgram,
-    TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountLogWrapper
+    ResolvedInstructionAccountMeta<
+      TAccountVoucher,
+      InstructionAccountInputAddress<TAccountVoucher>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintAuthority,
+      InstructionAccountInputAddress<TAccountMintAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarRent,
+      InstructionAccountInputAddress<TAccountSysvarRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMetadataProgram,
+      InstructionAccountInputAddress<TAccountTokenMetadataProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >
   >);
 }
 
 export type DecompressV1Input<
-  TAccountVoucher extends string = string,
-  TAccountLeafOwner extends string = string,
-  TAccountTokenAccount extends string = string,
-  TAccountMint extends string = string,
-  TAccountMintAuthority extends string = string,
-  TAccountMetadata extends string = string,
-  TAccountMasterEdition extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountSysvarRent extends string = string,
-  TAccountTokenMetadataProgram extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountAssociatedTokenProgram extends string = string,
-  TAccountLogWrapper extends string = string,
+  TAccountVoucher extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLeafOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMintAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSysvarRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /**
    * Voucher PDA created by `redeem`; closed by this instruction once its
    * leaf data has been used to mint the decompressed NFT.
    */
-  voucher: Address<TAccountVoucher>;
+  voucher: TAccountVoucher;
   /** Owner of the compressed NFT leaf being operated on. */
-  leafOwner: TransactionSigner<TAccountLeafOwner>;
+  leafOwner: TAccountLeafOwner;
   /** Token account that will hold the decompressed NFT for `leafOwner`. */
-  tokenAccount: Address<TAccountTokenAccount>;
+  tokenAccount: TAccountTokenAccount;
   /** Mint account of the decompressed NFT, created fresh during decompression. */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** PDA mint authority for the decompressed NFT's mint. */
-  mintAuthority: Address<TAccountMintAuthority>;
+  mintAuthority: TAccountMintAuthority;
   /** Metadata account created for the decompressed NFT. */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Master edition account created for the decompressed NFT. */
-  masterEdition: Address<TAccountMasterEdition>;
+  masterEdition: TAccountMasterEdition;
   /** The Solana System program. */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** The Rent sysvar. */
-  sysvarRent?: Address<TAccountSysvarRent>;
+  sysvarRent?: TAccountSysvarRent;
   /**
    * The Token Metadata program, invoked to read or (un)verify the
    * legacy collection accounts.
    */
-  tokenMetadataProgram?: Address<TAccountTokenMetadataProgram>;
+  tokenMetadataProgram?: TAccountTokenMetadataProgram;
   /** The SPL Token program. */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** The SPL Associated Token Account program. */
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
+  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   /**
    * The SPL/MPL Noop program, used to log leaf data so off-chain indexers
    * can reconstruct the tree.
    */
-  logWrapper?: Address<TAccountLogWrapper>;
+  logWrapper?: TAccountLogWrapper;
   metadataArg: DecompressV1InstructionDataArgs["metadata"];
 };
 
@@ -501,19 +650,19 @@ export type DecompressV1Input<
  * NFT.
  */
 export function getDecompressV1Instruction<
-  TAccountVoucher extends string,
-  TAccountLeafOwner extends string,
-  TAccountTokenAccount extends string,
-  TAccountMint extends string,
-  TAccountMintAuthority extends string,
-  TAccountMetadata extends string,
-  TAccountMasterEdition extends string,
-  TAccountSystemProgram extends string,
-  TAccountSysvarRent extends string,
-  TAccountTokenMetadataProgram extends string,
-  TAccountTokenProgram extends string,
-  TAccountAssociatedTokenProgram extends string,
-  TAccountLogWrapper extends string,
+  TAccountVoucher extends InstructionAccountInput,
+  TAccountLeafOwner extends InstructionSignerInput,
+  TAccountTokenAccount extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountMintAuthority extends InstructionAccountInput,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountMasterEdition extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountSysvarRent extends InstructionAccountInput,
+  TAccountTokenMetadataProgram extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput,
+  TAccountLogWrapper extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: DecompressV1Input<
@@ -531,47 +680,141 @@ export function getDecompressV1Instruction<
     TAccountAssociatedTokenProgram,
     TAccountLogWrapper
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DecompressV1Instruction<
   TProgramAddress,
-  TAccountVoucher,
-  TAccountLeafOwner,
-  TAccountTokenAccount,
-  TAccountMint,
-  TAccountMintAuthority,
-  TAccountMetadata,
-  TAccountMasterEdition,
-  TAccountSystemProgram,
-  TAccountSysvarRent,
-  TAccountTokenMetadataProgram,
-  TAccountTokenProgram,
-  TAccountAssociatedTokenProgram,
-  TAccountLogWrapper
+  ResolvedInstructionAccountMeta<
+    TAccountVoucher,
+    InstructionAccountInputAddress<TAccountVoucher>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLeafOwner,
+    InstructionAccountInputAddress<TAccountLeafOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAccount,
+    InstructionAccountInputAddress<TAccountTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMintAuthority,
+    InstructionAccountInputAddress<TAccountMintAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMasterEdition,
+    InstructionAccountInputAddress<TAccountMasterEdition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSysvarRent,
+    InstructionAccountInputAddress<TAccountSysvarRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMetadataProgram,
+    InstructionAccountInputAddress<TAccountTokenMetadataProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAssociatedTokenProgram,
+    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLogWrapper,
+    InstructionAccountInputAddress<TAccountLogWrapper>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    voucher: { value: input.voucher ?? null, isWritable: true },
-    leafOwner: { value: input.leafOwner ?? null, isWritable: true },
-    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    mintAuthority: { value: input.mintAuthority ?? null, isWritable: true },
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    masterEdition: { value: input.masterEdition ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    sysvarRent: { value: input.sysvarRent ?? null, isWritable: false },
+    voucher: {
+      value: input.voucher ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    leafOwner: {
+      value: input.leafOwner ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    tokenAccount: {
+      value: input.tokenAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    mintAuthority: {
+      value: input.mintAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    masterEdition: {
+      value: input.masterEdition ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    sysvarRent: {
+      value: input.sysvarRent ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     tokenMetadataProgram: {
       value: input.tokenMetadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     associatedTokenProgram: {
       value: input.associatedTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    logWrapper: { value: input.logWrapper ?? null, isWritable: false },
+    logWrapper: {
+      value: input.logWrapper ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -607,7 +850,6 @@ export function getDecompressV1Instruction<
       "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV" as Address<"noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("voucher", accounts.voucher),
@@ -630,19 +872,58 @@ export function getDecompressV1Instruction<
     programAddress,
   } as DecompressV1Instruction<
     TProgramAddress,
-    TAccountVoucher,
-    TAccountLeafOwner,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountMintAuthority,
-    TAccountMetadata,
-    TAccountMasterEdition,
-    TAccountSystemProgram,
-    TAccountSysvarRent,
-    TAccountTokenMetadataProgram,
-    TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountLogWrapper
+    ResolvedInstructionAccountMeta<
+      TAccountVoucher,
+      InstructionAccountInputAddress<TAccountVoucher>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLeafOwner,
+      InstructionAccountInputAddress<TAccountLeafOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintAuthority,
+      InstructionAccountInputAddress<TAccountMintAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMasterEdition,
+      InstructionAccountInputAddress<TAccountMasterEdition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSysvarRent,
+      InstructionAccountInputAddress<TAccountSysvarRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMetadataProgram,
+      InstructionAccountInputAddress<TAccountTokenMetadataProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLogWrapper,
+      InstructionAccountInputAddress<TAccountLogWrapper>
+    >
   >);
 }
 

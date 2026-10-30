@@ -23,18 +23,22 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -87,7 +91,9 @@ export type AddSignatoryInstructionData = {
   signatory: Address;
 };
 
-export type AddSignatoryInstructionDataArgs = { signatory: Address };
+export type AddSignatoryInstructionDataArgs = {
+  signatory: Address | HasAddress;
+};
 
 export function getAddSignatoryInstructionDataEncoder(): FixedSizeEncoder<AddSignatoryInstructionDataArgs> {
   return transformEncoder(
@@ -117,33 +123,38 @@ export function getAddSignatoryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type AddSignatoryInput<
-  TAccountProposalAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountGovernanceAuthority extends string = string,
-  TAccountSignatoryRecordAccount extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountProposalAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountSignatoryRecordAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Proposal Account associated with the governance */
-  proposalAccount: Address<TAccountProposalAccount>;
+  proposalAccount: TAccountProposalAccount;
   /** TokenOwnerRecord account of the Proposal owner */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
   /** Governance Authority (Token Owner or Governance Delegate) */
-  governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
+  governanceAuthority: TAccountGovernanceAuthority;
   /** Signatory Record Account */
-  signatoryRecordAccount: Address<TAccountSignatoryRecordAccount>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  signatoryRecordAccount: TAccountSignatoryRecordAccount;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   signatory: AddSignatoryInstructionDataArgs["signatory"];
 };
 
 export function getAddSignatoryInstruction<
-  TAccountProposalAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountGovernanceAuthority extends string,
-  TAccountSignatoryRecordAccount extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountProposalAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput,
+  TAccountSignatoryRecordAccount extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: AddSignatoryInput<
@@ -154,37 +165,78 @@ export function getAddSignatoryInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): AddSignatoryInstruction<
   TProgramAddress,
-  TAccountProposalAccount,
-  TAccountTokenOwnerRecord,
-  TAccountGovernanceAuthority,
-  TAccountSignatoryRecordAccount,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountProposalAccount,
+    InstructionAccountInputAddress<TAccountProposalAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAuthority,
+    InstructionAccountInputAddress<TAccountGovernanceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSignatoryRecordAccount,
+    InstructionAccountInputAddress<TAccountSignatoryRecordAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    proposalAccount: { value: input.proposalAccount ?? null, isWritable: true },
+    proposalAccount: {
+      value: input.proposalAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
     governanceAuthority: {
       value: input.governanceAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
     signatoryRecordAccount: {
       value: input.signatoryRecordAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -200,7 +252,6 @@ export function getAddSignatoryInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("proposalAccount", accounts.proposalAccount),
@@ -216,12 +267,30 @@ export function getAddSignatoryInstruction<
     programAddress,
   } as AddSignatoryInstruction<
     TProgramAddress,
-    TAccountProposalAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGovernanceAuthority,
-    TAccountSignatoryRecordAccount,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountProposalAccount,
+      InstructionAccountInputAddress<TAccountProposalAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAuthority,
+      InstructionAccountInputAddress<TAccountGovernanceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSignatoryRecordAccount,
+      InstructionAccountInputAddress<TAccountSignatoryRecordAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

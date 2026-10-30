@@ -30,12 +30,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -61,11 +65,11 @@ export type FarmsGlobalConfig = {
 };
 
 export type FarmsGlobalConfigArgs = {
-  globalAdmin: Address;
+  globalAdmin: Address | HasAddress;
   treasuryFeeBps: number | bigint;
-  treasuryVaultsAuthority: Address;
+  treasuryVaultsAuthority: Address | HasAddress;
   treasuryVaultsAuthorityBump: number | bigint;
-  pendingGlobalAdmin: Address;
+  pendingGlobalAdmin: Address | HasAddress;
   padding1: Array<number | bigint>;
 };
 
@@ -127,8 +131,10 @@ export function decodeFarmsGlobalConfig<TAddress extends string = string>(
 }
 
 export async function fetchFarmsGlobalConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<FarmsGlobalConfig, TAddress>> {
   const maybeAccount = await fetchMaybeFarmsGlobalConfig(rpc, address, config);
@@ -139,17 +145,25 @@ export async function fetchFarmsGlobalConfig<TAddress extends string = string>(
 export async function fetchMaybeFarmsGlobalConfig<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<FarmsGlobalConfig, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeFarmsGlobalConfig(maybeAccount);
 }
 
 export async function fetchAllFarmsGlobalConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<FarmsGlobalConfig>[]> {
   const maybeAccounts = await fetchAllMaybeFarmsGlobalConfig(
@@ -162,11 +176,17 @@ export async function fetchAllFarmsGlobalConfig(
 }
 
 export async function fetchAllMaybeFarmsGlobalConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<FarmsGlobalConfig>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeFarmsGlobalConfig(maybeAccount),
   );

@@ -21,12 +21,16 @@ import {
   getU8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from "@solana/kit";
@@ -48,9 +52,9 @@ export type HolderDelegateRecord = {
 export type HolderDelegateRecordArgs = {
   key: KeyArgs;
   bump: number;
-  mint: Address;
-  delegate: Address;
-  updateAuthority: Address;
+  mint: Address | HasAddress;
+  delegate: Address | HasAddress;
+  updateAuthority: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link HolderDelegateRecordArgs} account data. */
@@ -106,8 +110,10 @@ export function decodeHolderDelegateRecord<TAddress extends string = string>(
 export async function fetchHolderDelegateRecord<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<HolderDelegateRecord, TAddress>> {
   const maybeAccount = await fetchMaybeHolderDelegateRecord(
@@ -122,17 +128,25 @@ export async function fetchHolderDelegateRecord<
 export async function fetchMaybeHolderDelegateRecord<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<HolderDelegateRecord, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeHolderDelegateRecord(maybeAccount);
 }
 
 export async function fetchAllHolderDelegateRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<HolderDelegateRecord>[]> {
   const maybeAccounts = await fetchAllMaybeHolderDelegateRecord(
@@ -145,11 +159,17 @@ export async function fetchAllHolderDelegateRecord(
 }
 
 export async function fetchAllMaybeHolderDelegateRecord(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<HolderDelegateRecord>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeHolderDelegateRecord(maybeAccount),
   );

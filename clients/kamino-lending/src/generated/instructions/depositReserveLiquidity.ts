@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findLendingMarketAuthPda,
@@ -159,47 +162,57 @@ export function getDepositReserveLiquidityInstructionDataCodec(): FixedSizeCodec
 }
 
 export type DepositReserveLiquidityAsyncInput<
-  TAccountOwner extends string = string,
-  TAccountReserve extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountReserveLiquiditySupply extends string = string,
-  TAccountReserveCollateralMint extends string = string,
-  TAccountUserSourceLiquidity extends string = string,
-  TAccountUserDestinationCollateral extends string = string,
-  TAccountCollateralTokenProgram extends string = string,
-  TAccountLiquidityTokenProgram extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveLiquiditySupply extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveCollateralMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUserDestinationCollateral extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollateralTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLiquidityTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  reserve: Address<TAccountReserve>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  lendingMarketAuthority?: Address<TAccountLendingMarketAuthority>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveLiquiditySupply?: Address<TAccountReserveLiquiditySupply>;
-  reserveCollateralMint?: Address<TAccountReserveCollateralMint>;
-  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
-  userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
-  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
-  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  owner: TAccountOwner;
+  reserve: TAccountReserve;
+  lendingMarket: TAccountLendingMarket;
+  lendingMarketAuthority?: TAccountLendingMarketAuthority;
+  reserveLiquidityMint: TAccountReserveLiquidityMint;
+  reserveLiquiditySupply?: TAccountReserveLiquiditySupply;
+  reserveCollateralMint?: TAccountReserveCollateralMint;
+  userSourceLiquidity: TAccountUserSourceLiquidity;
+  userDestinationCollateral: TAccountUserDestinationCollateral;
+  collateralTokenProgram?: TAccountCollateralTokenProgram;
+  liquidityTokenProgram?: TAccountLiquidityTokenProgram;
+  instructionSysvarAccount?: TAccountInstructionSysvarAccount;
   liquidityAmount: DepositReserveLiquidityInstructionDataArgs["liquidityAmount"];
 };
 
 export async function getDepositReserveLiquidityInstructionAsync<
-  TAccountOwner extends string,
-  TAccountReserve extends string,
-  TAccountLendingMarket extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountReserveLiquiditySupply extends string,
-  TAccountReserveCollateralMint extends string,
-  TAccountUserSourceLiquidity extends string,
-  TAccountUserDestinationCollateral extends string,
-  TAccountCollateralTokenProgram extends string,
-  TAccountLiquidityTokenProgram extends string,
-  TAccountInstructionSysvarAccount extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput,
+  TAccountReserveLiquiditySupply extends InstructionAccountInput,
+  TAccountReserveCollateralMint extends InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput,
+  TAccountUserDestinationCollateral extends InstructionAccountInput,
+  TAccountCollateralTokenProgram extends InstructionAccountInput,
+  TAccountLiquidityTokenProgram extends InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: DepositReserveLiquidityAsyncInput<
@@ -216,67 +229,132 @@ export async function getDepositReserveLiquidityInstructionAsync<
     TAccountLiquidityTokenProgram,
     TAccountInstructionSysvarAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   DepositReserveLiquidityInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountReserve,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountReserveLiquidityMint,
-    TAccountReserveLiquiditySupply,
-    TAccountReserveCollateralMint,
-    TAccountUserSourceLiquidity,
-    TAccountUserDestinationCollateral,
-    TAccountCollateralTokenProgram,
-    TAccountLiquidityTokenProgram,
-    TAccountInstructionSysvarAccount
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquiditySupply,
+      InstructionAccountInputAddress<TAccountReserveLiquiditySupply>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveCollateralMint,
+      InstructionAccountInputAddress<TAccountReserveCollateralMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserSourceLiquidity,
+      InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserDestinationCollateral,
+      InstructionAccountInputAddress<TAccountUserDestinationCollateral>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollateralTokenProgram,
+      InstructionAccountInputAddress<TAccountCollateralTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLiquidityTokenProgram,
+      InstructionAccountInputAddress<TAccountLiquidityTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructionSysvarAccount,
+      InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     lendingMarketAuthority: {
       value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     reserveLiquidityMint: {
       value: input.reserveLiquidityMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     reserveLiquiditySupply: {
       value: input.reserveLiquiditySupply ?? null,
+      isSigner: false,
       isWritable: true,
     },
     reserveCollateralMint: {
       value: input.reserveCollateralMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
     userSourceLiquidity: {
       value: input.userSourceLiquidity ?? null,
+      isSigner: false,
       isWritable: true,
     },
     userDestinationCollateral: {
       value: input.userDestinationCollateral ?? null,
+      isSigner: false,
       isWritable: true,
     },
     collateralTokenProgram: {
       value: input.collateralTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     liquidityTokenProgram: {
       value: input.liquidityTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     instructionSysvarAccount: {
       value: input.instructionSysvarAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -343,7 +421,6 @@ export async function getDepositReserveLiquidityInstructionAsync<
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -371,63 +448,109 @@ export async function getDepositReserveLiquidityInstructionAsync<
     programAddress,
   } as DepositReserveLiquidityInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountReserve,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountReserveLiquidityMint,
-    TAccountReserveLiquiditySupply,
-    TAccountReserveCollateralMint,
-    TAccountUserSourceLiquidity,
-    TAccountUserDestinationCollateral,
-    TAccountCollateralTokenProgram,
-    TAccountLiquidityTokenProgram,
-    TAccountInstructionSysvarAccount
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquiditySupply,
+      InstructionAccountInputAddress<TAccountReserveLiquiditySupply>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveCollateralMint,
+      InstructionAccountInputAddress<TAccountReserveCollateralMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserSourceLiquidity,
+      InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserDestinationCollateral,
+      InstructionAccountInputAddress<TAccountUserDestinationCollateral>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollateralTokenProgram,
+      InstructionAccountInputAddress<TAccountCollateralTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLiquidityTokenProgram,
+      InstructionAccountInputAddress<TAccountLiquidityTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructionSysvarAccount,
+      InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+    >
   >);
 }
 
 export type DepositReserveLiquidityInput<
-  TAccountOwner extends string = string,
-  TAccountReserve extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountLendingMarketAuthority extends string = string,
-  TAccountReserveLiquidityMint extends string = string,
-  TAccountReserveLiquiditySupply extends string = string,
-  TAccountReserveCollateralMint extends string = string,
-  TAccountUserSourceLiquidity extends string = string,
-  TAccountUserDestinationCollateral extends string = string,
-  TAccountCollateralTokenProgram extends string = string,
-  TAccountLiquidityTokenProgram extends string = string,
-  TAccountInstructionSysvarAccount extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveLiquiditySupply extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserveCollateralMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountUserDestinationCollateral extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountCollateralTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLiquidityTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  reserve: Address<TAccountReserve>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  lendingMarketAuthority: Address<TAccountLendingMarketAuthority>;
-  reserveLiquidityMint: Address<TAccountReserveLiquidityMint>;
-  reserveLiquiditySupply: Address<TAccountReserveLiquiditySupply>;
-  reserveCollateralMint: Address<TAccountReserveCollateralMint>;
-  userSourceLiquidity: Address<TAccountUserSourceLiquidity>;
-  userDestinationCollateral: Address<TAccountUserDestinationCollateral>;
-  collateralTokenProgram?: Address<TAccountCollateralTokenProgram>;
-  liquidityTokenProgram?: Address<TAccountLiquidityTokenProgram>;
-  instructionSysvarAccount?: Address<TAccountInstructionSysvarAccount>;
+  owner: TAccountOwner;
+  reserve: TAccountReserve;
+  lendingMarket: TAccountLendingMarket;
+  lendingMarketAuthority: TAccountLendingMarketAuthority;
+  reserveLiquidityMint: TAccountReserveLiquidityMint;
+  reserveLiquiditySupply: TAccountReserveLiquiditySupply;
+  reserveCollateralMint: TAccountReserveCollateralMint;
+  userSourceLiquidity: TAccountUserSourceLiquidity;
+  userDestinationCollateral: TAccountUserDestinationCollateral;
+  collateralTokenProgram?: TAccountCollateralTokenProgram;
+  liquidityTokenProgram?: TAccountLiquidityTokenProgram;
+  instructionSysvarAccount?: TAccountInstructionSysvarAccount;
   liquidityAmount: DepositReserveLiquidityInstructionDataArgs["liquidityAmount"];
 };
 
 export function getDepositReserveLiquidityInstruction<
-  TAccountOwner extends string,
-  TAccountReserve extends string,
-  TAccountLendingMarket extends string,
-  TAccountLendingMarketAuthority extends string,
-  TAccountReserveLiquidityMint extends string,
-  TAccountReserveLiquiditySupply extends string,
-  TAccountReserveCollateralMint extends string,
-  TAccountUserSourceLiquidity extends string,
-  TAccountUserDestinationCollateral extends string,
-  TAccountCollateralTokenProgram extends string,
-  TAccountLiquidityTokenProgram extends string,
-  TAccountInstructionSysvarAccount extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountLendingMarketAuthority extends InstructionAccountInput,
+  TAccountReserveLiquidityMint extends InstructionAccountInput,
+  TAccountReserveLiquiditySupply extends InstructionAccountInput,
+  TAccountReserveCollateralMint extends InstructionAccountInput,
+  TAccountUserSourceLiquidity extends InstructionAccountInput,
+  TAccountUserDestinationCollateral extends InstructionAccountInput,
+  TAccountCollateralTokenProgram extends InstructionAccountInput,
+  TAccountLiquidityTokenProgram extends InstructionAccountInput,
+  TAccountInstructionSysvarAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: DepositReserveLiquidityInput<
@@ -444,65 +567,130 @@ export function getDepositReserveLiquidityInstruction<
     TAccountLiquidityTokenProgram,
     TAccountInstructionSysvarAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DepositReserveLiquidityInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountReserve,
-  TAccountLendingMarket,
-  TAccountLendingMarketAuthority,
-  TAccountReserveLiquidityMint,
-  TAccountReserveLiquiditySupply,
-  TAccountReserveCollateralMint,
-  TAccountUserSourceLiquidity,
-  TAccountUserDestinationCollateral,
-  TAccountCollateralTokenProgram,
-  TAccountLiquidityTokenProgram,
-  TAccountInstructionSysvarAccount
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarketAuthority,
+    InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveLiquidityMint,
+    InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveLiquiditySupply,
+    InstructionAccountInputAddress<TAccountReserveLiquiditySupply>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveCollateralMint,
+    InstructionAccountInputAddress<TAccountReserveCollateralMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserSourceLiquidity,
+    InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserDestinationCollateral,
+    InstructionAccountInputAddress<TAccountUserDestinationCollateral>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountCollateralTokenProgram,
+    InstructionAccountInputAddress<TAccountCollateralTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLiquidityTokenProgram,
+    InstructionAccountInputAddress<TAccountLiquidityTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountInstructionSysvarAccount,
+    InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     lendingMarketAuthority: {
       value: input.lendingMarketAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     reserveLiquidityMint: {
       value: input.reserveLiquidityMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
     reserveLiquiditySupply: {
       value: input.reserveLiquiditySupply ?? null,
+      isSigner: false,
       isWritable: true,
     },
     reserveCollateralMint: {
       value: input.reserveCollateralMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
     userSourceLiquidity: {
       value: input.userSourceLiquidity ?? null,
+      isSigner: false,
       isWritable: true,
     },
     userDestinationCollateral: {
       value: input.userDestinationCollateral ?? null,
+      isSigner: false,
       isWritable: true,
     },
     collateralTokenProgram: {
       value: input.collateralTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     liquidityTokenProgram: {
       value: input.liquidityTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     instructionSysvarAccount: {
       value: input.instructionSysvarAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -528,7 +716,6 @@ export function getDepositReserveLiquidityInstruction<
       "Sysvar1nstructions1111111111111111111111111" as Address<"Sysvar1nstructions1111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -556,18 +743,54 @@ export function getDepositReserveLiquidityInstruction<
     programAddress,
   } as DepositReserveLiquidityInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountReserve,
-    TAccountLendingMarket,
-    TAccountLendingMarketAuthority,
-    TAccountReserveLiquidityMint,
-    TAccountReserveLiquiditySupply,
-    TAccountReserveCollateralMint,
-    TAccountUserSourceLiquidity,
-    TAccountUserDestinationCollateral,
-    TAccountCollateralTokenProgram,
-    TAccountLiquidityTokenProgram,
-    TAccountInstructionSysvarAccount
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarketAuthority,
+      InstructionAccountInputAddress<TAccountLendingMarketAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquidityMint,
+      InstructionAccountInputAddress<TAccountReserveLiquidityMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveLiquiditySupply,
+      InstructionAccountInputAddress<TAccountReserveLiquiditySupply>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveCollateralMint,
+      InstructionAccountInputAddress<TAccountReserveCollateralMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserSourceLiquidity,
+      InstructionAccountInputAddress<TAccountUserSourceLiquidity>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserDestinationCollateral,
+      InstructionAccountInputAddress<TAccountUserDestinationCollateral>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountCollateralTokenProgram,
+      InstructionAccountInputAddress<TAccountCollateralTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLiquidityTokenProgram,
+      InstructionAccountInputAddress<TAccountLiquidityTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountInstructionSysvarAccount,
+      InstructionAccountInputAddress<TAccountInstructionSysvarAccount>
+    >
   >);
 }
 

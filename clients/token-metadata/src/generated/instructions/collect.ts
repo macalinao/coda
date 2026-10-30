@@ -27,11 +27,14 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -87,38 +90,67 @@ export function getCollectInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CollectInput<
-  TAccountAuthority extends string = string,
-  TAccountRecipient extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Authority to collect fees */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** The account to transfer collected fees to */
-  recipient: Address<TAccountRecipient>;
+  recipient: TAccountRecipient;
 };
 
 export function getCollectInstruction<
-  TAccountAuthority extends string,
-  TAccountRecipient extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountRecipient extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: CollectInput<TAccountAuthority, TAccountRecipient>,
-  config?: { programAddress?: TProgramAddress },
-): CollectInstruction<TProgramAddress, TAccountAuthority, TAccountRecipient> {
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
+): CollectInstruction<
+  TProgramAddress,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRecipient,
+    InstructionAccountInputAddress<TAccountRecipient>
+  >
+> {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    recipient: { value: input.recipient ?? null, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    recipient: {
+      value: input.recipient ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -128,8 +160,14 @@ export function getCollectInstruction<
     programAddress,
   } as CollectInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountRecipient
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRecipient,
+      InstructionAccountInputAddress<TAccountRecipient>
+    >
   >);
 }
 

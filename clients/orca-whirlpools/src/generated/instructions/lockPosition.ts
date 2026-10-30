@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -141,38 +144,43 @@ export function getLockPositionInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type LockPositionInput<
-  TAccountFunder extends string = string,
-  TAccountPositionAuthority extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPositionMint extends string = string,
-  TAccountPositionTokenAccount extends string = string,
-  TAccountLockConfig extends string = string,
-  TAccountWhirlpool extends string = string,
-  TAccountToken2022Program extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPositionAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountLockConfig extends InstructionAccountInput = InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountToken2022Program extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  funder: TransactionSigner<TAccountFunder>;
-  positionAuthority: TransactionSigner<TAccountPositionAuthority>;
-  position: Address<TAccountPosition>;
-  positionMint: Address<TAccountPositionMint>;
-  positionTokenAccount: Address<TAccountPositionTokenAccount>;
-  lockConfig: Address<TAccountLockConfig>;
-  whirlpool: Address<TAccountWhirlpool>;
-  token2022Program?: Address<TAccountToken2022Program>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  funder: TAccountFunder;
+  positionAuthority: TAccountPositionAuthority;
+  position: TAccountPosition;
+  positionMint: TAccountPositionMint;
+  positionTokenAccount: TAccountPositionTokenAccount;
+  lockConfig: TAccountLockConfig;
+  whirlpool: TAccountWhirlpool;
+  token2022Program?: TAccountToken2022Program;
+  systemProgram?: TAccountSystemProgram;
   lockType: LockPositionInstructionDataArgs["lockType"];
 };
 
 export function getLockPositionInstruction<
-  TAccountFunder extends string,
-  TAccountPositionAuthority extends string,
-  TAccountPosition extends string,
-  TAccountPositionMint extends string,
-  TAccountPositionTokenAccount extends string,
-  TAccountLockConfig extends string,
-  TAccountWhirlpool extends string,
-  TAccountToken2022Program extends string,
-  TAccountSystemProgram extends string,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountPositionAuthority extends InstructionSignerInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPositionMint extends InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput,
+  TAccountLockConfig extends InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountToken2022Program extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: LockPositionInput<
@@ -186,42 +194,105 @@ export function getLockPositionInstruction<
     TAccountToken2022Program,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): LockPositionInstruction<
   TProgramAddress,
-  TAccountFunder,
-  TAccountPositionAuthority,
-  TAccountPosition,
-  TAccountPositionMint,
-  TAccountPositionTokenAccount,
-  TAccountLockConfig,
-  TAccountWhirlpool,
-  TAccountToken2022Program,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionAuthority,
+    InstructionAccountInputAddress<TAccountPositionAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionMint,
+    InstructionAccountInputAddress<TAccountPositionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLockConfig,
+    InstructionAccountInputAddress<TAccountLockConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountToken2022Program,
+    InstructionAccountInputAddress<TAccountToken2022Program>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    funder: { value: input.funder ?? null, isWritable: true },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
     positionAuthority: {
       value: input.positionAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    position: { value: input.position ?? null, isWritable: false },
-    positionMint: { value: input.positionMint ?? null, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    positionMint: {
+      value: input.positionMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     positionTokenAccount: {
       value: input.positionTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    lockConfig: { value: input.lockConfig ?? null, isWritable: true },
-    whirlpool: { value: input.whirlpool ?? null, isWritable: false },
-    token2022Program: {
-      value: input.token2022Program ?? null,
+    lockConfig: {
+      value: input.lockConfig ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    token2022Program: {
+      value: input.token2022Program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -241,7 +312,6 @@ export function getLockPositionInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("funder", accounts.funder),
@@ -260,15 +330,42 @@ export function getLockPositionInstruction<
     programAddress,
   } as LockPositionInstruction<
     TProgramAddress,
-    TAccountFunder,
-    TAccountPositionAuthority,
-    TAccountPosition,
-    TAccountPositionMint,
-    TAccountPositionTokenAccount,
-    TAccountLockConfig,
-    TAccountWhirlpool,
-    TAccountToken2022Program,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionAuthority,
+      InstructionAccountInputAddress<TAccountPositionAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionMint,
+      InstructionAccountInputAddress<TAccountPositionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLockConfig,
+      InstructionAccountInputAddress<TAccountLockConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountToken2022Program,
+      InstructionAccountInputAddress<TAccountToken2022Program>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

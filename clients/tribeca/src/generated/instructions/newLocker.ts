@@ -31,13 +31,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -133,30 +136,31 @@ export function getNewLockerInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type NewLockerInput<
-  TAccountBase extends string = string,
-  TAccountLocker extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountGovernor extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountBase extends InstructionSignerInput = InstructionSignerInput,
+  TAccountLocker extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  base: TransactionSigner<TAccountBase>;
-  locker: Address<TAccountLocker>;
-  tokenMint: Address<TAccountTokenMint>;
-  governor: Address<TAccountGovernor>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  base: TAccountBase;
+  locker: TAccountLocker;
+  tokenMint: TAccountTokenMint;
+  governor: TAccountGovernor;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: NewLockerInstructionDataArgs["bump"];
   params: NewLockerInstructionDataArgs["params"];
 };
 
 export function getNewLockerInstruction<
-  TAccountBase extends string,
-  TAccountLocker extends string,
-  TAccountTokenMint extends string,
-  TAccountGovernor extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountBase extends InstructionSignerInput,
+  TAccountLocker extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountGovernor extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: NewLockerInput<
@@ -167,27 +171,70 @@ export function getNewLockerInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): NewLockerInstruction<
   TProgramAddress,
-  TAccountBase,
-  TAccountLocker,
-  TAccountTokenMint,
-  TAccountGovernor,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountBase,
+    InstructionAccountInputAddress<TAccountBase>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLocker,
+    InstructionAccountInputAddress<TAccountLocker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMint,
+    InstructionAccountInputAddress<TAccountTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernor,
+    InstructionAccountInputAddress<TAccountGovernor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    base: { value: input.base ?? null, isWritable: false },
-    locker: { value: input.locker ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    governor: { value: input.governor ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    base: { value: input.base ?? null, isSigner: true, isWritable: false },
+    locker: { value: input.locker ?? null, isSigner: false, isWritable: true },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    governor: {
+      value: input.governor ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -203,7 +250,6 @@ export function getNewLockerInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("base", accounts.base),
@@ -219,12 +265,30 @@ export function getNewLockerInstruction<
     programAddress,
   } as NewLockerInstruction<
     TProgramAddress,
-    TAccountBase,
-    TAccountLocker,
-    TAccountTokenMint,
-    TAccountGovernor,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountBase,
+      InstructionAccountInputAddress<TAccountBase>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLocker,
+      InstructionAccountInputAddress<TAccountLocker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernor,
+      InstructionAccountInputAddress<TAccountGovernor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

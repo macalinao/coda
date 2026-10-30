@@ -24,6 +24,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -49,7 +50,7 @@ export type RealmConfigArgs = {
   reserved: Array<number>;
   minCommunityWeightToCreateGovernance: number | bigint;
   communityMintMaxVoterWeightSource: MintMaxVoterWeightSourceArgs;
-  councilMint: OptionOrNullable<Address>;
+  councilMint: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getRealmConfigEncoder(): Encoder<RealmConfigArgs> {

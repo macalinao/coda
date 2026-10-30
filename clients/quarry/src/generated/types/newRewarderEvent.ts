@@ -18,12 +18,13 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type NewRewarderEvent = { authority: Address; timestamp: bigint };
 
 export type NewRewarderEventArgs = {
-  authority: Address;
+  authority: Address | HasAddress;
   timestamp: number | bigint;
 };
 

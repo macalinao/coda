@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -511,52 +512,65 @@ export type QuarryMergeMinePluginAccounts = {
 export type QuarryMergeMinePluginInstructions = {
   newPool: (
     input: MakeOptional<NewPoolAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewPoolInstructionAsync> & SelfPlanAndSendFunctions;
   newPoolV2: (
     input: MakeOptional<NewPoolV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewPoolV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   initMergeMiner: (
     input: MakeOptional<InitMergeMinerAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitMergeMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   initMergeMinerV2: (
     input: MakeOptional<InitMergeMinerV2AsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitMergeMinerV2InstructionAsync> &
     SelfPlanAndSendFunctions;
   initMinerMM: (
     input: MakeOptional<InitMinerMMInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitMinerMMInstruction> & SelfPlanAndSendFunctions;
   initMinerMMV2: (
     input: MakeOptional<InitMinerMMV2Input, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitMinerMMV2Instruction> &
     SelfPlanAndSendFunctions;
   stakePrimaryMiner: (
     input: StakePrimaryMinerAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getStakePrimaryMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   stakeReplicaMiner: (
     input: StakeReplicaMinerAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getStakeReplicaMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   unstakePrimaryMiner: (
     input: UnstakePrimaryMinerAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnstakePrimaryMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   unstakeAllReplicaMiner: (
     input: UnstakeAllReplicaMinerAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnstakeAllReplicaMinerInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawTokensMM: (
     input: WithdrawTokensMMAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawTokensMMInstructionAsync> &
     SelfPlanAndSendFunctions;
   rescueTokensMM: (
     input: RescueTokensMMInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getRescueTokensMMInstruction> &
     SelfPlanAndSendFunctions;
   claimRewardsMM: (
     input: ClaimRewardsMMAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClaimRewardsMMInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -574,7 +588,9 @@ export type QuarryMergeMinePluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function quarryMergeMineProgram() {
+export function quarryMergeMineProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends QuarryMergeMinePluginRequirements>(
     client: T,
   ): ExtendedClient<T, { quarryMergeMine: QuarryMergeMinePlugin }> => {
@@ -585,94 +601,145 @@ export function quarryMergeMineProgram() {
           mergeMiner: addSelfFetchFunctions(client, getMergeMinerCodec()),
         },
         instructions: {
-          newPool: (input) =>
+          newPool: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewPoolInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getNewPoolInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          newPoolV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getNewPoolV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initMergeMiner: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMergeMinerInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initMergeMinerV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMergeMinerV2InstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initMinerMM: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMinerMMInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          initMinerMMV2: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getInitMinerMMV2Instruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          stakePrimaryMiner: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getStakePrimaryMinerInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newPoolV2: (input) =>
+          stakeReplicaMiner: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewPoolV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getStakeReplicaMinerInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initMergeMiner: (input) =>
+          unstakePrimaryMiner: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitMergeMinerInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnstakePrimaryMinerInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initMergeMinerV2: (input) =>
+          unstakeAllReplicaMiner: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitMergeMinerV2InstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getUnstakeAllReplicaMinerInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initMinerMM: (input) =>
+          withdrawTokensMM: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitMinerMMInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getWithdrawTokensMMInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          initMinerMMV2: (input) =>
+          rescueTokensMM: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitMinerMMV2Instruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getRescueTokensMMInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          stakePrimaryMiner: (input) =>
+          claimRewardsMM: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getStakePrimaryMinerInstructionAsync(input),
-            ),
-          stakeReplicaMiner: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getStakeReplicaMinerInstructionAsync(input),
-            ),
-          unstakePrimaryMiner: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUnstakePrimaryMinerInstructionAsync(input),
-            ),
-          unstakeAllReplicaMiner: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getUnstakeAllReplicaMinerInstructionAsync(input),
-            ),
-          withdrawTokensMM: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getWithdrawTokensMMInstructionAsync(input),
-            ),
-          rescueTokensMM: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getRescueTokensMMInstruction(input),
-            ),
-          claimRewardsMM: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getClaimRewardsMMInstructionAsync(input),
+              getClaimRewardsMMInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          mergePool: findMergePoolPda,
-          replicaMint: findReplicaMintPda,
-          mergeMiner: findMergeMinerPda,
+          mergePool: (seeds, pdaConfig) =>
+            findMergePoolPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          replicaMint: (seeds, pdaConfig) =>
+            findReplicaMintPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          mergeMiner: (seeds, pdaConfig) =>
+            findMergeMinerPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyQuarryMergeMineAccount,
         identifyInstruction: identifyQuarryMergeMineInstruction,

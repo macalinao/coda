@@ -11,20 +11,26 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type WithdrawAuthoritySeeds = {
-  stakePoolAddress: Address;
+  stakePoolAddress: Address | HasAddress;
 };
 
 export async function findWithdrawAuthorityPda(
   seeds: WithdrawAuthoritySeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">,
+    programAddress:
+      programAddressInput = "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy" as Address<"SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

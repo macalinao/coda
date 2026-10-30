@@ -26,6 +26,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getHashablePluginSchemaDecoder,
@@ -60,7 +61,7 @@ export type CompressionProof = {
 
 export type CompressionProofArgs = {
   /** The asset's owner at the time it was compressed. */
-  owner: Address;
+  owner: Address | HasAddress;
   /** The asset's update authority at the time it was compressed. */
   updateAuthority: UpdateAuthorityArgs;
   /** The asset's name at the time it was compressed. */

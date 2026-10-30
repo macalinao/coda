@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findEventAuthorityPda,
@@ -158,65 +161,72 @@ export function getClaimPositionFeeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type ClaimPositionFeeAsyncInput<
-  TAccountPoolAuthority extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountTokenAAccount extends string = string,
-  TAccountTokenBAccount extends string = string,
-  TAccountTokenAVault extends string = string,
-  TAccountTokenBVault extends string = string,
-  TAccountTokenAMint extends string = string,
-  TAccountTokenBMint extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenAProgram extends string = string,
-  TAccountTokenBProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenBAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenAVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenBVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenBMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenAProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenBProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  poolAuthority?: Address<TAccountPoolAuthority>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
+  poolAuthority?: TAccountPoolAuthority;
+  pool: TAccountPool;
+  position: TAccountPosition;
   /** The user token a account */
-  tokenAAccount: Address<TAccountTokenAAccount>;
+  tokenAAccount: TAccountTokenAAccount;
   /** The user token b account */
-  tokenBAccount: Address<TAccountTokenBAccount>;
+  tokenBAccount: TAccountTokenBAccount;
   /** The vault token account for input token */
-  tokenAVault?: Address<TAccountTokenAVault>;
+  tokenAVault?: TAccountTokenAVault;
   /** The vault token account for output token */
-  tokenBVault?: Address<TAccountTokenBVault>;
+  tokenBVault?: TAccountTokenBVault;
   /** The mint of token a */
-  tokenAMint: Address<TAccountTokenAMint>;
+  tokenAMint: TAccountTokenAMint;
   /** The mint of token b */
-  tokenBMint: Address<TAccountTokenBMint>;
+  tokenBMint: TAccountTokenBMint;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Token a program */
-  tokenAProgram?: Address<TAccountTokenAProgram>;
+  tokenAProgram?: TAccountTokenAProgram;
   /** Token b program */
-  tokenBProgram?: Address<TAccountTokenBProgram>;
-  eventAuthority?: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  tokenBProgram?: TAccountTokenBProgram;
+  eventAuthority?: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export async function getClaimPositionFeeInstructionAsync<
-  TAccountPoolAuthority extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountTokenAAccount extends string,
-  TAccountTokenBAccount extends string,
-  TAccountTokenAVault extends string,
-  TAccountTokenBVault extends string,
-  TAccountTokenAMint extends string,
-  TAccountTokenBMint extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountTokenAProgram extends string,
-  TAccountTokenBProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountTokenAAccount extends InstructionAccountInput,
+  TAccountTokenBAccount extends InstructionAccountInput,
+  TAccountTokenAVault extends InstructionAccountInput,
+  TAccountTokenBVault extends InstructionAccountInput,
+  TAccountTokenAMint extends InstructionAccountInput,
+  TAccountTokenBMint extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenAProgram extends InstructionAccountInput,
+  TAccountTokenBProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClaimPositionFeeAsyncInput<
@@ -236,50 +246,156 @@ export async function getClaimPositionFeeInstructionAsync<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   ClaimPositionFeeInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountTokenAAccount,
-    TAccountTokenBAccount,
-    TAccountTokenAVault,
-    TAccountTokenBVault,
-    TAccountTokenAMint,
-    TAccountTokenBMint,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenAProgram,
-    TAccountTokenBProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAAccount,
+      InstructionAccountInputAddress<TAccountTokenAAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBAccount,
+      InstructionAccountInputAddress<TAccountTokenBAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAVault,
+      InstructionAccountInputAddress<TAccountTokenAVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBVault,
+      InstructionAccountInputAddress<TAccountTokenBVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAMint,
+      InstructionAccountInputAddress<TAccountTokenAMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBMint,
+      InstructionAccountInputAddress<TAccountTokenBMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAProgram,
+      InstructionAccountInputAddress<TAccountTokenAProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBProgram,
+      InstructionAccountInputAddress<TAccountTokenBProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
-    tokenAAccount: { value: input.tokenAAccount ?? null, isWritable: true },
-    tokenBAccount: { value: input.tokenBAccount ?? null, isWritable: true },
-    tokenAVault: { value: input.tokenAVault ?? null, isWritable: true },
-    tokenBVault: { value: input.tokenBVault ?? null, isWritable: true },
-    tokenAMint: { value: input.tokenAMint ?? null, isWritable: false },
-    tokenBMint: { value: input.tokenBMint ?? null, isWritable: false },
-    positionNftAccount: {
-      value: input.positionNftAccount ?? null,
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenAProgram: { value: input.tokenAProgram ?? null, isWritable: false },
-    tokenBProgram: { value: input.tokenBProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAAccount: {
+      value: input.tokenAAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenBAccount: {
+      value: input.tokenBAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAVault: {
+      value: input.tokenAVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenBVault: {
+      value: input.tokenBVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAMint: {
+      value: input.tokenAMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenBMint: {
+      value: input.tokenBMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    positionNftAccount: {
+      value: input.positionNftAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenAProgram: {
+      value: input.tokenAProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenBProgram: {
+      value: input.tokenBProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -340,7 +456,6 @@ export async function getClaimPositionFeeInstructionAsync<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("poolAuthority", accounts.poolAuthority),
@@ -363,84 +478,136 @@ export async function getClaimPositionFeeInstructionAsync<
     programAddress,
   } as ClaimPositionFeeInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountTokenAAccount,
-    TAccountTokenBAccount,
-    TAccountTokenAVault,
-    TAccountTokenBVault,
-    TAccountTokenAMint,
-    TAccountTokenBMint,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenAProgram,
-    TAccountTokenBProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAAccount,
+      InstructionAccountInputAddress<TAccountTokenAAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBAccount,
+      InstructionAccountInputAddress<TAccountTokenBAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAVault,
+      InstructionAccountInputAddress<TAccountTokenAVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBVault,
+      InstructionAccountInputAddress<TAccountTokenBVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAMint,
+      InstructionAccountInputAddress<TAccountTokenAMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBMint,
+      InstructionAccountInputAddress<TAccountTokenBMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAProgram,
+      InstructionAccountInputAddress<TAccountTokenAProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBProgram,
+      InstructionAccountInputAddress<TAccountTokenBProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 
 export type ClaimPositionFeeInput<
-  TAccountPoolAuthority extends string = string,
-  TAccountPool extends string = string,
-  TAccountPosition extends string = string,
-  TAccountTokenAAccount extends string = string,
-  TAccountTokenBAccount extends string = string,
-  TAccountTokenAVault extends string = string,
-  TAccountTokenBVault extends string = string,
-  TAccountTokenAMint extends string = string,
-  TAccountTokenBMint extends string = string,
-  TAccountPositionNftAccount extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenAProgram extends string = string,
-  TAccountTokenBProgram extends string = string,
-  TAccountEventAuthority extends string = string,
-  TAccountProgram extends string = string,
+  TAccountPoolAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenBAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenAVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenBVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenBMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenAProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenBProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  poolAuthority: Address<TAccountPoolAuthority>;
-  pool: Address<TAccountPool>;
-  position: Address<TAccountPosition>;
+  poolAuthority: TAccountPoolAuthority;
+  pool: TAccountPool;
+  position: TAccountPosition;
   /** The user token a account */
-  tokenAAccount: Address<TAccountTokenAAccount>;
+  tokenAAccount: TAccountTokenAAccount;
   /** The user token b account */
-  tokenBAccount: Address<TAccountTokenBAccount>;
+  tokenBAccount: TAccountTokenBAccount;
   /** The vault token account for input token */
-  tokenAVault: Address<TAccountTokenAVault>;
+  tokenAVault: TAccountTokenAVault;
   /** The vault token account for output token */
-  tokenBVault: Address<TAccountTokenBVault>;
+  tokenBVault: TAccountTokenBVault;
   /** The mint of token a */
-  tokenAMint: Address<TAccountTokenAMint>;
+  tokenAMint: TAccountTokenAMint;
   /** The mint of token b */
-  tokenBMint: Address<TAccountTokenBMint>;
+  tokenBMint: TAccountTokenBMint;
   /** The token account for nft */
-  positionNftAccount: Address<TAccountPositionNftAccount>;
+  positionNftAccount: TAccountPositionNftAccount;
   /** owner of position */
-  owner: TransactionSigner<TAccountOwner>;
+  owner: TAccountOwner;
   /** Token a program */
-  tokenAProgram?: Address<TAccountTokenAProgram>;
+  tokenAProgram?: TAccountTokenAProgram;
   /** Token b program */
-  tokenBProgram?: Address<TAccountTokenBProgram>;
-  eventAuthority: Address<TAccountEventAuthority>;
-  program?: Address<TAccountProgram>;
+  tokenBProgram?: TAccountTokenBProgram;
+  eventAuthority: TAccountEventAuthority;
+  program?: TAccountProgram;
 };
 
 export function getClaimPositionFeeInstruction<
-  TAccountPoolAuthority extends string,
-  TAccountPool extends string,
-  TAccountPosition extends string,
-  TAccountTokenAAccount extends string,
-  TAccountTokenBAccount extends string,
-  TAccountTokenAVault extends string,
-  TAccountTokenBVault extends string,
-  TAccountTokenAMint extends string,
-  TAccountTokenBMint extends string,
-  TAccountPositionNftAccount extends string,
-  TAccountOwner extends string,
-  TAccountTokenAProgram extends string,
-  TAccountTokenBProgram extends string,
-  TAccountEventAuthority extends string,
-  TAccountProgram extends string,
+  TAccountPoolAuthority extends InstructionAccountInput,
+  TAccountPool extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountTokenAAccount extends InstructionAccountInput,
+  TAccountTokenBAccount extends InstructionAccountInput,
+  TAccountTokenAVault extends InstructionAccountInput,
+  TAccountTokenBVault extends InstructionAccountInput,
+  TAccountTokenAMint extends InstructionAccountInput,
+  TAccountTokenBMint extends InstructionAccountInput,
+  TAccountPositionNftAccount extends InstructionAccountInput,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountTokenAProgram extends InstructionAccountInput,
+  TAccountTokenBProgram extends InstructionAccountInput,
+  TAccountEventAuthority extends InstructionAccountInput,
+  TAccountProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof CP_AMM_PROGRAM_ADDRESS,
 >(
   input: ClaimPositionFeeInput<
@@ -460,48 +627,154 @@ export function getClaimPositionFeeInstruction<
     TAccountEventAuthority,
     TAccountProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): ClaimPositionFeeInstruction<
   TProgramAddress,
-  TAccountPoolAuthority,
-  TAccountPool,
-  TAccountPosition,
-  TAccountTokenAAccount,
-  TAccountTokenBAccount,
-  TAccountTokenAVault,
-  TAccountTokenBVault,
-  TAccountTokenAMint,
-  TAccountTokenBMint,
-  TAccountPositionNftAccount,
-  TAccountOwner,
-  TAccountTokenAProgram,
-  TAccountTokenBProgram,
-  TAccountEventAuthority,
-  TAccountProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPoolAuthority,
+    InstructionAccountInputAddress<TAccountPoolAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAAccount,
+    InstructionAccountInputAddress<TAccountTokenAAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBAccount,
+    InstructionAccountInputAddress<TAccountTokenBAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAVault,
+    InstructionAccountInputAddress<TAccountTokenAVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBVault,
+    InstructionAccountInputAddress<TAccountTokenBVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAMint,
+    InstructionAccountInputAddress<TAccountTokenAMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBMint,
+    InstructionAccountInputAddress<TAccountTokenBMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionNftAccount,
+    InstructionAccountInputAddress<TAccountPositionNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAProgram,
+    InstructionAccountInputAddress<TAccountTokenAProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenBProgram,
+    InstructionAccountInputAddress<TAccountTokenBProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEventAuthority,
+    InstructionAccountInputAddress<TAccountEventAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? CP_AMM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    poolAuthority: { value: input.poolAuthority ?? null, isWritable: false },
-    pool: { value: input.pool ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
-    tokenAAccount: { value: input.tokenAAccount ?? null, isWritable: true },
-    tokenBAccount: { value: input.tokenBAccount ?? null, isWritable: true },
-    tokenAVault: { value: input.tokenAVault ?? null, isWritable: true },
-    tokenBVault: { value: input.tokenBVault ?? null, isWritable: true },
-    tokenAMint: { value: input.tokenAMint ?? null, isWritable: false },
-    tokenBMint: { value: input.tokenBMint ?? null, isWritable: false },
-    positionNftAccount: {
-      value: input.positionNftAccount ?? null,
+    poolAuthority: {
+      value: input.poolAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenAProgram: { value: input.tokenAProgram ?? null, isWritable: false },
-    tokenBProgram: { value: input.tokenBProgram ?? null, isWritable: false },
-    eventAuthority: { value: input.eventAuthority ?? null, isWritable: false },
-    program: { value: input.program ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAAccount: {
+      value: input.tokenAAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenBAccount: {
+      value: input.tokenBAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAVault: {
+      value: input.tokenAVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenBVault: {
+      value: input.tokenBVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenAMint: {
+      value: input.tokenAMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenBMint: {
+      value: input.tokenBMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    positionNftAccount: {
+      value: input.positionNftAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    tokenAProgram: {
+      value: input.tokenAProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenBProgram: {
+      value: input.tokenBProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    eventAuthority: {
+      value: input.eventAuthority ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -522,7 +795,6 @@ export function getClaimPositionFeeInstruction<
       "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG" as Address<"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("poolAuthority", accounts.poolAuthority),
@@ -545,21 +817,66 @@ export function getClaimPositionFeeInstruction<
     programAddress,
   } as ClaimPositionFeeInstruction<
     TProgramAddress,
-    TAccountPoolAuthority,
-    TAccountPool,
-    TAccountPosition,
-    TAccountTokenAAccount,
-    TAccountTokenBAccount,
-    TAccountTokenAVault,
-    TAccountTokenBVault,
-    TAccountTokenAMint,
-    TAccountTokenBMint,
-    TAccountPositionNftAccount,
-    TAccountOwner,
-    TAccountTokenAProgram,
-    TAccountTokenBProgram,
-    TAccountEventAuthority,
-    TAccountProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPoolAuthority,
+      InstructionAccountInputAddress<TAccountPoolAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAAccount,
+      InstructionAccountInputAddress<TAccountTokenAAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBAccount,
+      InstructionAccountInputAddress<TAccountTokenBAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAVault,
+      InstructionAccountInputAddress<TAccountTokenAVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBVault,
+      InstructionAccountInputAddress<TAccountTokenBVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAMint,
+      InstructionAccountInputAddress<TAccountTokenAMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBMint,
+      InstructionAccountInputAddress<TAccountTokenBMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionNftAccount,
+      InstructionAccountInputAddress<TAccountPositionNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAProgram,
+      InstructionAccountInputAddress<TAccountTokenAProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenBProgram,
+      InstructionAccountInputAddress<TAccountTokenBProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEventAuthority,
+      InstructionAccountInputAddress<TAccountEventAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >
   >);
 }
 

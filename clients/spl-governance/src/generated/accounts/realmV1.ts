@@ -34,12 +34,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -75,11 +79,11 @@ export type RealmV1 = {
 };
 
 export type RealmV1Args = {
-  communityMint: Address;
+  communityMint: Address | HasAddress;
   config: RealmConfigArgs;
   reserved: Array<number>;
   votingProposalCount: number;
-  authority: OptionOrNullable<Address>;
+  authority: OptionOrNullable<Address | HasAddress>;
   name: string;
 };
 
@@ -133,8 +137,10 @@ export function decodeRealmV1<TAddress extends string = string>(
 }
 
 export async function fetchRealmV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<RealmV1, TAddress>> {
   const maybeAccount = await fetchMaybeRealmV1(rpc, address, config);
@@ -143,17 +149,25 @@ export async function fetchRealmV1<TAddress extends string = string>(
 }
 
 export async function fetchMaybeRealmV1<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<RealmV1, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeRealmV1(maybeAccount);
 }
 
 export async function fetchAllRealmV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<RealmV1>[]> {
   const maybeAccounts = await fetchAllMaybeRealmV1(rpc, addresses, config);
@@ -162,18 +176,26 @@ export async function fetchAllRealmV1(
 }
 
 export async function fetchAllMaybeRealmV1(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<RealmV1>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeRealmV1(maybeAccount));
 }
 
 export async function fetchRealmV1FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RealmSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<RealmV1>> {
   const maybeAccount = await fetchMaybeRealmV1FromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -181,9 +203,11 @@ export async function fetchRealmV1FromSeeds(
 }
 
 export async function fetchMaybeRealmV1FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RealmSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<RealmV1>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findRealmPda(seeds, { programAddress });

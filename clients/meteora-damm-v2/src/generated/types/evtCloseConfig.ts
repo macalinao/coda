@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtCloseConfig = {
@@ -25,7 +26,12 @@ export type EvtCloseConfig = {
   admin: Address;
 };
 
-export type EvtCloseConfigArgs = EvtCloseConfig;
+export type EvtCloseConfigArgs = {
+  /** Config pubkey */
+  config: Address | HasAddress;
+  /** admin pk */
+  admin: Address | HasAddress;
+};
 
 export function getEvtCloseConfigEncoder(): FixedSizeEncoder<EvtCloseConfigArgs> {
   return getStructEncoder([

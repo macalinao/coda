@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -118,28 +121,33 @@ export function getDeletePositionBundleInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DeletePositionBundleInput<
-  TAccountPositionBundle extends string = string,
-  TAccountPositionBundleMint extends string = string,
-  TAccountPositionBundleTokenAccount extends string = string,
-  TAccountPositionBundleOwner extends string = string,
-  TAccountReceiver extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountPositionBundle extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionBundleOwner extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  positionBundle: Address<TAccountPositionBundle>;
-  positionBundleMint: Address<TAccountPositionBundleMint>;
-  positionBundleTokenAccount: Address<TAccountPositionBundleTokenAccount>;
-  positionBundleOwner: TransactionSigner<TAccountPositionBundleOwner>;
-  receiver: Address<TAccountReceiver>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  positionBundle: TAccountPositionBundle;
+  positionBundleMint: TAccountPositionBundleMint;
+  positionBundleTokenAccount: TAccountPositionBundleTokenAccount;
+  positionBundleOwner: TAccountPositionBundleOwner;
+  receiver: TAccountReceiver;
+  tokenProgram?: TAccountTokenProgram;
 };
 
 export function getDeletePositionBundleInstruction<
-  TAccountPositionBundle extends string,
-  TAccountPositionBundleMint extends string,
-  TAccountPositionBundleTokenAccount extends string,
-  TAccountPositionBundleOwner extends string,
-  TAccountReceiver extends string,
-  TAccountTokenProgram extends string,
+  TAccountPositionBundle extends InstructionAccountInput,
+  TAccountPositionBundleMint extends InstructionAccountInput,
+  TAccountPositionBundleTokenAccount extends InstructionAccountInput,
+  TAccountPositionBundleOwner extends InstructionSignerInput,
+  TAccountReceiver extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: DeletePositionBundleInput<
@@ -150,36 +158,82 @@ export function getDeletePositionBundleInstruction<
     TAccountReceiver,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DeletePositionBundleInstruction<
   TProgramAddress,
-  TAccountPositionBundle,
-  TAccountPositionBundleMint,
-  TAccountPositionBundleTokenAccount,
-  TAccountPositionBundleOwner,
-  TAccountReceiver,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundle,
+    InstructionAccountInputAddress<TAccountPositionBundle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleMint,
+    InstructionAccountInputAddress<TAccountPositionBundleMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionBundleOwner,
+    InstructionAccountInputAddress<TAccountPositionBundleOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReceiver,
+    InstructionAccountInputAddress<TAccountReceiver>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    positionBundle: { value: input.positionBundle ?? null, isWritable: true },
+    positionBundle: {
+      value: input.positionBundle ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     positionBundleMint: {
       value: input.positionBundleMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionBundleTokenAccount: {
       value: input.positionBundleTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionBundleOwner: {
       value: input.positionBundleOwner ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    receiver: { value: input.receiver ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    receiver: {
+      value: input.receiver ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -192,7 +246,6 @@ export function getDeletePositionBundleInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("positionBundle", accounts.positionBundle),
@@ -209,12 +262,30 @@ export function getDeletePositionBundleInstruction<
     programAddress,
   } as DeletePositionBundleInstruction<
     TProgramAddress,
-    TAccountPositionBundle,
-    TAccountPositionBundleMint,
-    TAccountPositionBundleTokenAccount,
-    TAccountPositionBundleOwner,
-    TAccountReceiver,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundle,
+      InstructionAccountInputAddress<TAccountPositionBundle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleMint,
+      InstructionAccountInputAddress<TAccountPositionBundleMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionBundleTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionBundleOwner,
+      InstructionAccountInputAddress<TAccountPositionBundleOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReceiver,
+      InstructionAccountInputAddress<TAccountReceiver>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

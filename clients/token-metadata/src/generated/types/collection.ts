@@ -18,11 +18,12 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type Collection = { verified: boolean; key: Address };
 
-export type CollectionArgs = Collection;
+export type CollectionArgs = { verified: boolean; key: Address | HasAddress };
 
 export function getCollectionEncoder(): FixedSizeEncoder<CollectionArgs> {
   return getStructEncoder([

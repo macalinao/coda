@@ -16,11 +16,15 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type NewMergePoolEvent = { pool: Address; primaryMint: Address };
 
-export type NewMergePoolEventArgs = NewMergePoolEvent;
+export type NewMergePoolEventArgs = {
+  pool: Address | HasAddress;
+  primaryMint: Address | HasAddress;
+};
 
 export function getNewMergePoolEventEncoder(): FixedSizeEncoder<NewMergePoolEventArgs> {
   return getStructEncoder([

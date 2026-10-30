@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { QUARRY_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -96,39 +99,61 @@ export function getUpdateQuarryRewardsInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateQuarryRewardsInput<
-  TAccountQuarry extends string = string,
-  TAccountRewarder extends string = string,
+  TAccountQuarry extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  quarry: Address<TAccountQuarry>;
-  rewarder: Address<TAccountRewarder>;
+  quarry: TAccountQuarry;
+  rewarder: TAccountRewarder;
 };
 
 export function getUpdateQuarryRewardsInstruction<
-  TAccountQuarry extends string,
-  TAccountRewarder extends string,
+  TAccountQuarry extends InstructionAccountInput,
+  TAccountRewarder extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MINE_PROGRAM_ADDRESS,
 >(
   input: UpdateQuarryRewardsInput<TAccountQuarry, TAccountRewarder>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UpdateQuarryRewardsInstruction<
   TProgramAddress,
-  TAccountQuarry,
-  TAccountRewarder
+  ResolvedInstructionAccountMeta<
+    TAccountQuarry,
+    InstructionAccountInputAddress<TAccountQuarry>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? QUARRY_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    quarry: { value: input.quarry ?? null, isWritable: true },
-    rewarder: { value: input.rewarder ?? null, isWritable: false },
+    quarry: { value: input.quarry ?? null, isSigner: false, isWritable: true },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("quarry", accounts.quarry),
@@ -138,8 +163,14 @@ export function getUpdateQuarryRewardsInstruction<
     programAddress,
   } as UpdateQuarryRewardsInstruction<
     TProgramAddress,
-    TAccountQuarry,
-    TAccountRewarder
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >
   >);
 }
 

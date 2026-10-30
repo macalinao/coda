@@ -25,6 +25,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
@@ -33,12 +34,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -86,7 +90,7 @@ export type SetPreferredValidatorInstructionData = {
 
 export type SetPreferredValidatorInstructionDataArgs = {
   validatorType: PreferredValidatorTypeArgs;
-  validatorVoteAddress: OptionOrNullable<Address>;
+  validatorVoteAddress: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getSetPreferredValidatorInstructionDataEncoder(): Encoder<SetPreferredValidatorInstructionDataArgs> {
@@ -122,13 +126,14 @@ export function getSetPreferredValidatorInstructionDataCodec(): Codec<
 }
 
 export type SetPreferredValidatorInput<
-  TAccountStakePool extends string = string,
-  TAccountStaker extends string = string,
-  TAccountValidatorList extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput = InstructionSignerInput,
+  TAccountValidatorList extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  stakePool: Address<TAccountStakePool>;
-  staker: TransactionSigner<TAccountStaker>;
-  validatorList: Address<TAccountValidatorList>;
+  stakePool: TAccountStakePool;
+  staker: TAccountStaker;
+  validatorList: TAccountValidatorList;
   validatorType: SetPreferredValidatorInstructionDataArgs["validatorType"];
   validatorVoteAddress: SetPreferredValidatorInstructionDataArgs["validatorVoteAddress"];
 };
@@ -146,9 +151,9 @@ export type SetPreferredValidatorInput<
  * Fails if the validator is not part of the stake pool.
  */
 export function getSetPreferredValidatorInstruction<
-  TAccountStakePool extends string,
-  TAccountStaker extends string,
-  TAccountValidatorList extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput,
+  TAccountValidatorList extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: SetPreferredValidatorInput<
@@ -156,22 +161,51 @@ export function getSetPreferredValidatorInstruction<
     TAccountStaker,
     TAccountValidatorList
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetPreferredValidatorInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountStaker,
-  TAccountValidatorList
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountStaker,
+    InstructionAccountInputAddress<TAccountStaker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountValidatorList,
+    InstructionAccountInputAddress<TAccountValidatorList>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    staker: { value: input.staker ?? null, isWritable: false },
-    validatorList: { value: input.validatorList ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    staker: { value: input.staker ?? null, isSigner: true, isWritable: false },
+    validatorList: {
+      value: input.validatorList ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -181,7 +215,6 @@ export function getSetPreferredValidatorInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -194,9 +227,18 @@ export function getSetPreferredValidatorInstruction<
     programAddress,
   } as SetPreferredValidatorInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountStaker,
-    TAccountValidatorList
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStaker,
+      InstructionAccountInputAddress<TAccountStaker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorList,
+      InstructionAccountInputAddress<TAccountValidatorList>
+    >
   >);
 }
 

@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -637,63 +638,80 @@ export type VoterStakeRegistryPluginAccounts = {
 export type VoterStakeRegistryPluginInstructions = {
   createRegistrar: (
     input: MakeOptional<CreateRegistrarInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateRegistrarInstruction> &
     SelfPlanAndSendFunctions;
   configureVotingMint: (
     input: ConfigureVotingMintInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getConfigureVotingMintInstruction> &
     SelfPlanAndSendFunctions;
   createVoter: (
     input: MakeOptional<CreateVoterAsyncInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateVoterInstructionAsync> &
     SelfPlanAndSendFunctions;
   createDepositEntry: (
     input: MakeOptional<CreateDepositEntryInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateDepositEntryInstruction> &
     SelfPlanAndSendFunctions;
   deposit: (
     input: DepositInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getDepositInstruction> & SelfPlanAndSendFunctions;
   withdraw: (
     input: WithdrawInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawInstruction> & SelfPlanAndSendFunctions;
   grant: (
     input: MakeOptional<GrantInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getGrantInstruction> & SelfPlanAndSendFunctions;
   clawback: (
     input: ClawbackInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getClawbackInstruction> & SelfPlanAndSendFunctions;
   closeDepositEntry: (
     input: CloseDepositEntryInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseDepositEntryInstruction> &
     SelfPlanAndSendFunctions;
   resetLockup: (
     input: ResetLockupInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getResetLockupInstruction> & SelfPlanAndSendFunctions;
   internalTransferLocked: (
     input: InternalTransferLockedInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInternalTransferLockedInstruction> &
     SelfPlanAndSendFunctions;
   internalTransferUnlocked: (
     input: InternalTransferUnlockedInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInternalTransferUnlockedInstruction> &
     SelfPlanAndSendFunctions;
   updateVoterWeightRecord: (
     input: UpdateVoterWeightRecordInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateVoterWeightRecordInstruction> &
     SelfPlanAndSendFunctions;
   updateMaxVoteWeight: (
     input: UpdateMaxVoteWeightInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateMaxVoteWeightInstruction> &
     SelfPlanAndSendFunctions;
   closeVoter: (
     input: CloseVoterInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseVoterInstruction> & SelfPlanAndSendFunctions;
   logVoterInfo: (
     input: LogVoterInfoInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getLogVoterInfoInstruction> & SelfPlanAndSendFunctions;
   setTimeOffset: (
     input: SetTimeOffsetInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetTimeOffsetInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -711,7 +729,9 @@ export type VoterStakeRegistryPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function voterStakeRegistryProgram() {
+export function voterStakeRegistryProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends VoterStakeRegistryPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { voterStakeRegistry: VoterStakeRegistryPlugin }> => {
@@ -726,99 +746,171 @@ export function voterStakeRegistryProgram() {
           ),
         },
         instructions: {
-          createRegistrar: (input) =>
+          createRegistrar: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateRegistrarInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateRegistrarInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          configureVotingMint: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getConfigureVotingMintInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          configureVotingMint: (input) =>
+          createVoter: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getConfigureVotingMintInstruction(input),
+              getCreateVoterInstructionAsync(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          createVoter: (input) =>
+          createDepositEntry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateVoterInstructionAsync({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateDepositEntryInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          deposit: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getDepositInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createDepositEntry: (input) =>
+          withdraw: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateDepositEntryInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getWithdrawInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          deposit: (input) =>
-            addSelfPlanAndSendFunctions(client, getDepositInstruction(input)),
-          withdraw: (input) =>
-            addSelfPlanAndSendFunctions(client, getWithdrawInstruction(input)),
-          grant: (input) =>
+          grant: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getGrantInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getGrantInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          clawback: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getClawbackInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          clawback: (input) =>
-            addSelfPlanAndSendFunctions(client, getClawbackInstruction(input)),
-          closeDepositEntry: (input) =>
+          closeDepositEntry: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseDepositEntryInstruction(input),
+              getCloseDepositEntryInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          resetLockup: (input) =>
+          resetLockup: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getResetLockupInstruction(input),
+              getResetLockupInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          internalTransferLocked: (input) =>
+          internalTransferLocked: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInternalTransferLockedInstruction(input),
+              getInternalTransferLockedInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          internalTransferUnlocked: (input) =>
+          internalTransferUnlocked: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInternalTransferUnlockedInstruction(input),
+              getInternalTransferUnlockedInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateVoterWeightRecord: (input) =>
+          updateVoterWeightRecord: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateVoterWeightRecordInstruction(input),
+              getUpdateVoterWeightRecordInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateMaxVoteWeight: (input) =>
+          updateMaxVoteWeight: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateMaxVoteWeightInstruction(input),
+              getUpdateMaxVoteWeightInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          closeVoter: (input) =>
+          closeVoter: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseVoterInstruction(input),
+              getCloseVoterInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          logVoterInfo: (input) =>
+          logVoterInfo: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getLogVoterInfoInstruction(input),
+              getLogVoterInfoInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          setTimeOffset: (input) =>
+          setTimeOffset: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetTimeOffsetInstruction(input),
+              getSetTimeOffsetInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          registrar: findRegistrarPda,
-          voter: findVoterPda,
-          voterWeightRecord: findVoterWeightRecordPda,
+          registrar: (seeds, pdaConfig) =>
+            findRegistrarPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          voter: (seeds, pdaConfig) =>
+            findVoterPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          voterWeightRecord: (seeds, pdaConfig) =>
+            findVoterWeightRecordPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyVoterStakeRegistryAccount,
         identifyInstruction: identifyVoterStakeRegistryInstruction,

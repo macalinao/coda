@@ -30,14 +30,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findFarmsUserStatePda } from "../pdas/index.ts";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -113,23 +116,23 @@ export function getUnstakeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UnstakeAsyncInput<
-  TAccountOwner extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  userState?: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  scopePrices?: Address<TAccountScopePrices>;
+  owner: TAccountOwner;
+  userState?: TAccountUserState;
+  farmState: TAccountFarmState;
+  scopePrices?: TAccountScopePrices;
   stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
 };
 
 export async function getUnstakeInstructionAsync<
-  TAccountOwner extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountScopePrices extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: UnstakeAsyncInput<
@@ -138,25 +141,61 @@ export async function getUnstakeInstructionAsync<
     TAccountFarmState,
     TAccountScopePrices
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   UnstakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: true },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: true },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -183,7 +222,6 @@ export async function getUnstakeInstructionAsync<
     );
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -197,31 +235,43 @@ export async function getUnstakeInstructionAsync<
     programAddress,
   } as UnstakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 
 export type UnstakeInput<
-  TAccountOwner extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  userState: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  scopePrices?: Address<TAccountScopePrices>;
+  owner: TAccountOwner;
+  userState: TAccountUserState;
+  farmState: TAccountFarmState;
+  scopePrices?: TAccountScopePrices;
   stakeSharesScaled: UnstakeInstructionDataArgs["stakeSharesScaled"];
 };
 
 export function getUnstakeInstruction<
-  TAccountOwner extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountScopePrices extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: UnstakeInput<
@@ -230,23 +280,59 @@ export function getUnstakeInstruction<
     TAccountFarmState,
     TAccountScopePrices
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UnstakeInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountUserState,
-  TAccountFarmState,
-  TAccountScopePrices
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: true },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: true },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -256,7 +342,6 @@ export function getUnstakeInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -270,10 +355,22 @@ export function getUnstakeInstruction<
     programAddress,
   } as UnstakeInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 

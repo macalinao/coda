@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -143,38 +146,44 @@ export function getInitObligationInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitObligationInput<
-  TAccountObligationOwner extends string = string,
-  TAccountFeePayer extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountSeed1Account extends string = string,
-  TAccountSeed2Account extends string = string,
-  TAccountOwnerUserMetadata extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountObligationOwner extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountFeePayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSeed1Account extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSeed2Account extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountOwnerUserMetadata extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  obligationOwner: TransactionSigner<TAccountObligationOwner>;
-  feePayer: TransactionSigner<TAccountFeePayer>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  seed1Account: Address<TAccountSeed1Account>;
-  seed2Account: Address<TAccountSeed2Account>;
-  ownerUserMetadata: Address<TAccountOwnerUserMetadata>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  obligationOwner: TAccountObligationOwner;
+  feePayer: TAccountFeePayer;
+  obligation: TAccountObligation;
+  lendingMarket: TAccountLendingMarket;
+  seed1Account: TAccountSeed1Account;
+  seed2Account: TAccountSeed2Account;
+  ownerUserMetadata: TAccountOwnerUserMetadata;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
   args: InitObligationInstructionDataArgs["args"];
 };
 
 export function getInitObligationInstruction<
-  TAccountObligationOwner extends string,
-  TAccountFeePayer extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
-  TAccountSeed1Account extends string,
-  TAccountSeed2Account extends string,
-  TAccountOwnerUserMetadata extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountObligationOwner extends InstructionSignerInput,
+  TAccountFeePayer extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountSeed1Account extends InstructionAccountInput,
+  TAccountSeed2Account extends InstructionAccountInput,
+  TAccountOwnerUserMetadata extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitObligationInput<
@@ -188,40 +197,105 @@ export function getInitObligationInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitObligationInstruction<
   TProgramAddress,
-  TAccountObligationOwner,
-  TAccountFeePayer,
-  TAccountObligation,
-  TAccountLendingMarket,
-  TAccountSeed1Account,
-  TAccountSeed2Account,
-  TAccountOwnerUserMetadata,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountObligationOwner,
+    InstructionAccountInputAddress<TAccountObligationOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFeePayer,
+    InstructionAccountInputAddress<TAccountFeePayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSeed1Account,
+    InstructionAccountInputAddress<TAccountSeed1Account>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSeed2Account,
+    InstructionAccountInputAddress<TAccountSeed2Account>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwnerUserMetadata,
+    InstructionAccountInputAddress<TAccountOwnerUserMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     obligationOwner: {
       value: input.obligationOwner ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    feePayer: { value: input.feePayer ?? null, isWritable: true },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    seed1Account: { value: input.seed1Account ?? null, isWritable: false },
-    seed2Account: { value: input.seed2Account ?? null, isWritable: false },
+    feePayer: {
+      value: input.feePayer ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    seed1Account: {
+      value: input.seed1Account ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    seed2Account: {
+      value: input.seed2Account ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     ownerUserMetadata: {
       value: input.ownerUserMetadata ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -241,7 +315,6 @@ export function getInitObligationInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("obligationOwner", accounts.obligationOwner),
@@ -260,15 +333,42 @@ export function getInitObligationInstruction<
     programAddress,
   } as InitObligationInstruction<
     TProgramAddress,
-    TAccountObligationOwner,
-    TAccountFeePayer,
-    TAccountObligation,
-    TAccountLendingMarket,
-    TAccountSeed1Account,
-    TAccountSeed2Account,
-    TAccountOwnerUserMetadata,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountObligationOwner,
+      InstructionAccountInputAddress<TAccountObligationOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFeePayer,
+      InstructionAccountInputAddress<TAccountFeePayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSeed1Account,
+      InstructionAccountInputAddress<TAccountSeed1Account>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSeed2Account,
+      InstructionAccountInputAddress<TAccountSeed2Account>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwnerUserMetadata,
+      InstructionAccountInputAddress<TAccountOwnerUserMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

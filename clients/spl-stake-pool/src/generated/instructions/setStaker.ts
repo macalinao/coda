@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -92,16 +95,17 @@ export function getSetStakerInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetStakerInput<
-  TAccountStakePool extends string = string,
-  TAccountAuthority extends string = string,
-  TAccountNewStakerPubkey extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewStakerPubkey extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Manager or current staker */
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: TAccountAuthority;
   /** New staker pubkey */
-  newStakerPubkey: Address<TAccountNewStakerPubkey>;
+  newStakerPubkey: TAccountNewStakerPubkey;
 };
 
 /**
@@ -111,9 +115,9 @@ export type SetStakerInput<
  * 2. '[]` New staker pubkey
  */
 export function getSetStakerInstruction<
-  TAccountStakePool extends string,
-  TAccountAuthority extends string,
-  TAccountNewStakerPubkey extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountNewStakerPubkey extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: SetStakerInput<
@@ -121,23 +125,53 @@ export function getSetStakerInstruction<
     TAccountAuthority,
     TAccountNewStakerPubkey
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetStakerInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountAuthority,
-  TAccountNewStakerPubkey
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewStakerPubkey,
+    InstructionAccountInputAddress<TAccountNewStakerPubkey>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    authority: { value: input.authority ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     newStakerPubkey: {
       value: input.newStakerPubkey ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -146,7 +180,6 @@ export function getSetStakerInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -157,9 +190,18 @@ export function getSetStakerInstruction<
     programAddress,
   } as SetStakerInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountAuthority,
-    TAccountNewStakerPubkey
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewStakerPubkey,
+      InstructionAccountInputAddress<TAccountNewStakerPubkey>
+    >
   >);
 }
 

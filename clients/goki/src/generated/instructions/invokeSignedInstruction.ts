@@ -33,11 +33,14 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { TOKEN_SIGNER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -114,20 +117,21 @@ export function getInvokeSignedInstructionInstructionDataCodec(): Codec<
 }
 
 export type InvokeSignedInstructionInput<
-  TAccountOwnerAuthority extends string = string,
-  TAccountNftAccount extends string = string,
-  TAccountNftPda extends string = string,
+  TAccountOwnerAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountNftAccount extends InstructionAccountInput = InstructionAccountInput,
+  TAccountNftPda extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  ownerAuthority: TransactionSigner<TAccountOwnerAuthority>;
-  nftAccount: Address<TAccountNftAccount>;
-  nftPda: Address<TAccountNftPda>;
+  ownerAuthority: TAccountOwnerAuthority;
+  nftAccount: TAccountNftAccount;
+  nftPda: TAccountNftPda;
   data: InvokeSignedInstructionInstructionDataArgs["data"];
 };
 
 export function getInvokeSignedInstructionInstruction<
-  TAccountOwnerAuthority extends string,
-  TAccountNftAccount extends string,
-  TAccountNftPda extends string,
+  TAccountOwnerAuthority extends InstructionSignerInput,
+  TAccountNftAccount extends InstructionAccountInput,
+  TAccountNftPda extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_SIGNER_PROGRAM_ADDRESS,
 >(
   input: InvokeSignedInstructionInput<
@@ -135,21 +139,51 @@ export function getInvokeSignedInstructionInstruction<
     TAccountNftAccount,
     TAccountNftPda
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InvokeSignedInstructionInstruction<
   TProgramAddress,
-  TAccountOwnerAuthority,
-  TAccountNftAccount,
-  TAccountNftPda
+  ResolvedInstructionAccountMeta<
+    TAccountOwnerAuthority,
+    InstructionAccountInputAddress<TAccountOwnerAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNftAccount,
+    InstructionAccountInputAddress<TAccountNftAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNftPda,
+    InstructionAccountInputAddress<TAccountNftPda>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TOKEN_SIGNER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? TOKEN_SIGNER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    ownerAuthority: { value: input.ownerAuthority ?? null, isWritable: false },
-    nftAccount: { value: input.nftAccount ?? null, isWritable: false },
-    nftPda: { value: input.nftPda ?? null, isWritable: false },
+    ownerAuthority: {
+      value: input.ownerAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    nftAccount: {
+      value: input.nftAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    nftPda: { value: input.nftPda ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -159,7 +193,6 @@ export function getInvokeSignedInstructionInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("ownerAuthority", accounts.ownerAuthority),
@@ -172,9 +205,18 @@ export function getInvokeSignedInstructionInstruction<
     programAddress,
   } as InvokeSignedInstructionInstruction<
     TProgramAddress,
-    TAccountOwnerAuthority,
-    TAccountNftAccount,
-    TAccountNftPda
+    ResolvedInstructionAccountMeta<
+      TAccountOwnerAuthority,
+      InstructionAccountInputAddress<TAccountOwnerAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNftAccount,
+      InstructionAccountInputAddress<TAccountNftAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNftPda,
+      InstructionAccountInputAddress<TAccountNftPda>
+    >
   >);
 }
 

@@ -6,7 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 
-import { extendClient, type Address, type ExtendedClient } from "@solana/kit";
+import {
+  extendClient,
+  type Address,
+  type ExtendedClient,
+  type HasAddress,
+} from "@solana/kit";
 import { findMasterEditionPda, findMetadataPda } from "../pdas/index.ts";
 
 export const MPL_TOKEN_METADATA_PROGRAM_ADDRESS =
@@ -21,15 +26,25 @@ export type MplTokenMetadataPluginPdas = {
 
 export type MplTokenMetadataPluginRequirements = object;
 
-export function mplTokenMetadataProgram() {
+export function mplTokenMetadataProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends MplTokenMetadataPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { mplTokenMetadata: MplTokenMetadataPlugin }> => {
     return extendClient(client, {
       mplTokenMetadata: {
         pdas: {
-          metadata: findMetadataPda,
-          masterEdition: findMasterEditionPda,
+          metadata: (seeds, pdaConfig) =>
+            findMetadataPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          masterEdition: (seeds, pdaConfig) =>
+            findMasterEditionPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
       } as MplTokenMetadataPlugin,
     });

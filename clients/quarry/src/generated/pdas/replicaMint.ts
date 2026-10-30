@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type ReplicaMintSeeds = {
-  pool: Address;
+  pool: Address | HasAddress;
 };
 
 /** Replica mint token for the merge pool */
 export async function findReplicaMintPda(
   seeds: ReplicaMintSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">,
+    programAddress:
+      programAddressInput = "QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto" as Address<"QMMD16kjauP5knBwxNUJRZ1Z5o3deBuFrqVjBVmmqto">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

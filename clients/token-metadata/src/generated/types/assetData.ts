@@ -30,6 +30,7 @@ import {
   type Codec,
   type Decoder,
   type Encoder,
+  type HasAddress,
   type Option,
   type OptionOrNullable,
 } from "@solana/kit";
@@ -83,7 +84,7 @@ export type AssetDataArgs = {
   collection: OptionOrNullable<CollectionArgs>;
   uses: OptionOrNullable<UsesArgs>;
   collectionDetails: OptionOrNullable<CollectionDetailsArgs>;
-  ruleSet: OptionOrNullable<Address>;
+  ruleSet: OptionOrNullable<Address | HasAddress>;
 };
 
 export function getAssetDataEncoder(): Encoder<AssetDataArgs> {

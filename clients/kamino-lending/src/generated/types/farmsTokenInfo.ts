@@ -20,6 +20,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type FarmsTokenInfo = {
@@ -30,9 +31,9 @@ export type FarmsTokenInfo = {
 };
 
 export type FarmsTokenInfoArgs = {
-  mint: Address;
+  mint: Address | HasAddress;
   decimals: number | bigint;
-  tokenProgram: Address;
+  tokenProgram: Address | HasAddress;
   padding: Array<number | bigint>;
 };
 

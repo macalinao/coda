@@ -31,7 +31,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -97,19 +100,19 @@ export function getRefreshUserStateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RefreshUserStateInput<
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountScopePrices extends string = string,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  userState: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  scopePrices?: Address<TAccountScopePrices>;
+  userState: TAccountUserState;
+  farmState: TAccountFarmState;
+  scopePrices?: TAccountScopePrices;
 };
 
 export function getRefreshUserStateInstruction<
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountScopePrices extends string,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountScopePrices extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: RefreshUserStateInput<
@@ -117,28 +120,60 @@ export function getRefreshUserStateInstruction<
     TAccountFarmState,
     TAccountScopePrices
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RefreshUserStateInstruction<
   TProgramAddress,
-  TAccountUserState,
-  TAccountFarmState,
-  TAccountScopePrices
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountScopePrices,
+    InstructionAccountInputAddress<TAccountScopePrices>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    scopePrices: { value: input.scopePrices ?? null, isWritable: false },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    scopePrices: {
+      value: input.scopePrices ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("userState", accounts.userState),
@@ -149,9 +184,18 @@ export function getRefreshUserStateInstruction<
     programAddress,
   } as RefreshUserStateInstruction<
     TProgramAddress,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountScopePrices
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountScopePrices,
+      InstructionAccountInputAddress<TAccountScopePrices>
+    >
   >);
 }
 

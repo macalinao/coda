@@ -24,6 +24,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getFarmsTokenInfoDecoder,
@@ -55,7 +56,7 @@ export type RewardInfo = {
 
 export type RewardInfoArgs = {
   token: FarmsTokenInfoArgs;
-  rewardsVault: Address;
+  rewardsVault: Address | HasAddress;
   rewardsAvailable: number | bigint;
   rewardScheduleCurve: RewardScheduleCurveArgs;
   minClaimDurationSeconds: number | bigint;

@@ -30,14 +30,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMergeMinerPda } from "../pdas/index.ts";
 import { QUARRY_MERGE_MINE_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -117,26 +120,27 @@ export function getInitMergeMinerInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitMergeMinerAsyncInput<
-  TAccountPool extends string = string,
-  TAccountOwner extends string = string,
-  TAccountMm extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  owner: Address<TAccountOwner>;
-  mm?: Address<TAccountMm>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  pool: TAccountPool;
+  owner: TAccountOwner;
+  mm?: TAccountMm;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: InitMergeMinerInstructionDataArgs["bump"];
 };
 
 export async function getInitMergeMinerInstructionAsync<
-  TAccountPool extends string,
-  TAccountOwner extends string,
-  TAccountMm extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: InitMergeMinerAsyncInput<
@@ -146,28 +150,59 @@ export async function getInitMergeMinerInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   InitMergeMinerInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountOwner,
-    TAccountMm,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: false },
-    owner: { value: input.owner ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    mm: { value: input.mm ?? null, isSigner: false, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -198,7 +233,6 @@ export async function getInitMergeMinerInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -213,35 +247,51 @@ export async function getInitMergeMinerInstructionAsync<
     programAddress,
   } as InitMergeMinerInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountOwner,
-    TAccountMm,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type InitMergeMinerInput<
-  TAccountPool extends string = string,
-  TAccountOwner extends string = string,
-  TAccountMm extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  pool: Address<TAccountPool>;
-  owner: Address<TAccountOwner>;
-  mm: Address<TAccountMm>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  pool: TAccountPool;
+  owner: TAccountOwner;
+  mm: TAccountMm;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
   bump: InitMergeMinerInstructionDataArgs["bump"];
 };
 
 export function getInitMergeMinerInstruction<
-  TAccountPool extends string,
-  TAccountOwner extends string,
-  TAccountMm extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountPool extends InstructionAccountInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountMm extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_MERGE_MINE_PROGRAM_ADDRESS,
 >(
   input: InitMergeMinerInput<
@@ -251,26 +301,57 @@ export function getInitMergeMinerInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitMergeMinerInstruction<
   TProgramAddress,
-  TAccountPool,
-  TAccountOwner,
-  TAccountMm,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPool,
+    InstructionAccountInputAddress<TAccountPool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMm,
+    InstructionAccountInputAddress<TAccountMm>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_MERGE_MINE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    pool: { value: input.pool ?? null, isWritable: false },
-    owner: { value: input.owner ?? null, isWritable: false },
-    mm: { value: input.mm ?? null, isWritable: true },
-    payer: { value: input.payer ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    pool: { value: input.pool ?? null, isSigner: false, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    mm: { value: input.mm ?? null, isSigner: false, isWritable: true },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -286,7 +367,6 @@ export function getInitMergeMinerInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("pool", accounts.pool),
@@ -301,11 +381,26 @@ export function getInitMergeMinerInstruction<
     programAddress,
   } as InitMergeMinerInstruction<
     TProgramAddress,
-    TAccountPool,
-    TAccountOwner,
-    TAccountMm,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPool,
+      InstructionAccountInputAddress<TAccountPool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMm,
+      InstructionAccountInputAddress<TAccountMm>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

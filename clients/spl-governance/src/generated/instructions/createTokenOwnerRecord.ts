@@ -27,13 +27,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findTokenOwnerRecordPda } from "../pdas/index.ts";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -111,29 +114,34 @@ export function getCreateTokenOwnerRecordInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateTokenOwnerRecordAsyncInput<
-  TAccountRealmAccount extends string = string,
-  TAccountGoverningTokenOwnerAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountGoverningTokenMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenOwnerAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
-  governingTokenOwnerAccount: Address<TAccountGoverningTokenOwnerAccount>;
+  realmAccount: TAccountRealmAccount;
+  governingTokenOwnerAccount: TAccountGoverningTokenOwnerAccount;
   /** seeds=['governance', realm, governing_token_mint, governing_token_owner] */
-  tokenOwnerRecord?: Address<TAccountTokenOwnerRecord>;
-  governingTokenMint: Address<TAccountGoverningTokenMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  tokenOwnerRecord?: TAccountTokenOwnerRecord;
+  governingTokenMint: TAccountGoverningTokenMint;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export async function getCreateTokenOwnerRecordInstructionAsync<
-  TAccountRealmAccount extends string,
-  TAccountGoverningTokenOwnerAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountGoverningTokenMint extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountGoverningTokenOwnerAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateTokenOwnerRecordAsyncInput<
@@ -144,39 +152,80 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   CreateTokenOwnerRecordInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGoverningTokenOwnerAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGoverningTokenMint,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenOwnerAccount,
+      InstructionAccountInputAddress<TAccountGoverningTokenOwnerAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     governingTokenOwnerAccount: {
       value: input.governingTokenOwnerAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governingTokenMint: {
       value: input.governingTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -208,7 +257,6 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -225,39 +273,62 @@ export async function getCreateTokenOwnerRecordInstructionAsync<
     programAddress,
   } as CreateTokenOwnerRecordInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGoverningTokenOwnerAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGoverningTokenMint,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenOwnerAccount,
+      InstructionAccountInputAddress<TAccountGoverningTokenOwnerAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type CreateTokenOwnerRecordInput<
-  TAccountRealmAccount extends string = string,
-  TAccountGoverningTokenOwnerAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountGoverningTokenMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenOwnerAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
-  governingTokenOwnerAccount: Address<TAccountGoverningTokenOwnerAccount>;
+  realmAccount: TAccountRealmAccount;
+  governingTokenOwnerAccount: TAccountGoverningTokenOwnerAccount;
   /** seeds=['governance', realm, governing_token_mint, governing_token_owner] */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
-  governingTokenMint: Address<TAccountGoverningTokenMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
+  governingTokenMint: TAccountGoverningTokenMint;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getCreateTokenOwnerRecordInstruction<
-  TAccountRealmAccount extends string,
-  TAccountGoverningTokenOwnerAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountGoverningTokenMint extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountGoverningTokenOwnerAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateTokenOwnerRecordInput<
@@ -268,37 +339,78 @@ export function getCreateTokenOwnerRecordInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateTokenOwnerRecordInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountGoverningTokenOwnerAccount,
-  TAccountTokenOwnerRecord,
-  TAccountGoverningTokenMint,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenOwnerAccount,
+    InstructionAccountInputAddress<TAccountGoverningTokenOwnerAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenMint,
+    InstructionAccountInputAddress<TAccountGoverningTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     governingTokenOwnerAccount: {
       value: input.governingTokenOwnerAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governingTokenMint: {
       value: input.governingTokenMint ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -311,7 +423,6 @@ export function getCreateTokenOwnerRecordInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -328,12 +439,30 @@ export function getCreateTokenOwnerRecordInstruction<
     programAddress,
   } as CreateTokenOwnerRecordInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGoverningTokenOwnerAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGoverningTokenMint,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenOwnerAccount,
+      InstructionAccountInputAddress<TAccountGoverningTokenOwnerAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

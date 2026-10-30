@@ -30,13 +30,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { WHIRLPOOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -173,52 +176,59 @@ export function getOpenPositionWithMetadataInstructionDataCodec(): FixedSizeCode
 }
 
 export type OpenPositionWithMetadataInput<
-  TAccountFunder extends string = string,
-  TAccountOwner extends string = string,
-  TAccountPosition extends string = string,
-  TAccountPositionMint extends string = string,
-  TAccountPositionMetadataAccount extends string = string,
-  TAccountPositionTokenAccount extends string = string,
-  TAccountWhirlpool extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountAssociatedTokenProgram extends string = string,
-  TAccountMetadataProgram extends string = string,
-  TAccountMetadataUpdateAuth extends string = string,
+  TAccountFunder extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPositionMint extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPositionMetadataAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMetadataUpdateAuth extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  funder: TransactionSigner<TAccountFunder>;
-  owner: Address<TAccountOwner>;
-  position: Address<TAccountPosition>;
-  positionMint: TransactionSigner<TAccountPositionMint>;
-  positionMetadataAccount: Address<TAccountPositionMetadataAccount>;
-  positionTokenAccount: Address<TAccountPositionTokenAccount>;
-  whirlpool: Address<TAccountWhirlpool>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
-  associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-  metadataProgram?: Address<TAccountMetadataProgram>;
-  metadataUpdateAuth: Address<TAccountMetadataUpdateAuth>;
+  funder: TAccountFunder;
+  owner: TAccountOwner;
+  position: TAccountPosition;
+  positionMint: TAccountPositionMint;
+  positionMetadataAccount: TAccountPositionMetadataAccount;
+  positionTokenAccount: TAccountPositionTokenAccount;
+  whirlpool: TAccountWhirlpool;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
+  associatedTokenProgram?: TAccountAssociatedTokenProgram;
+  metadataProgram?: TAccountMetadataProgram;
+  metadataUpdateAuth: TAccountMetadataUpdateAuth;
   bumps: OpenPositionWithMetadataInstructionDataArgs["bumps"];
   tickLowerIndex: OpenPositionWithMetadataInstructionDataArgs["tickLowerIndex"];
   tickUpperIndex: OpenPositionWithMetadataInstructionDataArgs["tickUpperIndex"];
 };
 
 export function getOpenPositionWithMetadataInstruction<
-  TAccountFunder extends string,
-  TAccountOwner extends string,
-  TAccountPosition extends string,
-  TAccountPositionMint extends string,
-  TAccountPositionMetadataAccount extends string,
-  TAccountPositionTokenAccount extends string,
-  TAccountWhirlpool extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountAssociatedTokenProgram extends string,
-  TAccountMetadataProgram extends string,
-  TAccountMetadataUpdateAuth extends string,
+  TAccountFunder extends InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountPosition extends InstructionAccountInput,
+  TAccountPositionMint extends InstructionSignerInput,
+  TAccountPositionMetadataAccount extends InstructionAccountInput,
+  TAccountPositionTokenAccount extends InstructionAccountInput,
+  TAccountWhirlpool extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountAssociatedTokenProgram extends InstructionAccountInput,
+  TAccountMetadataProgram extends InstructionAccountInput,
+  TAccountMetadataUpdateAuth extends InstructionAccountInput,
   TProgramAddress extends Address = typeof WHIRLPOOL_PROGRAM_ADDRESS,
 >(
   input: OpenPositionWithMetadataInput<
@@ -236,54 +246,131 @@ export function getOpenPositionWithMetadataInstruction<
     TAccountMetadataProgram,
     TAccountMetadataUpdateAuth
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): OpenPositionWithMetadataInstruction<
   TProgramAddress,
-  TAccountFunder,
-  TAccountOwner,
-  TAccountPosition,
-  TAccountPositionMint,
-  TAccountPositionMetadataAccount,
-  TAccountPositionTokenAccount,
-  TAccountWhirlpool,
-  TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountRent,
-  TAccountAssociatedTokenProgram,
-  TAccountMetadataProgram,
-  TAccountMetadataUpdateAuth
+  ResolvedInstructionAccountMeta<
+    TAccountFunder,
+    InstructionAccountInputAddress<TAccountFunder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPosition,
+    InstructionAccountInputAddress<TAccountPosition>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionMint,
+    InstructionAccountInputAddress<TAccountPositionMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionMetadataAccount,
+    InstructionAccountInputAddress<TAccountPositionMetadataAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPositionTokenAccount,
+    InstructionAccountInputAddress<TAccountPositionTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWhirlpool,
+    InstructionAccountInputAddress<TAccountWhirlpool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAssociatedTokenProgram,
+    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataProgram,
+    InstructionAccountInputAddress<TAccountMetadataProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMetadataUpdateAuth,
+    InstructionAccountInputAddress<TAccountMetadataUpdateAuth>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? WHIRLPOOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    funder: { value: input.funder ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    position: { value: input.position ?? null, isWritable: true },
-    positionMint: { value: input.positionMint ?? null, isWritable: true },
+    funder: { value: input.funder ?? null, isSigner: true, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    position: {
+      value: input.position ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    positionMint: {
+      value: input.positionMint ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
     positionMetadataAccount: {
       value: input.positionMetadataAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     positionTokenAccount: {
       value: input.positionTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    whirlpool: { value: input.whirlpool ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    whirlpool: {
+      value: input.whirlpool ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
     associatedTokenProgram: {
       value: input.associatedTokenProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     metadataProgram: {
       value: input.metadataProgram ?? null,
+      isSigner: false,
       isWritable: false,
     },
     metadataUpdateAuth: {
       value: input.metadataUpdateAuth ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -317,7 +404,6 @@ export function getOpenPositionWithMetadataInstruction<
       "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" as Address<"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("funder", accounts.funder),
@@ -343,19 +429,58 @@ export function getOpenPositionWithMetadataInstruction<
     programAddress,
   } as OpenPositionWithMetadataInstruction<
     TProgramAddress,
-    TAccountFunder,
-    TAccountOwner,
-    TAccountPosition,
-    TAccountPositionMint,
-    TAccountPositionMetadataAccount,
-    TAccountPositionTokenAccount,
-    TAccountWhirlpool,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountAssociatedTokenProgram,
-    TAccountMetadataProgram,
-    TAccountMetadataUpdateAuth
+    ResolvedInstructionAccountMeta<
+      TAccountFunder,
+      InstructionAccountInputAddress<TAccountFunder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPosition,
+      InstructionAccountInputAddress<TAccountPosition>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionMint,
+      InstructionAccountInputAddress<TAccountPositionMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionMetadataAccount,
+      InstructionAccountInputAddress<TAccountPositionMetadataAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPositionTokenAccount,
+      InstructionAccountInputAddress<TAccountPositionTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWhirlpool,
+      InstructionAccountInputAddress<TAccountWhirlpool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAssociatedTokenProgram,
+      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataProgram,
+      InstructionAccountInputAddress<TAccountMetadataProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMetadataUpdateAuth,
+      InstructionAccountInputAddress<TAccountMetadataUpdateAuth>
+    >
   >);
 }
 

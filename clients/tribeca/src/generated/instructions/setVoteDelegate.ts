@@ -25,17 +25,21 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { LOCKED_VOTER_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -73,7 +77,9 @@ export type SetVoteDelegateInstructionData = {
   newDelegate: Address;
 };
 
-export type SetVoteDelegateInstructionDataArgs = { newDelegate: Address };
+export type SetVoteDelegateInstructionDataArgs = {
+  newDelegate: Address | HasAddress;
+};
 
 export function getSetVoteDelegateInstructionDataEncoder(): FixedSizeEncoder<SetVoteDelegateInstructionDataArgs> {
   return transformEncoder(
@@ -103,33 +109,56 @@ export function getSetVoteDelegateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetVoteDelegateInput<
-  TAccountEscrow extends string = string,
-  TAccountEscrowOwner extends string = string,
+  TAccountEscrow extends InstructionAccountInput = InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput = InstructionSignerInput,
 > = {
-  escrow: Address<TAccountEscrow>;
-  escrowOwner: TransactionSigner<TAccountEscrowOwner>;
+  escrow: TAccountEscrow;
+  escrowOwner: TAccountEscrowOwner;
   newDelegate: SetVoteDelegateInstructionDataArgs["newDelegate"];
 };
 
 export function getSetVoteDelegateInstruction<
-  TAccountEscrow extends string,
-  TAccountEscrowOwner extends string,
+  TAccountEscrow extends InstructionAccountInput,
+  TAccountEscrowOwner extends InstructionSignerInput,
   TProgramAddress extends Address = typeof LOCKED_VOTER_PROGRAM_ADDRESS,
 >(
   input: SetVoteDelegateInput<TAccountEscrow, TAccountEscrowOwner>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetVoteDelegateInstruction<
   TProgramAddress,
-  TAccountEscrow,
-  TAccountEscrowOwner
+  ResolvedInstructionAccountMeta<
+    TAccountEscrow,
+    InstructionAccountInputAddress<TAccountEscrow>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountEscrowOwner,
+    InstructionAccountInputAddress<TAccountEscrowOwner>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? LOCKED_VOTER_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    escrow: { value: input.escrow ?? null, isWritable: true },
-    escrowOwner: { value: input.escrowOwner ?? null, isWritable: false },
+    escrow: { value: input.escrow ?? null, isSigner: false, isWritable: true },
+    escrowOwner: {
+      value: input.escrowOwner ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -139,7 +168,6 @@ export function getSetVoteDelegateInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("escrow", accounts.escrow),
@@ -151,8 +179,14 @@ export function getSetVoteDelegateInstruction<
     programAddress,
   } as SetVoteDelegateInstruction<
     TProgramAddress,
-    TAccountEscrow,
-    TAccountEscrowOwner
+    ResolvedInstructionAccountMeta<
+      TAccountEscrow,
+      InstructionAccountInputAddress<TAccountEscrow>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountEscrowOwner,
+      InstructionAccountInputAddress<TAccountEscrowOwner>
+    >
   >);
 }
 

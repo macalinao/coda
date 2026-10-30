@@ -30,7 +30,10 @@ import {
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { BUBBLEGUM_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -89,47 +92,74 @@ export function getCollectV2InstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CollectV2Input<
-  TAccountTreeAuthority extends string = string,
-  TAccountDestination extends string = string,
+  TAccountTreeAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /**
    * The tree's `TreeConfig` PDA, which stores its configuration and acts
    * as the tree's authority for CPIs into the compression program.
    */
-  treeAuthority: Address<TAccountTreeAuthority>;
+  treeAuthority: TAccountTreeAuthority;
   /** Account to receive the collected V2 tree fees. */
-  destination: Address<TAccountDestination>;
+  destination: TAccountDestination;
 };
 
 /**
  * Collects accumulated protocol fees from a V2 tree's `TreeConfig` PDA.
  */
 export function getCollectV2Instruction<
-  TAccountTreeAuthority extends string,
-  TAccountDestination extends string,
+  TAccountTreeAuthority extends InstructionAccountInput,
+  TAccountDestination extends InstructionAccountInput,
   TProgramAddress extends Address = typeof BUBBLEGUM_PROGRAM_ADDRESS,
 >(
   input: CollectV2Input<TAccountTreeAuthority, TAccountDestination>,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CollectV2Instruction<
   TProgramAddress,
-  TAccountTreeAuthority,
-  TAccountDestination
+  ResolvedInstructionAccountMeta<
+    TAccountTreeAuthority,
+    InstructionAccountInputAddress<TAccountTreeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDestination,
+    InstructionAccountInputAddress<TAccountDestination>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddressInput =
+    config?.programAddress ?? BUBBLEGUM_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    treeAuthority: { value: input.treeAuthority ?? null, isWritable: true },
-    destination: { value: input.destination ?? null, isWritable: true },
+    treeAuthority: {
+      value: input.treeAuthority ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    destination: {
+      value: input.destination ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("treeAuthority", accounts.treeAuthority),
@@ -139,8 +169,14 @@ export function getCollectV2Instruction<
     programAddress,
   } as CollectV2Instruction<
     TProgramAddress,
-    TAccountTreeAuthority,
-    TAccountDestination
+    ResolvedInstructionAccountMeta<
+      TAccountTreeAuthority,
+      InstructionAccountInputAddress<TAccountTreeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDestination,
+      InstructionAccountInputAddress<TAccountDestination>
+    >
   >);
 }
 

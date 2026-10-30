@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -78,9 +82,9 @@ export type TreeConfig = {
 
 export type TreeConfigArgs = {
   /** Original creator of the tree. */
-  treeCreator: Address;
+  treeCreator: Address | HasAddress;
   /** Current delegate authority of the tree, authorized to mint and manage it on the creator's behalf. */
-  treeDelegate: Address;
+  treeDelegate: Address | HasAddress;
   /** Maximum number of leaves the tree can ever hold, derived from its `maxDepth`. */
   totalMintCapacity: number | bigint;
   /** Number of leaves minted into the tree so far; used as the `nonce` for the next minted leaf. */
@@ -148,8 +152,10 @@ export function decodeTreeConfig<TAddress extends string = string>(
 }
 
 export async function fetchTreeConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<TreeConfig, TAddress>> {
   const maybeAccount = await fetchMaybeTreeConfig(rpc, address, config);
@@ -158,17 +164,25 @@ export async function fetchTreeConfig<TAddress extends string = string>(
 }
 
 export async function fetchMaybeTreeConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<TreeConfig, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeTreeConfig(maybeAccount);
 }
 
 export async function fetchAllTreeConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TreeConfig>[]> {
   const maybeAccounts = await fetchAllMaybeTreeConfig(rpc, addresses, config);
@@ -177,18 +191,26 @@ export async function fetchAllTreeConfig(
 }
 
 export async function fetchAllMaybeTreeConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TreeConfig>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeTreeConfig(maybeAccount));
 }
 
 export async function fetchTreeConfigFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TreeConfigSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<TreeConfig>> {
   const maybeAccount = await fetchMaybeTreeConfigFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -196,9 +218,11 @@ export async function fetchTreeConfigFromSeeds(
 }
 
 export async function fetchMaybeTreeConfigFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TreeConfigSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<TreeConfig>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findTreeConfigPda(seeds, { programAddress });

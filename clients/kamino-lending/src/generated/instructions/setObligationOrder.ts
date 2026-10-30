@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -123,21 +126,22 @@ export function getSetObligationOrderInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetObligationOrderInput<
-  TAccountOwner extends string = string,
-  TAccountObligation extends string = string,
-  TAccountLendingMarket extends string = string,
+  TAccountOwner extends InstructionSignerInput = InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput = InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  owner: TransactionSigner<TAccountOwner>;
-  obligation: Address<TAccountObligation>;
-  lendingMarket: Address<TAccountLendingMarket>;
+  owner: TAccountOwner;
+  obligation: TAccountObligation;
+  lendingMarket: TAccountLendingMarket;
   index: SetObligationOrderInstructionDataArgs["index"];
   order: SetObligationOrderInstructionDataArgs["order"];
 };
 
 export function getSetObligationOrderInstruction<
-  TAccountOwner extends string,
-  TAccountObligation extends string,
-  TAccountLendingMarket extends string,
+  TAccountOwner extends InstructionSignerInput,
+  TAccountObligation extends InstructionAccountInput,
+  TAccountLendingMarket extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: SetObligationOrderInput<
@@ -145,22 +149,51 @@ export function getSetObligationOrderInstruction<
     TAccountObligation,
     TAccountLendingMarket
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetObligationOrderInstruction<
   TProgramAddress,
-  TAccountOwner,
-  TAccountObligation,
-  TAccountLendingMarket
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountObligation,
+    InstructionAccountInputAddress<TAccountObligation>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    owner: { value: input.owner ?? null, isWritable: false },
-    obligation: { value: input.obligation ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
+    owner: { value: input.owner ?? null, isSigner: true, isWritable: false },
+    obligation: {
+      value: input.obligation ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -170,7 +203,6 @@ export function getSetObligationOrderInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("owner", accounts.owner),
@@ -183,9 +215,18 @@ export function getSetObligationOrderInstruction<
     programAddress,
   } as SetObligationOrderInstruction<
     TProgramAddress,
-    TAccountOwner,
-    TAccountObligation,
-    TAccountLendingMarket
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountObligation,
+      InstructionAccountInputAddress<TAccountObligation>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >
   >);
 }
 

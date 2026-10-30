@@ -11,21 +11,27 @@ import {
   getProgramDerivedAddress,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type LockerSeeds = {
-  base: Address;
+  base: Address | HasAddress;
 };
 
 /** Locker account that manages vote escrows for a specific base */
 export async function findLockerPda(
   seeds: LockerSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
+    programAddress:
+      programAddressInput = "LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw" as Address<"LocktDzaV1W2Bm9DeZeiyz4J9zs4fRqNiYqQyracRXw">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

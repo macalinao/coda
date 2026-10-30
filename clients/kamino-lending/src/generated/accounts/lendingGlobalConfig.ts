@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -63,11 +67,11 @@ export type LendingGlobalConfig = {
 
 export type LendingGlobalConfigArgs = {
   /** Global admin of the program */
-  globalAdmin: Address;
+  globalAdmin: Address | HasAddress;
   /** Pending admin must sign a specific transaction to become the global admin */
-  pendingAdmin: Address;
+  pendingAdmin: Address | HasAddress;
   /** Fee collector is the only allowed owner of token accounts receiving protocol fees */
-  feeCollector: Address;
+  feeCollector: Address | HasAddress;
   /** Padding to make the struct size 1024 bytes */
   padding: Array<number>;
 };
@@ -131,8 +135,10 @@ export function decodeLendingGlobalConfig<TAddress extends string = string>(
 export async function fetchLendingGlobalConfig<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<LendingGlobalConfig, TAddress>> {
   const maybeAccount = await fetchMaybeLendingGlobalConfig(
@@ -147,17 +153,25 @@ export async function fetchLendingGlobalConfig<
 export async function fetchMaybeLendingGlobalConfig<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<LendingGlobalConfig, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeLendingGlobalConfig(maybeAccount);
 }
 
 export async function fetchAllLendingGlobalConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<LendingGlobalConfig>[]> {
   const maybeAccounts = await fetchAllMaybeLendingGlobalConfig(
@@ -170,20 +184,28 @@ export async function fetchAllLendingGlobalConfig(
 }
 
 export async function fetchAllMaybeLendingGlobalConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<LendingGlobalConfig>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeLendingGlobalConfig(maybeAccount),
   );
 }
 
 export async function fetchLendingGlobalConfigFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
 
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<LendingGlobalConfig>> {
   const maybeAccount = await fetchMaybeLendingGlobalConfigFromSeeds(
     rpc,
@@ -194,9 +216,11 @@ export async function fetchLendingGlobalConfigFromSeeds(
 }
 
 export async function fetchMaybeLendingGlobalConfigFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
 
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<LendingGlobalConfig>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findLendingGlobalConfigStatePda({ programAddress });

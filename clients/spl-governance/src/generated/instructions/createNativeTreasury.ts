@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -100,24 +103,27 @@ export function getCreateNativeTreasuryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type CreateNativeTreasuryInput<
-  TAccountGovernanceAccount extends string = string,
-  TAccountNativeTreasuryAccount extends string = string,
-  TAccountPayer extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountNativeTreasuryAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Governance account the treasury account is for */
-  governanceAccount: Address<TAccountGovernanceAccount>;
+  governanceAccount: TAccountGovernanceAccount;
   /** seeds=['native-treasury', governance] */
-  nativeTreasuryAccount: Address<TAccountNativeTreasuryAccount>;
-  payer: TransactionSigner<TAccountPayer>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  nativeTreasuryAccount: TAccountNativeTreasuryAccount;
+  payer: TAccountPayer;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getCreateNativeTreasuryInstruction<
-  TAccountGovernanceAccount extends string,
-  TAccountNativeTreasuryAccount extends string,
-  TAccountPayer extends string,
-  TAccountSystemProgram extends string,
+  TAccountGovernanceAccount extends InstructionAccountInput,
+  TAccountNativeTreasuryAccount extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateNativeTreasuryInput<
@@ -126,30 +132,60 @@ export function getCreateNativeTreasuryInstruction<
     TAccountPayer,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateNativeTreasuryInstruction<
   TProgramAddress,
-  TAccountGovernanceAccount,
-  TAccountNativeTreasuryAccount,
-  TAccountPayer,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAccount,
+    InstructionAccountInputAddress<TAccountGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNativeTreasuryAccount,
+    InstructionAccountInputAddress<TAccountNativeTreasuryAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
     governanceAccount: {
       value: input.governanceAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
     nativeTreasuryAccount: {
       value: input.nativeTreasuryAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -162,7 +198,6 @@ export function getCreateNativeTreasuryInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("governanceAccount", accounts.governanceAccount),
@@ -174,10 +209,22 @@ export function getCreateNativeTreasuryInstruction<
     programAddress,
   } as CreateNativeTreasuryInstruction<
     TProgramAddress,
-    TAccountGovernanceAccount,
-    TAccountNativeTreasuryAccount,
-    TAccountPayer,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAccount,
+      InstructionAccountInputAddress<TAccountGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNativeTreasuryAccount,
+      InstructionAccountInputAddress<TAccountNativeTreasuryAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

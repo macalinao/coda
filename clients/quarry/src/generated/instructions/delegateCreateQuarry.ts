@@ -31,14 +31,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findQuarryPda } from "../pdas/index.ts";
 import { QUARRY_OPERATOR_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -141,38 +144,41 @@ export function getDelegateCreateQuarryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DelegateCreateQuarryAsyncInput<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
-  TAccountQuarry extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountUnusedAccount extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountOperator extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDelegate extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUnusedAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
-  quarry?: Address<TAccountQuarry>;
-  tokenMint: Address<TAccountTokenMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  unusedAccount: Address<TAccountUnusedAccount>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  operator: TAccountOperator;
+  delegate: TAccountDelegate;
+  rewarder: TAccountRewarder;
+  quarryMineProgram?: TAccountQuarryMineProgram;
+  quarry?: TAccountQuarry;
+  tokenMint: TAccountTokenMint;
+  payer: TAccountPayer;
+  unusedAccount: TAccountUnusedAccount;
+  systemProgram?: TAccountSystemProgram;
   bump: DelegateCreateQuarryInstructionDataArgs["bump"];
 };
 
 export async function getDelegateCreateQuarryInstructionAsync<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
-  TAccountQuarry extends string,
-  TAccountTokenMint extends string,
-  TAccountPayer extends string,
-  TAccountUnusedAccount extends string,
-  TAccountSystemProgram extends string,
+  TAccountOperator extends InstructionAccountInput,
+  TAccountDelegate extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountUnusedAccount extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateCreateQuarryAsyncInput<
@@ -186,39 +192,103 @@ export async function getDelegateCreateQuarryInstructionAsync<
     TAccountUnusedAccount,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   DelegateCreateQuarryInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
-    TAccountQuarry,
-    TAccountTokenMint,
-    TAccountPayer,
-    TAccountUnusedAccount,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegate,
+      InstructionAccountInputAddress<TAccountDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    operator: {
+      value: input.operator ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    delegate: {
+      value: input.delegate ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    quarry: { value: input.quarry ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    quarryMineProgram: {
+      value: input.quarryMineProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    quarry: { value: input.quarry ?? null, isSigner: false, isWritable: true },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    unusedAccount: {
+      value: input.unusedAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -250,7 +320,6 @@ export async function getDelegateCreateQuarryInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("operator", accounts.operator),
@@ -269,51 +338,81 @@ export async function getDelegateCreateQuarryInstructionAsync<
     programAddress,
   } as DelegateCreateQuarryInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
-    TAccountQuarry,
-    TAccountTokenMint,
-    TAccountPayer,
-    TAccountUnusedAccount,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegate,
+      InstructionAccountInputAddress<TAccountDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type DelegateCreateQuarryInput<
-  TAccountOperator extends string = string,
-  TAccountDelegate extends string = string,
-  TAccountRewarder extends string = string,
-  TAccountQuarryMineProgram extends string = string,
-  TAccountQuarry extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountPayer extends string = string,
-  TAccountUnusedAccount extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountOperator extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDelegate extends InstructionSignerInput = InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput = InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountUnusedAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  operator: Address<TAccountOperator>;
-  delegate: TransactionSigner<TAccountDelegate>;
-  rewarder: Address<TAccountRewarder>;
-  quarryMineProgram?: Address<TAccountQuarryMineProgram>;
-  quarry: Address<TAccountQuarry>;
-  tokenMint: Address<TAccountTokenMint>;
-  payer: TransactionSigner<TAccountPayer>;
-  unusedAccount: Address<TAccountUnusedAccount>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  operator: TAccountOperator;
+  delegate: TAccountDelegate;
+  rewarder: TAccountRewarder;
+  quarryMineProgram?: TAccountQuarryMineProgram;
+  quarry: TAccountQuarry;
+  tokenMint: TAccountTokenMint;
+  payer: TAccountPayer;
+  unusedAccount: TAccountUnusedAccount;
+  systemProgram?: TAccountSystemProgram;
   bump: DelegateCreateQuarryInstructionDataArgs["bump"];
 };
 
 export function getDelegateCreateQuarryInstruction<
-  TAccountOperator extends string,
-  TAccountDelegate extends string,
-  TAccountRewarder extends string,
-  TAccountQuarryMineProgram extends string,
-  TAccountQuarry extends string,
-  TAccountTokenMint extends string,
-  TAccountPayer extends string,
-  TAccountUnusedAccount extends string,
-  TAccountSystemProgram extends string,
+  TAccountOperator extends InstructionAccountInput,
+  TAccountDelegate extends InstructionSignerInput,
+  TAccountRewarder extends InstructionAccountInput,
+  TAccountQuarryMineProgram extends InstructionAccountInput,
+  TAccountQuarry extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountUnusedAccount extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof QUARRY_OPERATOR_PROGRAM_ADDRESS,
 >(
   input: DelegateCreateQuarryInput<
@@ -327,37 +426,101 @@ export function getDelegateCreateQuarryInstruction<
     TAccountUnusedAccount,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DelegateCreateQuarryInstruction<
   TProgramAddress,
-  TAccountOperator,
-  TAccountDelegate,
-  TAccountRewarder,
-  TAccountQuarryMineProgram,
-  TAccountQuarry,
-  TAccountTokenMint,
-  TAccountPayer,
-  TAccountUnusedAccount,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountOperator,
+    InstructionAccountInputAddress<TAccountOperator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDelegate,
+    InstructionAccountInputAddress<TAccountDelegate>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewarder,
+    InstructionAccountInputAddress<TAccountRewarder>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountQuarryMineProgram,
+    InstructionAccountInputAddress<TAccountQuarryMineProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountQuarry,
+    InstructionAccountInputAddress<TAccountQuarry>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMint,
+    InstructionAccountInputAddress<TAccountTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUnusedAccount,
+    InstructionAccountInputAddress<TAccountUnusedAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? QUARRY_OPERATOR_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    operator: { value: input.operator ?? null, isWritable: true },
-    delegate: { value: input.delegate ?? null, isWritable: false },
-    rewarder: { value: input.rewarder ?? null, isWritable: true },
-    quarryMineProgram: {
-      value: input.quarryMineProgram ?? null,
+    operator: {
+      value: input.operator ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    delegate: {
+      value: input.delegate ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    quarry: { value: input.quarry ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    unusedAccount: { value: input.unusedAccount ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rewarder: {
+      value: input.rewarder ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    quarryMineProgram: {
+      value: input.quarryMineProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    quarry: { value: input.quarry ?? null, isSigner: false, isWritable: true },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    unusedAccount: {
+      value: input.unusedAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -377,7 +540,6 @@ export function getDelegateCreateQuarryInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("operator", accounts.operator),
@@ -396,15 +558,42 @@ export function getDelegateCreateQuarryInstruction<
     programAddress,
   } as DelegateCreateQuarryInstruction<
     TProgramAddress,
-    TAccountOperator,
-    TAccountDelegate,
-    TAccountRewarder,
-    TAccountQuarryMineProgram,
-    TAccountQuarry,
-    TAccountTokenMint,
-    TAccountPayer,
-    TAccountUnusedAccount,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOperator,
+      InstructionAccountInputAddress<TAccountOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegate,
+      InstructionAccountInputAddress<TAccountDelegate>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewarder,
+      InstructionAccountInputAddress<TAccountRewarder>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarryMineProgram,
+      InstructionAccountInputAddress<TAccountQuarryMineProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountQuarry,
+      InstructionAccountInputAddress<TAccountQuarry>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUnusedAccount,
+      InstructionAccountInputAddress<TAccountUnusedAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

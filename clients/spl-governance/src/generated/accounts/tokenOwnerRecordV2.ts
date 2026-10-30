@@ -28,12 +28,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type Option,
@@ -74,15 +78,15 @@ export type TokenOwnerRecordV2 = {
 };
 
 export type TokenOwnerRecordV2Args = {
-  realm: Address;
-  governingTokenMint: Address;
-  governingTokenOwner: Address;
+  realm: Address | HasAddress;
+  governingTokenMint: Address | HasAddress;
+  governingTokenOwner: Address | HasAddress;
   governingTokenDepositAmount: number | bigint;
   unrelinquishedVotesCount: number | bigint;
   outstandingProposalCount: number;
   version: number;
   reserved: Array<number>;
-  governanceDelegate: OptionOrNullable<Address>;
+  governanceDelegate: OptionOrNullable<Address | HasAddress>;
   reservedV2: Array<number>;
 };
 
@@ -152,8 +156,10 @@ export function decodeTokenOwnerRecordV2<TAddress extends string = string>(
 }
 
 export async function fetchTokenOwnerRecordV2<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<TokenOwnerRecordV2, TAddress>> {
   const maybeAccount = await fetchMaybeTokenOwnerRecordV2(rpc, address, config);
@@ -164,17 +170,25 @@ export async function fetchTokenOwnerRecordV2<TAddress extends string = string>(
 export async function fetchMaybeTokenOwnerRecordV2<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<TokenOwnerRecordV2, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeTokenOwnerRecordV2(maybeAccount);
 }
 
 export async function fetchAllTokenOwnerRecordV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenOwnerRecordV2>[]> {
   const maybeAccounts = await fetchAllMaybeTokenOwnerRecordV2(
@@ -187,20 +201,28 @@ export async function fetchAllTokenOwnerRecordV2(
 }
 
 export async function fetchAllMaybeTokenOwnerRecordV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenOwnerRecordV2>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeTokenOwnerRecordV2(maybeAccount),
   );
 }
 
 export async function fetchTokenOwnerRecordV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TokenOwnerRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<TokenOwnerRecordV2>> {
   const maybeAccount = await fetchMaybeTokenOwnerRecordV2FromSeeds(
     rpc,
@@ -212,9 +234,11 @@ export async function fetchTokenOwnerRecordV2FromSeeds(
 }
 
 export async function fetchMaybeTokenOwnerRecordV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: TokenOwnerRecordSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<TokenOwnerRecordV2>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findTokenOwnerRecordPda(seeds, { programAddress });

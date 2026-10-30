@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -55,9 +59,9 @@ export type WhirlpoolsConfig = {
 };
 
 export type WhirlpoolsConfigArgs = {
-  feeAuthority: Address;
-  collectProtocolFeesAuthority: Address;
-  rewardEmissionsSuperAuthority: Address;
+  feeAuthority: Address | HasAddress;
+  collectProtocolFeesAuthority: Address | HasAddress;
+  rewardEmissionsSuperAuthority: Address | HasAddress;
   defaultProtocolFeeRate: number;
 };
 
@@ -115,8 +119,10 @@ export function decodeWhirlpoolsConfig<TAddress extends string = string>(
 }
 
 export async function fetchWhirlpoolsConfig<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<WhirlpoolsConfig, TAddress>> {
   const maybeAccount = await fetchMaybeWhirlpoolsConfig(rpc, address, config);
@@ -127,17 +133,25 @@ export async function fetchWhirlpoolsConfig<TAddress extends string = string>(
 export async function fetchMaybeWhirlpoolsConfig<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<WhirlpoolsConfig, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeWhirlpoolsConfig(maybeAccount);
 }
 
 export async function fetchAllWhirlpoolsConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<WhirlpoolsConfig>[]> {
   const maybeAccounts = await fetchAllMaybeWhirlpoolsConfig(
@@ -150,11 +164,17 @@ export async function fetchAllWhirlpoolsConfig(
 }
 
 export async function fetchAllMaybeWhirlpoolsConfig(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<WhirlpoolsConfig>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeWhirlpoolsConfig(maybeAccount),
   );

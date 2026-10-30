@@ -28,13 +28,16 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { KAMINO_LENDING_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -122,31 +125,34 @@ export function getInitReferrerTokenStateInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitReferrerTokenStateInput<
-  TAccountPayer extends string = string,
-  TAccountLendingMarket extends string = string,
-  TAccountReserve extends string = string,
-  TAccountReferrer extends string = string,
-  TAccountReferrerTokenState extends string = string,
-  TAccountRent extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountLendingMarket extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReferrer extends InstructionAccountInput = InstructionAccountInput,
+  TAccountReferrerTokenState extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  payer: TransactionSigner<TAccountPayer>;
-  lendingMarket: Address<TAccountLendingMarket>;
-  reserve: Address<TAccountReserve>;
-  referrer: Address<TAccountReferrer>;
-  referrerTokenState: Address<TAccountReferrerTokenState>;
-  rent?: Address<TAccountRent>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  payer: TAccountPayer;
+  lendingMarket: TAccountLendingMarket;
+  reserve: TAccountReserve;
+  referrer: TAccountReferrer;
+  referrerTokenState: TAccountReferrerTokenState;
+  rent?: TAccountRent;
+  systemProgram?: TAccountSystemProgram;
 };
 
 export function getInitReferrerTokenStateInstruction<
-  TAccountPayer extends string,
-  TAccountLendingMarket extends string,
-  TAccountReserve extends string,
-  TAccountReferrer extends string,
-  TAccountReferrerTokenState extends string,
-  TAccountRent extends string,
-  TAccountSystemProgram extends string,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountLendingMarket extends InstructionAccountInput,
+  TAccountReserve extends InstructionAccountInput,
+  TAccountReferrer extends InstructionAccountInput,
+  TAccountReferrerTokenState extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof KAMINO_LENDING_PROGRAM_ADDRESS,
 >(
   input: InitReferrerTokenStateInput<
@@ -158,33 +164,83 @@ export function getInitReferrerTokenStateInstruction<
     TAccountRent,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitReferrerTokenStateInstruction<
   TProgramAddress,
-  TAccountPayer,
-  TAccountLendingMarket,
-  TAccountReserve,
-  TAccountReferrer,
-  TAccountReferrerTokenState,
-  TAccountRent,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountLendingMarket,
+    InstructionAccountInputAddress<TAccountLendingMarket>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserve,
+    InstructionAccountInputAddress<TAccountReserve>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrer,
+    InstructionAccountInputAddress<TAccountReferrer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReferrerTokenState,
+    InstructionAccountInputAddress<TAccountReferrerTokenState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? KAMINO_LENDING_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    payer: { value: input.payer ?? null, isWritable: true },
-    lendingMarket: { value: input.lendingMarket ?? null, isWritable: false },
-    reserve: { value: input.reserve ?? null, isWritable: false },
-    referrer: { value: input.referrer ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    lendingMarket: {
+      value: input.lendingMarket ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    reserve: {
+      value: input.reserve ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    referrer: {
+      value: input.referrer ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     referrerTokenState: {
       value: input.referrerTokenState ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    rent: { value: input.rent ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -201,7 +257,6 @@ export function getInitReferrerTokenStateInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("payer", accounts.payer),
@@ -216,13 +271,34 @@ export function getInitReferrerTokenStateInstruction<
     programAddress,
   } as InitReferrerTokenStateInstruction<
     TProgramAddress,
-    TAccountPayer,
-    TAccountLendingMarket,
-    TAccountReserve,
-    TAccountReferrer,
-    TAccountReferrerTokenState,
-    TAccountRent,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountLendingMarket,
+      InstructionAccountInputAddress<TAccountLendingMarket>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserve,
+      InstructionAccountInputAddress<TAccountReserve>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrer,
+      InstructionAccountInputAddress<TAccountReferrer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReferrerTokenState,
+      InstructionAccountInputAddress<TAccountReferrerTokenState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

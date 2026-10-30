@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -97,19 +100,20 @@ export function getSetManagerInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetManagerInput<
-  TAccountStakePool extends string = string,
-  TAccountManager extends string = string,
-  TAccountNewManager extends string = string,
-  TAccountNewManagerFeeAccount extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewManager extends InstructionSignerInput = InstructionSignerInput,
+  TAccountNewManagerFeeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Manager */
-  manager: TransactionSigner<TAccountManager>;
+  manager: TAccountManager;
   /** New manager */
-  newManager: TransactionSigner<TAccountNewManager>;
+  newManager: TAccountNewManager;
   /** New manager fee account */
-  newManagerFeeAccount: Address<TAccountNewManagerFeeAccount>;
+  newManagerFeeAccount: TAccountNewManagerFeeAccount;
 };
 
 /**
@@ -120,10 +124,10 @@ export type SetManagerInput<
  * 3. `[]` New manager fee account
  */
 export function getSetManagerInstruction<
-  TAccountStakePool extends string,
-  TAccountManager extends string,
-  TAccountNewManager extends string,
-  TAccountNewManagerFeeAccount extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountManager extends InstructionSignerInput,
+  TAccountNewManager extends InstructionSignerInput,
+  TAccountNewManagerFeeAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: SetManagerInput<
@@ -132,25 +136,62 @@ export function getSetManagerInstruction<
     TAccountNewManager,
     TAccountNewManagerFeeAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetManagerInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountManager,
-  TAccountNewManager,
-  TAccountNewManagerFeeAccount
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountManager,
+    InstructionAccountInputAddress<TAccountManager>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewManager,
+    InstructionAccountInputAddress<TAccountNewManager>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewManagerFeeAccount,
+    InstructionAccountInputAddress<TAccountNewManagerFeeAccount>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    manager: { value: input.manager ?? null, isWritable: false },
-    newManager: { value: input.newManager ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    manager: {
+      value: input.manager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    newManager: {
+      value: input.newManager ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     newManagerFeeAccount: {
       value: input.newManagerFeeAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -159,7 +200,6 @@ export function getSetManagerInstruction<
     ResolvedInstructionAccount
   >;
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -171,10 +211,22 @@ export function getSetManagerInstruction<
     programAddress,
   } as SetManagerInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountManager,
-    TAccountNewManager,
-    TAccountNewManagerFeeAccount
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountManager,
+      InstructionAccountInputAddress<TAccountManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewManager,
+      InstructionAccountInputAddress<TAccountNewManager>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewManagerFeeAccount,
+      InstructionAccountInputAddress<TAccountNewManagerFeeAccount>
+    >
   >);
 }
 

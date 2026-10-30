@@ -32,12 +32,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -70,18 +74,18 @@ export type Rewarder = {
 };
 
 export type RewarderArgs = {
-  base: Address;
+  base: Address | HasAddress;
   bump: number;
-  authority: Address;
-  pendingAuthority: Address;
+  authority: Address | HasAddress;
+  pendingAuthority: Address | HasAddress;
   numQuarries: number;
   annualRewardsRate: number | bigint;
   totalRewardsShares: number | bigint;
-  mintWrapper: Address;
-  rewardsTokenMint: Address;
-  claimFeeTokenAccount: Address;
+  mintWrapper: Address | HasAddress;
+  rewardsTokenMint: Address | HasAddress;
+  claimFeeTokenAccount: Address | HasAddress;
   maxClaimFeeMillibps: number | bigint;
-  pauseAuthority: Address;
+  pauseAuthority: Address | HasAddress;
   isPaused: boolean;
 };
 
@@ -149,8 +153,10 @@ export function decodeRewarder<TAddress extends string = string>(
 }
 
 export async function fetchRewarder<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Rewarder, TAddress>> {
   const maybeAccount = await fetchMaybeRewarder(rpc, address, config);
@@ -159,17 +165,25 @@ export async function fetchRewarder<TAddress extends string = string>(
 }
 
 export async function fetchMaybeRewarder<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Rewarder, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeRewarder(maybeAccount);
 }
 
 export async function fetchAllRewarder(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Rewarder>[]> {
   const maybeAccounts = await fetchAllMaybeRewarder(rpc, addresses, config);
@@ -178,18 +192,26 @@ export async function fetchAllRewarder(
 }
 
 export async function fetchAllMaybeRewarder(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Rewarder>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeRewarder(maybeAccount));
 }
 
 export async function fetchRewarderFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RewarderSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Rewarder>> {
   const maybeAccount = await fetchMaybeRewarderFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -197,9 +219,11 @@ export async function fetchRewarderFromSeeds(
 }
 
 export async function fetchMaybeRewarderFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: RewarderSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Rewarder>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findRewarderPda(seeds, { programAddress });

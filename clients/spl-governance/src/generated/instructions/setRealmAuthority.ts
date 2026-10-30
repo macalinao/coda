@@ -27,12 +27,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -109,21 +112,24 @@ export function getSetRealmAuthorityInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type SetRealmAuthorityInput<
-  TAccountRealmAccount extends string = string,
-  TAccountRealmAuthority extends string = string,
-  TAccountNewRealmAuthority extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountNewRealmAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
-  realmAuthority: TransactionSigner<TAccountRealmAuthority>;
+  realmAccount: TAccountRealmAccount;
+  realmAuthority: TAccountRealmAuthority;
   /** Must be one of the realm governances when set */
-  newRealmAuthority?: Address<TAccountNewRealmAuthority>;
+  newRealmAuthority?: TAccountNewRealmAuthority;
   action: SetRealmAuthorityInstructionDataArgs["action"];
 };
 
 export function getSetRealmAuthorityInstruction<
-  TAccountRealmAccount extends string,
-  TAccountRealmAuthority extends string,
-  TAccountNewRealmAuthority extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountRealmAuthority extends InstructionSignerInput,
+  TAccountNewRealmAuthority extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: SetRealmAuthorityInput<
@@ -131,23 +137,53 @@ export function getSetRealmAuthorityInstruction<
     TAccountRealmAuthority,
     TAccountNewRealmAuthority
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): SetRealmAuthorityInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountRealmAuthority,
-  TAccountNewRealmAuthority
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAuthority,
+    InstructionAccountInputAddress<TAccountRealmAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewRealmAuthority,
+    InstructionAccountInputAddress<TAccountNewRealmAuthority>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: true },
-    realmAuthority: { value: input.realmAuthority ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    realmAuthority: {
+      value: input.realmAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     newRealmAuthority: {
       value: input.newRealmAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -159,7 +195,6 @@ export function getSetRealmAuthorityInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -172,9 +207,18 @@ export function getSetRealmAuthorityInstruction<
     programAddress,
   } as SetRealmAuthorityInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountRealmAuthority,
-    TAccountNewRealmAuthority
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAuthority,
+      InstructionAccountInputAddress<TAccountRealmAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewRealmAuthority,
+      InstructionAccountInputAddress<TAccountNewRealmAuthority>
+    >
   >);
 }
 

@@ -27,14 +27,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findMetadataPda } from "../pdas/index.ts";
 import { TOKEN_METADATA_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -155,55 +158,59 @@ export function getUtilizeInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UtilizeAsyncInput<
-  TAccountMetadata extends string = string,
-  TAccountTokenAccount extends string = string,
-  TAccountMint extends string = string,
-  TAccountUseAuthority extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountAtaProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountUseAuthorityRecord extends string = string,
-  TAccountBurner extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUseAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUseAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBurner extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata?: Address<TAccountMetadata>;
+  metadata?: TAccountMetadata;
   /** Token Account Of NFT */
-  tokenAccount: Address<TAccountTokenAccount>;
+  tokenAccount: TAccountTokenAccount;
   /** Mint of the Metadata */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** A Use Authority / Can be the current Owner of the NFT */
-  useAuthority: TransactionSigner<TAccountUseAuthority>;
+  useAuthority: TAccountUseAuthority;
   /** Owner */
-  owner: Address<TAccountOwner>;
+  owner: TAccountOwner;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Associated Token program */
-  ataProgram?: Address<TAccountAtaProgram>;
+  ataProgram?: TAccountAtaProgram;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Rent info */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
   /** Use Authority Record PDA If present the program Assumes a delegated use authority */
-  useAuthorityRecord?: Address<TAccountUseAuthorityRecord>;
+  useAuthorityRecord?: TAccountUseAuthorityRecord;
   /** Program As Signer (Burner) */
-  burner?: Address<TAccountBurner>;
+  burner?: TAccountBurner;
   utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
 };
 
 export async function getUtilizeInstructionAsync<
-  TAccountMetadata extends string,
-  TAccountTokenAccount extends string,
-  TAccountMint extends string,
-  TAccountUseAuthority extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountAtaProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountUseAuthorityRecord extends string,
-  TAccountBurner extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountTokenAccount extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountUseAuthority extends InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountUseAuthorityRecord extends InstructionAccountInput,
+  TAccountBurner extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: UtilizeAsyncInput<
@@ -219,43 +226,113 @@ export async function getUtilizeInstructionAsync<
     TAccountUseAuthorityRecord,
     TAccountBurner
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   UtilizeInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountUseAuthority,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountAtaProgram,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountUseAuthorityRecord,
-    TAccountBurner
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthority,
+      InstructionAccountInputAddress<TAccountUseAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAtaProgram,
+      InstructionAccountInputAddress<TAccountAtaProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthorityRecord,
+      InstructionAccountInputAddress<TAccountUseAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBurner,
+      InstructionAccountInputAddress<TAccountBurner>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    useAuthority: { value: input.useAuthority ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    ataProgram: { value: input.ataProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    useAuthorityRecord: {
-      value: input.useAuthorityRecord ?? null,
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    burner: { value: input.burner ?? null, isWritable: false },
+    tokenAccount: {
+      value: input.tokenAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    useAuthority: {
+      value: input.useAuthority ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    ataProgram: {
+      value: input.ataProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    useAuthorityRecord: {
+      value: input.useAuthorityRecord ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    burner: { value: input.burner ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -295,7 +372,6 @@ export async function getUtilizeInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -316,70 +392,107 @@ export async function getUtilizeInstructionAsync<
     programAddress,
   } as UtilizeInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountUseAuthority,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountAtaProgram,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountUseAuthorityRecord,
-    TAccountBurner
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthority,
+      InstructionAccountInputAddress<TAccountUseAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAtaProgram,
+      InstructionAccountInputAddress<TAccountAtaProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthorityRecord,
+      InstructionAccountInputAddress<TAccountUseAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBurner,
+      InstructionAccountInputAddress<TAccountBurner>
+    >
   >);
 }
 
 export type UtilizeInput<
-  TAccountMetadata extends string = string,
-  TAccountTokenAccount extends string = string,
-  TAccountMint extends string = string,
-  TAccountUseAuthority extends string = string,
-  TAccountOwner extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountAtaProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
-  TAccountUseAuthorityRecord extends string = string,
-  TAccountBurner extends string = string,
+  TAccountMetadata extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUseAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUseAuthorityRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountBurner extends InstructionAccountInput = InstructionAccountInput,
 > = {
   /** Metadata account */
-  metadata: Address<TAccountMetadata>;
+  metadata: TAccountMetadata;
   /** Token Account Of NFT */
-  tokenAccount: Address<TAccountTokenAccount>;
+  tokenAccount: TAccountTokenAccount;
   /** Mint of the Metadata */
-  mint: Address<TAccountMint>;
+  mint: TAccountMint;
   /** A Use Authority / Can be the current Owner of the NFT */
-  useAuthority: TransactionSigner<TAccountUseAuthority>;
+  useAuthority: TAccountUseAuthority;
   /** Owner */
-  owner: Address<TAccountOwner>;
+  owner: TAccountOwner;
   /** Token program */
-  tokenProgram?: Address<TAccountTokenProgram>;
+  tokenProgram?: TAccountTokenProgram;
   /** Associated Token program */
-  ataProgram?: Address<TAccountAtaProgram>;
+  ataProgram?: TAccountAtaProgram;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Rent info */
-  rent?: Address<TAccountRent>;
+  rent?: TAccountRent;
   /** Use Authority Record PDA If present the program Assumes a delegated use authority */
-  useAuthorityRecord?: Address<TAccountUseAuthorityRecord>;
+  useAuthorityRecord?: TAccountUseAuthorityRecord;
   /** Program As Signer (Burner) */
-  burner?: Address<TAccountBurner>;
+  burner?: TAccountBurner;
   utilizeArgs: UtilizeInstructionDataArgs["utilizeArgs"];
 };
 
 export function getUtilizeInstruction<
-  TAccountMetadata extends string,
-  TAccountTokenAccount extends string,
-  TAccountMint extends string,
-  TAccountUseAuthority extends string,
-  TAccountOwner extends string,
-  TAccountTokenProgram extends string,
-  TAccountAtaProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
-  TAccountUseAuthorityRecord extends string,
-  TAccountBurner extends string,
+  TAccountMetadata extends InstructionAccountInput,
+  TAccountTokenAccount extends InstructionAccountInput,
+  TAccountMint extends InstructionAccountInput,
+  TAccountUseAuthority extends InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountAtaProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
+  TAccountUseAuthorityRecord extends InstructionAccountInput,
+  TAccountBurner extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TOKEN_METADATA_PROGRAM_ADDRESS,
 >(
   input: UtilizeInput<
@@ -395,41 +508,111 @@ export function getUtilizeInstruction<
     TAccountUseAuthorityRecord,
     TAccountBurner
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): UtilizeInstruction<
   TProgramAddress,
-  TAccountMetadata,
-  TAccountTokenAccount,
-  TAccountMint,
-  TAccountUseAuthority,
-  TAccountOwner,
-  TAccountTokenProgram,
-  TAccountAtaProgram,
-  TAccountSystemProgram,
-  TAccountRent,
-  TAccountUseAuthorityRecord,
-  TAccountBurner
+  ResolvedInstructionAccountMeta<
+    TAccountMetadata,
+    InstructionAccountInputAddress<TAccountMetadata>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenAccount,
+    InstructionAccountInputAddress<TAccountTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMint,
+    InstructionAccountInputAddress<TAccountMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUseAuthority,
+    InstructionAccountInputAddress<TAccountUseAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAtaProgram,
+    InstructionAccountInputAddress<TAccountAtaProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUseAuthorityRecord,
+    InstructionAccountInputAddress<TAccountUseAuthorityRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountBurner,
+    InstructionAccountInputAddress<TAccountBurner>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? TOKEN_METADATA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
 
   // Original accounts.
   const originalAccounts = {
-    metadata: { value: input.metadata ?? null, isWritable: true },
-    tokenAccount: { value: input.tokenAccount ?? null, isWritable: true },
-    mint: { value: input.mint ?? null, isWritable: true },
-    useAuthority: { value: input.useAuthority ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    ataProgram: { value: input.ataProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
-    useAuthorityRecord: {
-      value: input.useAuthorityRecord ?? null,
+    metadata: {
+      value: input.metadata ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    burner: { value: input.burner ?? null, isWritable: false },
+    tokenAccount: {
+      value: input.tokenAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mint: { value: input.mint ?? null, isSigner: false, isWritable: true },
+    useAuthority: {
+      value: input.useAuthority ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    ataProgram: {
+      value: input.ataProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
+    useAuthorityRecord: {
+      value: input.useAuthorityRecord ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    burner: { value: input.burner ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -457,7 +640,6 @@ export function getUtilizeInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "omitted");
   return Object.freeze({
     accounts: [
       getAccountMeta("metadata", accounts.metadata),
@@ -478,17 +660,50 @@ export function getUtilizeInstruction<
     programAddress,
   } as UtilizeInstruction<
     TProgramAddress,
-    TAccountMetadata,
-    TAccountTokenAccount,
-    TAccountMint,
-    TAccountUseAuthority,
-    TAccountOwner,
-    TAccountTokenProgram,
-    TAccountAtaProgram,
-    TAccountSystemProgram,
-    TAccountRent,
-    TAccountUseAuthorityRecord,
-    TAccountBurner
+    ResolvedInstructionAccountMeta<
+      TAccountMetadata,
+      InstructionAccountInputAddress<TAccountMetadata>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenAccount,
+      InstructionAccountInputAddress<TAccountTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMint,
+      InstructionAccountInputAddress<TAccountMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthority,
+      InstructionAccountInputAddress<TAccountUseAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAtaProgram,
+      InstructionAccountInputAddress<TAccountAtaProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUseAuthorityRecord,
+      InstructionAccountInputAddress<TAccountUseAuthorityRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountBurner,
+      InstructionAccountInputAddress<TAccountBurner>
+    >
   >);
 }
 

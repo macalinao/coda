@@ -30,14 +30,17 @@ import {
   type InstructionWithData,
   type ReadonlyAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import {
   findRewardTreasuryVaultPda,
@@ -131,32 +134,37 @@ export function getWithdrawTreasuryInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type WithdrawTreasuryAsyncInput<
-  TAccountGlobalAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountRewardTreasuryVault extends string = string,
-  TAccountTreasuryVaultAuthority extends string = string,
-  TAccountWithdrawDestinationTokenAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountGlobalAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWithdrawDestinationTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  rewardMint: Address<TAccountRewardMint>;
-  rewardTreasuryVault?: Address<TAccountRewardTreasuryVault>;
-  treasuryVaultAuthority?: Address<TAccountTreasuryVaultAuthority>;
-  withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  globalAdmin: TAccountGlobalAdmin;
+  globalConfig: TAccountGlobalConfig;
+  rewardMint: TAccountRewardMint;
+  rewardTreasuryVault?: TAccountRewardTreasuryVault;
+  treasuryVaultAuthority?: TAccountTreasuryVaultAuthority;
+  withdrawDestinationTokenAccount: TAccountWithdrawDestinationTokenAccount;
+  tokenProgram?: TAccountTokenProgram;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
 };
 
 export async function getWithdrawTreasuryInstructionAsync<
-  TAccountGlobalAdmin extends string,
-  TAccountGlobalConfig extends string,
-  TAccountRewardMint extends string,
-  TAccountRewardTreasuryVault extends string,
-  TAccountTreasuryVaultAuthority extends string,
-  TAccountWithdrawDestinationTokenAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountGlobalAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput,
+  TAccountTreasuryVaultAuthority extends InstructionAccountInput,
+  TAccountWithdrawDestinationTokenAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: WithdrawTreasuryAsyncInput<
@@ -168,40 +176,92 @@ export async function getWithdrawTreasuryInstructionAsync<
     TAccountWithdrawDestinationTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   WithdrawTreasuryInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardTreasuryVault,
-    TAccountTreasuryVaultAuthority,
-    TAccountWithdrawDestinationTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawDestinationTokenAccount,
+      InstructionAccountInputAddress<TAccountWithdrawDestinationTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    globalAdmin: {
+      value: input.globalAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     rewardTreasuryVault: {
       value: input.rewardTreasuryVault ?? null,
+      isSigner: false,
       isWritable: true,
     },
     treasuryVaultAuthority: {
       value: input.treasuryVaultAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     withdrawDestinationTokenAccount: {
       value: input.withdrawDestinationTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -244,7 +304,6 @@ export async function getWithdrawTreasuryInstructionAsync<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalAdmin", accounts.globalAdmin),
@@ -264,43 +323,69 @@ export async function getWithdrawTreasuryInstructionAsync<
     programAddress,
   } as WithdrawTreasuryInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardTreasuryVault,
-    TAccountTreasuryVaultAuthority,
-    TAccountWithdrawDestinationTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawDestinationTokenAccount,
+      InstructionAccountInputAddress<TAccountWithdrawDestinationTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 
 export type WithdrawTreasuryInput<
-  TAccountGlobalAdmin extends string = string,
-  TAccountGlobalConfig extends string = string,
-  TAccountRewardMint extends string = string,
-  TAccountRewardTreasuryVault extends string = string,
-  TAccountTreasuryVaultAuthority extends string = string,
-  TAccountWithdrawDestinationTokenAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountGlobalAdmin extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTreasuryVaultAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWithdrawDestinationTokenAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  globalAdmin: TransactionSigner<TAccountGlobalAdmin>;
-  globalConfig: Address<TAccountGlobalConfig>;
-  rewardMint: Address<TAccountRewardMint>;
-  rewardTreasuryVault: Address<TAccountRewardTreasuryVault>;
-  treasuryVaultAuthority: Address<TAccountTreasuryVaultAuthority>;
-  withdrawDestinationTokenAccount: Address<TAccountWithdrawDestinationTokenAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  globalAdmin: TAccountGlobalAdmin;
+  globalConfig: TAccountGlobalConfig;
+  rewardMint: TAccountRewardMint;
+  rewardTreasuryVault: TAccountRewardTreasuryVault;
+  treasuryVaultAuthority: TAccountTreasuryVaultAuthority;
+  withdrawDestinationTokenAccount: TAccountWithdrawDestinationTokenAccount;
+  tokenProgram?: TAccountTokenProgram;
   amount: WithdrawTreasuryInstructionDataArgs["amount"];
 };
 
 export function getWithdrawTreasuryInstruction<
-  TAccountGlobalAdmin extends string,
-  TAccountGlobalConfig extends string,
-  TAccountRewardMint extends string,
-  TAccountRewardTreasuryVault extends string,
-  TAccountTreasuryVaultAuthority extends string,
-  TAccountWithdrawDestinationTokenAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountGlobalAdmin extends InstructionSignerInput,
+  TAccountGlobalConfig extends InstructionAccountInput,
+  TAccountRewardMint extends InstructionAccountInput,
+  TAccountRewardTreasuryVault extends InstructionAccountInput,
+  TAccountTreasuryVaultAuthority extends InstructionAccountInput,
+  TAccountWithdrawDestinationTokenAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: WithdrawTreasuryInput<
@@ -312,38 +397,90 @@ export function getWithdrawTreasuryInstruction<
     TAccountWithdrawDestinationTokenAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): WithdrawTreasuryInstruction<
   TProgramAddress,
-  TAccountGlobalAdmin,
-  TAccountGlobalConfig,
-  TAccountRewardMint,
-  TAccountRewardTreasuryVault,
-  TAccountTreasuryVaultAuthority,
-  TAccountWithdrawDestinationTokenAccount,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalAdmin,
+    InstructionAccountInputAddress<TAccountGlobalAdmin>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGlobalConfig,
+    InstructionAccountInputAddress<TAccountGlobalConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardMint,
+    InstructionAccountInputAddress<TAccountRewardMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRewardTreasuryVault,
+    InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTreasuryVaultAuthority,
+    InstructionAccountInputAddress<TAccountTreasuryVaultAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawDestinationTokenAccount,
+    InstructionAccountInputAddress<TAccountWithdrawDestinationTokenAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    globalAdmin: { value: input.globalAdmin ?? null, isWritable: true },
-    globalConfig: { value: input.globalConfig ?? null, isWritable: false },
-    rewardMint: { value: input.rewardMint ?? null, isWritable: false },
+    globalAdmin: {
+      value: input.globalAdmin ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
+    globalConfig: {
+      value: input.globalConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rewardMint: {
+      value: input.rewardMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     rewardTreasuryVault: {
       value: input.rewardTreasuryVault ?? null,
+      isSigner: false,
       isWritable: true,
     },
     treasuryVaultAuthority: {
       value: input.treasuryVaultAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     withdrawDestinationTokenAccount: {
       value: input.withdrawDestinationTokenAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -359,7 +496,6 @@ export function getWithdrawTreasuryInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("globalAdmin", accounts.globalAdmin),
@@ -379,13 +515,34 @@ export function getWithdrawTreasuryInstruction<
     programAddress,
   } as WithdrawTreasuryInstruction<
     TProgramAddress,
-    TAccountGlobalAdmin,
-    TAccountGlobalConfig,
-    TAccountRewardMint,
-    TAccountRewardTreasuryVault,
-    TAccountTreasuryVaultAuthority,
-    TAccountWithdrawDestinationTokenAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalAdmin,
+      InstructionAccountInputAddress<TAccountGlobalAdmin>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGlobalConfig,
+      InstructionAccountInputAddress<TAccountGlobalConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardMint,
+      InstructionAccountInputAddress<TAccountRewardMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRewardTreasuryVault,
+      InstructionAccountInputAddress<TAccountRewardTreasuryVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTreasuryVaultAuthority,
+      InstructionAccountInputAddress<TAccountTreasuryVaultAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawDestinationTokenAccount,
+      InstructionAccountInputAddress<TAccountWithdrawDestinationTokenAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getSplitAmountInfoDecoder,
@@ -48,11 +49,11 @@ export type EvtSplitPosition2 = {
 };
 
 export type EvtSplitPosition2Args = {
-  pool: Address;
-  firstOwner: Address;
-  secondOwner: Address;
-  firstPosition: Address;
-  secondPosition: Address;
+  pool: Address | HasAddress;
+  firstOwner: Address | HasAddress;
+  secondOwner: Address | HasAddress;
+  firstPosition: Address | HasAddress;
+  secondPosition: Address | HasAddress;
   currentSqrtPrice: number | bigint;
   amountSplits: SplitAmountInfoArgs;
   firstPositionInfo: SplitPositionInfoArgs;

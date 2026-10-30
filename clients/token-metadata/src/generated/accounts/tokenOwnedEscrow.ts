@@ -21,12 +21,16 @@ import {
   getU8Encoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from "@solana/kit";
@@ -50,7 +54,7 @@ export type TokenOwnedEscrow = {
 
 export type TokenOwnedEscrowArgs = {
   key: KeyArgs;
-  baseToken: Address;
+  baseToken: Address | HasAddress;
   authority: EscrowAuthorityArgs;
   bump: number;
 };
@@ -104,8 +108,10 @@ export function decodeTokenOwnedEscrow<TAddress extends string = string>(
 }
 
 export async function fetchTokenOwnedEscrow<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<TokenOwnedEscrow, TAddress>> {
   const maybeAccount = await fetchMaybeTokenOwnedEscrow(rpc, address, config);
@@ -116,17 +122,25 @@ export async function fetchTokenOwnedEscrow<TAddress extends string = string>(
 export async function fetchMaybeTokenOwnedEscrow<
   TAddress extends string = string,
 >(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<TokenOwnedEscrow, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeTokenOwnedEscrow(maybeAccount);
 }
 
 export async function fetchAllTokenOwnedEscrow(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<TokenOwnedEscrow>[]> {
   const maybeAccounts = await fetchAllMaybeTokenOwnedEscrow(
@@ -139,11 +153,17 @@ export async function fetchAllTokenOwnedEscrow(
 }
 
 export async function fetchAllMaybeTokenOwnedEscrow(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<TokenOwnedEscrow>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) =>
     decodeTokenOwnedEscrow(maybeAccount),
   );

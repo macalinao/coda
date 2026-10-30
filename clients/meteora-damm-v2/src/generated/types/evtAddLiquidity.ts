@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 import {
   getAddLiquidityParametersDecoder,
@@ -38,9 +39,9 @@ export type EvtAddLiquidity = {
 };
 
 export type EvtAddLiquidityArgs = {
-  pool: Address;
-  position: Address;
-  owner: Address;
+  pool: Address | HasAddress;
+  position: Address | HasAddress;
+  owner: Address | HasAddress;
   params: AddLiquidityParametersArgs;
   tokenAAmount: number | bigint;
   tokenBAmount: number | bigint;

@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -70,8 +74,8 @@ export type GovernanceV2 = {
 };
 
 export type GovernanceV2Args = {
-  realm: Address;
-  governedAccount: Address;
+  realm: Address | HasAddress;
+  governedAccount: Address | HasAddress;
   reserved1: number;
   config: GovernanceConfigArgs;
   reservedV2: Reserved119Args;
@@ -131,8 +135,10 @@ export function decodeGovernanceV2<TAddress extends string = string>(
 }
 
 export async function fetchGovernanceV2<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<GovernanceV2, TAddress>> {
   const maybeAccount = await fetchMaybeGovernanceV2(rpc, address, config);
@@ -141,17 +147,25 @@ export async function fetchGovernanceV2<TAddress extends string = string>(
 }
 
 export async function fetchMaybeGovernanceV2<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<GovernanceV2, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeGovernanceV2(maybeAccount);
 }
 
 export async function fetchAllGovernanceV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GovernanceV2>[]> {
   const maybeAccounts = await fetchAllMaybeGovernanceV2(rpc, addresses, config);
@@ -160,18 +174,26 @@ export async function fetchAllGovernanceV2(
 }
 
 export async function fetchAllMaybeGovernanceV2(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GovernanceV2>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeGovernanceV2(maybeAccount));
 }
 
 export async function fetchGovernanceV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: GovernanceSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<GovernanceV2>> {
   const maybeAccount = await fetchMaybeGovernanceV2FromSeeds(
     rpc,
@@ -183,9 +205,11 @@ export async function fetchGovernanceV2FromSeeds(
 }
 
 export async function fetchMaybeGovernanceV2FromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: GovernanceSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<GovernanceV2>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findGovernancePda(seeds, { programAddress });

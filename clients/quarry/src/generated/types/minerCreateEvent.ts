@@ -16,6 +16,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type MinerCreateEvent = {
@@ -24,7 +25,11 @@ export type MinerCreateEvent = {
   miner: Address;
 };
 
-export type MinerCreateEventArgs = MinerCreateEvent;
+export type MinerCreateEventArgs = {
+  authority: Address | HasAddress;
+  quarry: Address | HasAddress;
+  miner: Address | HasAddress;
+};
 
 export function getMinerCreateEventEncoder(): FixedSizeEncoder<MinerCreateEventArgs> {
   return getStructEncoder([

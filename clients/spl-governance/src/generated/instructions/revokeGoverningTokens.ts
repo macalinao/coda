@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -128,36 +131,44 @@ export function getRevokeGoverningTokensInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type RevokeGoverningTokensInput<
-  TAccountRealmAccount extends string = string,
-  TAccountGoverningTokenHoldingAccount extends string = string,
-  TAccountTokenOwnerRecord extends string = string,
-  TAccountGoverningTokenMint extends string = string,
-  TAccountGoverningTokenMintAuthorityOrTokenOwner extends string = string,
-  TAccountRealmConfigAccount extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenHoldingAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGoverningTokenMintAuthorityOrTokenOwner extends
+    InstructionSignerInput = InstructionSignerInput,
+  TAccountRealmConfigAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  realmAccount: Address<TAccountRealmAccount>;
+  realmAccount: TAccountRealmAccount;
   /** seeds=['governance', realm, governing_token_mint] */
-  governingTokenHoldingAccount: Address<TAccountGoverningTokenHoldingAccount>;
+  governingTokenHoldingAccount: TAccountGoverningTokenHoldingAccount;
   /** seeds=['governance', realm, governing_token_mint, governing_token_owner] */
-  tokenOwnerRecord: Address<TAccountTokenOwnerRecord>;
-  governingTokenMint: Address<TAccountGoverningTokenMint>;
+  tokenOwnerRecord: TAccountTokenOwnerRecord;
+  governingTokenMint: TAccountGoverningTokenMint;
   /** GoverningTokenMint mint_authority */
-  governingTokenMintAuthorityOrTokenOwner: TransactionSigner<TAccountGoverningTokenMintAuthorityOrTokenOwner>;
+  governingTokenMintAuthorityOrTokenOwner: TAccountGoverningTokenMintAuthorityOrTokenOwner;
   /** seeds=['realm-config', realm] */
-  realmConfigAccount: Address<TAccountRealmConfigAccount>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  realmConfigAccount: TAccountRealmConfigAccount;
+  tokenProgram?: TAccountTokenProgram;
   amount: RevokeGoverningTokensInstructionDataArgs["amount"];
 };
 
 export function getRevokeGoverningTokensInstruction<
-  TAccountRealmAccount extends string,
-  TAccountGoverningTokenHoldingAccount extends string,
-  TAccountTokenOwnerRecord extends string,
-  TAccountGoverningTokenMint extends string,
-  TAccountGoverningTokenMintAuthorityOrTokenOwner extends string,
-  TAccountRealmConfigAccount extends string,
-  TAccountTokenProgram extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountGoverningTokenHoldingAccount extends InstructionAccountInput,
+  TAccountTokenOwnerRecord extends InstructionAccountInput,
+  TAccountGoverningTokenMint extends InstructionAccountInput,
+  TAccountGoverningTokenMintAuthorityOrTokenOwner extends
+    InstructionSignerInput,
+  TAccountRealmConfigAccount extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: RevokeGoverningTokensInput<
@@ -169,45 +180,91 @@ export function getRevokeGoverningTokensInstruction<
     TAccountRealmConfigAccount,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): RevokeGoverningTokensInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountGoverningTokenHoldingAccount,
-  TAccountTokenOwnerRecord,
-  TAccountGoverningTokenMint,
-  TAccountGoverningTokenMintAuthorityOrTokenOwner,
-  TAccountRealmConfigAccount,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenHoldingAccount,
+    InstructionAccountInputAddress<TAccountGoverningTokenHoldingAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenMint,
+    InstructionAccountInputAddress<TAccountGoverningTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenMintAuthorityOrTokenOwner,
+    InstructionAccountInputAddress<TAccountGoverningTokenMintAuthorityOrTokenOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmConfigAccount,
+    InstructionAccountInputAddress<TAccountRealmConfigAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     governingTokenHoldingAccount: {
       value: input.governingTokenHoldingAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     tokenOwnerRecord: {
       value: input.tokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governingTokenMint: {
       value: input.governingTokenMint ?? null,
+      isSigner: false,
       isWritable: true,
     },
     governingTokenMintAuthorityOrTokenOwner: {
       value: input.governingTokenMintAuthorityOrTokenOwner ?? null,
+      isSigner: true,
       isWritable: false,
     },
     realmConfigAccount: {
       value: input.realmConfigAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -223,7 +280,6 @@ export function getRevokeGoverningTokensInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -246,13 +302,34 @@ export function getRevokeGoverningTokensInstruction<
     programAddress,
   } as RevokeGoverningTokensInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountGoverningTokenHoldingAccount,
-    TAccountTokenOwnerRecord,
-    TAccountGoverningTokenMint,
-    TAccountGoverningTokenMintAuthorityOrTokenOwner,
-    TAccountRealmConfigAccount,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenHoldingAccount,
+      InstructionAccountInputAddress<TAccountGoverningTokenHoldingAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMint,
+      InstructionAccountInputAddress<TAccountGoverningTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenMintAuthorityOrTokenOwner,
+      InstructionAccountInputAddress<TAccountGoverningTokenMintAuthorityOrTokenOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmConfigAccount,
+      InstructionAccountInputAddress<TAccountRealmConfigAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

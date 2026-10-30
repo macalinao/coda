@@ -31,12 +31,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
 
@@ -120,26 +123,28 @@ export function getDepositToFarmVaultInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type DepositToFarmVaultInput<
-  TAccountDepositor extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountFarmVault extends string = string,
-  TAccountDepositorAta extends string = string,
-  TAccountTokenProgram extends string = string,
+  TAccountDepositor extends InstructionSignerInput = InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDepositorAta extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  depositor: TransactionSigner<TAccountDepositor>;
-  farmState: Address<TAccountFarmState>;
-  farmVault: Address<TAccountFarmVault>;
-  depositorAta: Address<TAccountDepositorAta>;
-  tokenProgram?: Address<TAccountTokenProgram>;
+  depositor: TAccountDepositor;
+  farmState: TAccountFarmState;
+  farmVault: TAccountFarmVault;
+  depositorAta: TAccountDepositorAta;
+  tokenProgram?: TAccountTokenProgram;
   amount: DepositToFarmVaultInstructionDataArgs["amount"];
 };
 
 export function getDepositToFarmVaultInstruction<
-  TAccountDepositor extends string,
-  TAccountFarmState extends string,
-  TAccountFarmVault extends string,
-  TAccountDepositorAta extends string,
-  TAccountTokenProgram extends string,
+  TAccountDepositor extends InstructionSignerInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountFarmVault extends InstructionAccountInput,
+  TAccountDepositorAta extends InstructionAccountInput,
+  TAccountTokenProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: DepositToFarmVaultInput<
@@ -149,25 +154,72 @@ export function getDepositToFarmVaultInstruction<
     TAccountDepositorAta,
     TAccountTokenProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): DepositToFarmVaultInstruction<
   TProgramAddress,
-  TAccountDepositor,
-  TAccountFarmState,
-  TAccountFarmVault,
-  TAccountDepositorAta,
-  TAccountTokenProgram
+  ResolvedInstructionAccountMeta<
+    TAccountDepositor,
+    InstructionAccountInputAddress<TAccountDepositor>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmVault,
+    InstructionAccountInputAddress<TAccountFarmVault>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDepositorAta,
+    InstructionAccountInputAddress<TAccountDepositorAta>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    depositor: { value: input.depositor ?? null, isWritable: false },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    farmVault: { value: input.farmVault ?? null, isWritable: true },
-    depositorAta: { value: input.depositorAta ?? null, isWritable: true },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
+    depositor: {
+      value: input.depositor ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmVault: {
+      value: input.farmVault ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    depositorAta: {
+      value: input.depositorAta ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -183,7 +235,6 @@ export function getDepositToFarmVaultInstruction<
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("depositor", accounts.depositor),
@@ -198,11 +249,26 @@ export function getDepositToFarmVaultInstruction<
     programAddress,
   } as DepositToFarmVaultInstruction<
     TProgramAddress,
-    TAccountDepositor,
-    TAccountFarmState,
-    TAccountFarmVault,
-    TAccountDepositorAta,
-    TAccountTokenProgram
+    ResolvedInstructionAccountMeta<
+      TAccountDepositor,
+      InstructionAccountInputAddress<TAccountDepositor>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmVault,
+      InstructionAccountInputAddress<TAccountFarmVault>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDepositorAta,
+      InstructionAccountInputAddress<TAccountDepositorAta>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >
   >);
 }
 

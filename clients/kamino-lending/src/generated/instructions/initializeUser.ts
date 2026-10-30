@@ -29,14 +29,17 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findFarmsUserStatePda } from "../pdas/index.ts";
 import { FARMS_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -128,34 +131,35 @@ export function getInitializeUserInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeUserAsyncInput<
-  TAccountAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountOwner extends string = string,
-  TAccountDelegatee extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDelegatee extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  owner: Address<TAccountOwner>;
-  delegatee: Address<TAccountDelegatee>;
-  userState?: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  authority: TAccountAuthority;
+  payer: TAccountPayer;
+  owner: TAccountOwner;
+  delegatee: TAccountDelegatee;
+  userState?: TAccountUserState;
+  farmState: TAccountFarmState;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export async function getInitializeUserInstructionAsync<
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountOwner extends string,
-  TAccountDelegatee extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountDelegatee extends InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeUserAsyncInput<
@@ -168,33 +172,89 @@ export async function getInitializeUserInstructionAsync<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   InitializeUserInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountOwner,
-    TAccountDelegatee,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegatee,
+      InstructionAccountInputAddress<TAccountDelegatee>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    delegatee: { value: input.delegatee ?? null, isWritable: false },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    delegatee: {
+      value: input.delegatee ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -226,7 +286,6 @@ export async function getInitializeUserInstructionAsync<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -242,46 +301,71 @@ export async function getInitializeUserInstructionAsync<
     programAddress,
   } as InitializeUserInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountOwner,
-    TAccountDelegatee,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegatee,
+      InstructionAccountInputAddress<TAccountDelegatee>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 
 export type InitializeUserInput<
-  TAccountAuthority extends string = string,
-  TAccountPayer extends string = string,
-  TAccountOwner extends string = string,
-  TAccountDelegatee extends string = string,
-  TAccountUserState extends string = string,
-  TAccountFarmState extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountRent extends string = string,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput = InstructionAccountInput,
+  TAccountDelegatee extends InstructionAccountInput = InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput = InstructionAccountInput,
 > = {
-  authority: TransactionSigner<TAccountAuthority>;
-  payer: TransactionSigner<TAccountPayer>;
-  owner: Address<TAccountOwner>;
-  delegatee: Address<TAccountDelegatee>;
-  userState: Address<TAccountUserState>;
-  farmState: Address<TAccountFarmState>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  rent?: Address<TAccountRent>;
+  authority: TAccountAuthority;
+  payer: TAccountPayer;
+  owner: TAccountOwner;
+  delegatee: TAccountDelegatee;
+  userState: TAccountUserState;
+  farmState: TAccountFarmState;
+  systemProgram?: TAccountSystemProgram;
+  rent?: TAccountRent;
 };
 
 export function getInitializeUserInstruction<
-  TAccountAuthority extends string,
-  TAccountPayer extends string,
-  TAccountOwner extends string,
-  TAccountDelegatee extends string,
-  TAccountUserState extends string,
-  TAccountFarmState extends string,
-  TAccountSystemProgram extends string,
-  TAccountRent extends string,
+  TAccountAuthority extends InstructionSignerInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountOwner extends InstructionAccountInput,
+  TAccountDelegatee extends InstructionAccountInput,
+  TAccountUserState extends InstructionAccountInput,
+  TAccountFarmState extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountRent extends InstructionAccountInput,
   TProgramAddress extends Address = typeof FARMS_PROGRAM_ADDRESS,
 >(
   input: InitializeUserInput<
@@ -294,31 +378,87 @@ export function getInitializeUserInstruction<
     TAccountSystemProgram,
     TAccountRent
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): InitializeUserInstruction<
   TProgramAddress,
-  TAccountAuthority,
-  TAccountPayer,
-  TAccountOwner,
-  TAccountDelegatee,
-  TAccountUserState,
-  TAccountFarmState,
-  TAccountSystemProgram,
-  TAccountRent
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOwner,
+    InstructionAccountInputAddress<TAccountOwner>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountDelegatee,
+    InstructionAccountInputAddress<TAccountDelegatee>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUserState,
+    InstructionAccountInputAddress<TAccountUserState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountFarmState,
+    InstructionAccountInputAddress<TAccountFarmState>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRent,
+    InstructionAccountInputAddress<TAccountRent>
+  >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? FARMS_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    authority: { value: input.authority ?? null, isWritable: false },
-    payer: { value: input.payer ?? null, isWritable: true },
-    owner: { value: input.owner ?? null, isWritable: false },
-    delegatee: { value: input.delegatee ?? null, isWritable: false },
-    userState: { value: input.userState ?? null, isWritable: true },
-    farmState: { value: input.farmState ?? null, isWritable: true },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    rent: { value: input.rent ?? null, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: true },
+    owner: { value: input.owner ?? null, isSigner: false, isWritable: false },
+    delegatee: {
+      value: input.delegatee ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    userState: {
+      value: input.userState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    farmState: {
+      value: input.farmState ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    rent: { value: input.rent ?? null, isSigner: false, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -335,7 +475,6 @@ export function getInitializeUserInstruction<
       "SysvarRent111111111111111111111111111111111" as Address<"SysvarRent111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("authority", accounts.authority),
@@ -351,14 +490,38 @@ export function getInitializeUserInstruction<
     programAddress,
   } as InitializeUserInstruction<
     TProgramAddress,
-    TAccountAuthority,
-    TAccountPayer,
-    TAccountOwner,
-    TAccountDelegatee,
-    TAccountUserState,
-    TAccountFarmState,
-    TAccountSystemProgram,
-    TAccountRent
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOwner,
+      InstructionAccountInputAddress<TAccountOwner>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountDelegatee,
+      InstructionAccountInputAddress<TAccountDelegatee>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUserState,
+      InstructionAccountInputAddress<TAccountUserState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountFarmState,
+      InstructionAccountInputAddress<TAccountFarmState>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRent,
+      InstructionAccountInputAddress<TAccountRent>
+    >
   >);
 }
 

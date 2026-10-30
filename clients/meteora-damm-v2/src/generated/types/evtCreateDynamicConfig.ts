@@ -18,6 +18,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type EvtCreateDynamicConfig = {
@@ -27,8 +28,8 @@ export type EvtCreateDynamicConfig = {
 };
 
 export type EvtCreateDynamicConfigArgs = {
-  config: Address;
-  poolCreatorAuthority: Address;
+  config: Address | HasAddress;
+  poolCreatorAuthority: Address | HasAddress;
   index: number | bigint;
 };
 

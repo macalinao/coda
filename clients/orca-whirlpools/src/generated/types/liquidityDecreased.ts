@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 export type LiquidityDecreased = {
@@ -37,8 +38,8 @@ export type LiquidityDecreased = {
 };
 
 export type LiquidityDecreasedArgs = {
-  whirlpool: Address;
-  position: Address;
+  whirlpool: Address | HasAddress;
+  position: Address | HasAddress;
   tickLowerIndex: number;
   tickUpperIndex: number;
   liquidity: number | bigint;

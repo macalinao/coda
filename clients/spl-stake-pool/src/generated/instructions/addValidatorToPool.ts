@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { findWithdrawAuthorityPda } from "../pdas/index.ts";
 import { SPL_STAKE_POOL_PROGRAM_ADDRESS } from "../programs/index.ts";
@@ -154,46 +157,55 @@ export function getAddValidatorToPoolInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type AddValidatorToPoolAsyncInput<
-  TAccountStakePool extends string = string,
-  TAccountStaker extends string = string,
-  TAccountReserveStakeAccount extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountValidatorStakeList extends string = string,
-  TAccountNewStakeAccount extends string = string,
-  TAccountValidatorVoteAccount extends string = string,
-  TAccountRentSysvar extends string = string,
-  TAccountClockSysvar extends string = string,
-  TAccountStakeHistorySysvar extends string = string,
-  TAccountStakeConfigSysvar extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountStakeProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReserveStakeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorStakeList extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountNewStakeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorVoteAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentSysvar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountClockSysvar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountStakeHistorySysvar extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountStakeConfigSysvar extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountStakeProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Staker */
-  staker: TransactionSigner<TAccountStaker>;
+  staker: TAccountStaker;
   /** Reserve stake account */
-  reserveStakeAccount: Address<TAccountReserveStakeAccount>;
+  reserveStakeAccount: TAccountReserveStakeAccount;
   /** Stake pool withdraw authority */
-  withdrawAuthority?: Address<TAccountWithdrawAuthority>;
+  withdrawAuthority?: TAccountWithdrawAuthority;
   /** Validator stake list storage account */
-  validatorStakeList: Address<TAccountValidatorStakeList>;
+  validatorStakeList: TAccountValidatorStakeList;
   /** Stake account to add to the pool */
-  newStakeAccount: Address<TAccountNewStakeAccount>;
+  newStakeAccount: TAccountNewStakeAccount;
   /** Validator this stake account will be delegated to */
-  validatorVoteAccount: Address<TAccountValidatorVoteAccount>;
+  validatorVoteAccount: TAccountValidatorVoteAccount;
   /** Rent sysvar */
-  rentSysvar?: Address<TAccountRentSysvar>;
+  rentSysvar?: TAccountRentSysvar;
   /** Clock sysvar */
-  clockSysvar?: Address<TAccountClockSysvar>;
+  clockSysvar?: TAccountClockSysvar;
   /** Stake history sysvar */
-  stakeHistorySysvar?: Address<TAccountStakeHistorySysvar>;
+  stakeHistorySysvar?: TAccountStakeHistorySysvar;
   /** Stake config sysvar */
-  stakeConfigSysvar?: Address<TAccountStakeConfigSysvar>;
+  stakeConfigSysvar?: TAccountStakeConfigSysvar;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Stake program */
-  stakeProgram?: Address<TAccountStakeProgram>;
+  stakeProgram?: TAccountStakeProgram;
   args: AddValidatorToPoolInstructionDataArgs["args"];
 };
 
@@ -223,19 +235,19 @@ export type AddValidatorToPoolAsyncInput<
  * validator stake address
  */
 export async function getAddValidatorToPoolInstructionAsync<
-  TAccountStakePool extends string,
-  TAccountStaker extends string,
-  TAccountReserveStakeAccount extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountValidatorStakeList extends string,
-  TAccountNewStakeAccount extends string,
-  TAccountValidatorVoteAccount extends string,
-  TAccountRentSysvar extends string,
-  TAccountClockSysvar extends string,
-  TAccountStakeHistorySysvar extends string,
-  TAccountStakeConfigSysvar extends string,
-  TAccountSystemProgram extends string,
-  TAccountStakeProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput,
+  TAccountReserveStakeAccount extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountValidatorStakeList extends InstructionAccountInput,
+  TAccountNewStakeAccount extends InstructionAccountInput,
+  TAccountValidatorVoteAccount extends InstructionAccountInput,
+  TAccountRentSysvar extends InstructionAccountInput,
+  TAccountClockSysvar extends InstructionAccountInput,
+  TAccountStakeHistorySysvar extends InstructionAccountInput,
+  TAccountStakeConfigSysvar extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountStakeProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: AddValidatorToPoolAsyncInput<
@@ -253,62 +265,143 @@ export async function getAddValidatorToPoolInstructionAsync<
     TAccountSystemProgram,
     TAccountStakeProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): Promise<
   AddValidatorToPoolInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountStaker,
-    TAccountReserveStakeAccount,
-    TAccountWithdrawAuthority,
-    TAccountValidatorStakeList,
-    TAccountNewStakeAccount,
-    TAccountValidatorVoteAccount,
-    TAccountRentSysvar,
-    TAccountClockSysvar,
-    TAccountStakeHistorySysvar,
-    TAccountStakeConfigSysvar,
-    TAccountSystemProgram,
-    TAccountStakeProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStaker,
+      InstructionAccountInputAddress<TAccountStaker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStakeAccount,
+      InstructionAccountInputAddress<TAccountReserveStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorStakeList,
+      InstructionAccountInputAddress<TAccountValidatorStakeList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewStakeAccount,
+      InstructionAccountInputAddress<TAccountNewStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorVoteAccount,
+      InstructionAccountInputAddress<TAccountValidatorVoteAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentSysvar,
+      InstructionAccountInputAddress<TAccountRentSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClockSysvar,
+      InstructionAccountInputAddress<TAccountClockSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeHistorySysvar,
+      InstructionAccountInputAddress<TAccountStakeHistorySysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeConfigSysvar,
+      InstructionAccountInputAddress<TAccountStakeConfigSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeProgram,
+      InstructionAccountInputAddress<TAccountStakeProgram>
+    >
   >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    staker: { value: input.staker ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    staker: { value: input.staker ?? null, isSigner: true, isWritable: false },
     reserveStakeAccount: {
       value: input.reserveStakeAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     validatorStakeList: {
       value: input.validatorStakeList ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    newStakeAccount: { value: input.newStakeAccount ?? null, isWritable: true },
+    newStakeAccount: {
+      value: input.newStakeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     validatorVoteAccount: {
       value: input.validatorVoteAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
-    clockSysvar: { value: input.clockSysvar ?? null, isWritable: false },
+    rentSysvar: {
+      value: input.rentSysvar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    clockSysvar: {
+      value: input.clockSysvar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     stakeHistorySysvar: {
       value: input.stakeHistorySysvar ?? null,
+      isSigner: false,
       isWritable: false,
     },
     stakeConfigSysvar: {
       value: input.stakeConfigSysvar ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    stakeProgram: { value: input.stakeProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    stakeProgram: {
+      value: input.stakeProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -355,7 +448,6 @@ export async function getAddValidatorToPoolInstructionAsync<
       "Stake11111111111111111111111111111111111111" as Address<"Stake11111111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -378,63 +470,111 @@ export async function getAddValidatorToPoolInstructionAsync<
     programAddress,
   } as AddValidatorToPoolInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountStaker,
-    TAccountReserveStakeAccount,
-    TAccountWithdrawAuthority,
-    TAccountValidatorStakeList,
-    TAccountNewStakeAccount,
-    TAccountValidatorVoteAccount,
-    TAccountRentSysvar,
-    TAccountClockSysvar,
-    TAccountStakeHistorySysvar,
-    TAccountStakeConfigSysvar,
-    TAccountSystemProgram,
-    TAccountStakeProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStaker,
+      InstructionAccountInputAddress<TAccountStaker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStakeAccount,
+      InstructionAccountInputAddress<TAccountReserveStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorStakeList,
+      InstructionAccountInputAddress<TAccountValidatorStakeList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewStakeAccount,
+      InstructionAccountInputAddress<TAccountNewStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorVoteAccount,
+      InstructionAccountInputAddress<TAccountValidatorVoteAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentSysvar,
+      InstructionAccountInputAddress<TAccountRentSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClockSysvar,
+      InstructionAccountInputAddress<TAccountClockSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeHistorySysvar,
+      InstructionAccountInputAddress<TAccountStakeHistorySysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeConfigSysvar,
+      InstructionAccountInputAddress<TAccountStakeConfigSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeProgram,
+      InstructionAccountInputAddress<TAccountStakeProgram>
+    >
   >);
 }
 
 export type AddValidatorToPoolInput<
-  TAccountStakePool extends string = string,
-  TAccountStaker extends string = string,
-  TAccountReserveStakeAccount extends string = string,
-  TAccountWithdrawAuthority extends string = string,
-  TAccountValidatorStakeList extends string = string,
-  TAccountNewStakeAccount extends string = string,
-  TAccountValidatorVoteAccount extends string = string,
-  TAccountRentSysvar extends string = string,
-  TAccountClockSysvar extends string = string,
-  TAccountStakeHistorySysvar extends string = string,
-  TAccountStakeConfigSysvar extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountStakeProgram extends string = string,
+  TAccountStakePool extends InstructionAccountInput = InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput = InstructionSignerInput,
+  TAccountReserveStakeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorStakeList extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountNewStakeAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountValidatorVoteAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountRentSysvar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountClockSysvar extends InstructionAccountInput = InstructionAccountInput,
+  TAccountStakeHistorySysvar extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountStakeConfigSysvar extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountStakeProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Stake pool */
-  stakePool: Address<TAccountStakePool>;
+  stakePool: TAccountStakePool;
   /** Staker */
-  staker: TransactionSigner<TAccountStaker>;
+  staker: TAccountStaker;
   /** Reserve stake account */
-  reserveStakeAccount: Address<TAccountReserveStakeAccount>;
+  reserveStakeAccount: TAccountReserveStakeAccount;
   /** Stake pool withdraw authority */
-  withdrawAuthority: Address<TAccountWithdrawAuthority>;
+  withdrawAuthority: TAccountWithdrawAuthority;
   /** Validator stake list storage account */
-  validatorStakeList: Address<TAccountValidatorStakeList>;
+  validatorStakeList: TAccountValidatorStakeList;
   /** Stake account to add to the pool */
-  newStakeAccount: Address<TAccountNewStakeAccount>;
+  newStakeAccount: TAccountNewStakeAccount;
   /** Validator this stake account will be delegated to */
-  validatorVoteAccount: Address<TAccountValidatorVoteAccount>;
+  validatorVoteAccount: TAccountValidatorVoteAccount;
   /** Rent sysvar */
-  rentSysvar?: Address<TAccountRentSysvar>;
+  rentSysvar?: TAccountRentSysvar;
   /** Clock sysvar */
-  clockSysvar?: Address<TAccountClockSysvar>;
+  clockSysvar?: TAccountClockSysvar;
   /** Stake history sysvar */
-  stakeHistorySysvar?: Address<TAccountStakeHistorySysvar>;
+  stakeHistorySysvar?: TAccountStakeHistorySysvar;
   /** Stake config sysvar */
-  stakeConfigSysvar?: Address<TAccountStakeConfigSysvar>;
+  stakeConfigSysvar?: TAccountStakeConfigSysvar;
   /** System program */
-  systemProgram?: Address<TAccountSystemProgram>;
+  systemProgram?: TAccountSystemProgram;
   /** Stake program */
-  stakeProgram?: Address<TAccountStakeProgram>;
+  stakeProgram?: TAccountStakeProgram;
   args: AddValidatorToPoolInstructionDataArgs["args"];
 };
 
@@ -464,19 +604,19 @@ export type AddValidatorToPoolInput<
  * validator stake address
  */
 export function getAddValidatorToPoolInstruction<
-  TAccountStakePool extends string,
-  TAccountStaker extends string,
-  TAccountReserveStakeAccount extends string,
-  TAccountWithdrawAuthority extends string,
-  TAccountValidatorStakeList extends string,
-  TAccountNewStakeAccount extends string,
-  TAccountValidatorVoteAccount extends string,
-  TAccountRentSysvar extends string,
-  TAccountClockSysvar extends string,
-  TAccountStakeHistorySysvar extends string,
-  TAccountStakeConfigSysvar extends string,
-  TAccountSystemProgram extends string,
-  TAccountStakeProgram extends string,
+  TAccountStakePool extends InstructionAccountInput,
+  TAccountStaker extends InstructionSignerInput,
+  TAccountReserveStakeAccount extends InstructionAccountInput,
+  TAccountWithdrawAuthority extends InstructionAccountInput,
+  TAccountValidatorStakeList extends InstructionAccountInput,
+  TAccountNewStakeAccount extends InstructionAccountInput,
+  TAccountValidatorVoteAccount extends InstructionAccountInput,
+  TAccountRentSysvar extends InstructionAccountInput,
+  TAccountClockSysvar extends InstructionAccountInput,
+  TAccountStakeHistorySysvar extends InstructionAccountInput,
+  TAccountStakeConfigSysvar extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountStakeProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_STAKE_POOL_PROGRAM_ADDRESS,
 >(
   input: AddValidatorToPoolInput<
@@ -494,60 +634,141 @@ export function getAddValidatorToPoolInstruction<
     TAccountSystemProgram,
     TAccountStakeProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): AddValidatorToPoolInstruction<
   TProgramAddress,
-  TAccountStakePool,
-  TAccountStaker,
-  TAccountReserveStakeAccount,
-  TAccountWithdrawAuthority,
-  TAccountValidatorStakeList,
-  TAccountNewStakeAccount,
-  TAccountValidatorVoteAccount,
-  TAccountRentSysvar,
-  TAccountClockSysvar,
-  TAccountStakeHistorySysvar,
-  TAccountStakeConfigSysvar,
-  TAccountSystemProgram,
-  TAccountStakeProgram
+  ResolvedInstructionAccountMeta<
+    TAccountStakePool,
+    InstructionAccountInputAddress<TAccountStakePool>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountStaker,
+    InstructionAccountInputAddress<TAccountStaker>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountReserveStakeAccount,
+    InstructionAccountInputAddress<TAccountReserveStakeAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountWithdrawAuthority,
+    InstructionAccountInputAddress<TAccountWithdrawAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountValidatorStakeList,
+    InstructionAccountInputAddress<TAccountValidatorStakeList>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountNewStakeAccount,
+    InstructionAccountInputAddress<TAccountNewStakeAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountValidatorVoteAccount,
+    InstructionAccountInputAddress<TAccountValidatorVoteAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRentSysvar,
+    InstructionAccountInputAddress<TAccountRentSysvar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountClockSysvar,
+    InstructionAccountInputAddress<TAccountClockSysvar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountStakeHistorySysvar,
+    InstructionAccountInputAddress<TAccountStakeHistorySysvar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountStakeConfigSysvar,
+    InstructionAccountInputAddress<TAccountStakeConfigSysvar>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountStakeProgram,
+    InstructionAccountInputAddress<TAccountStakeProgram>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_STAKE_POOL_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    stakePool: { value: input.stakePool ?? null, isWritable: true },
-    staker: { value: input.staker ?? null, isWritable: false },
+    stakePool: {
+      value: input.stakePool ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    staker: { value: input.staker ?? null, isSigner: true, isWritable: false },
     reserveStakeAccount: {
       value: input.reserveStakeAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
     withdrawAuthority: {
       value: input.withdrawAuthority ?? null,
+      isSigner: false,
       isWritable: false,
     },
     validatorStakeList: {
       value: input.validatorStakeList ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    newStakeAccount: { value: input.newStakeAccount ?? null, isWritable: true },
+    newStakeAccount: {
+      value: input.newStakeAccount ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
     validatorVoteAccount: {
       value: input.validatorVoteAccount ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    rentSysvar: { value: input.rentSysvar ?? null, isWritable: false },
-    clockSysvar: { value: input.clockSysvar ?? null, isWritable: false },
+    rentSysvar: {
+      value: input.rentSysvar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    clockSysvar: {
+      value: input.clockSysvar ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     stakeHistorySysvar: {
       value: input.stakeHistorySysvar ?? null,
+      isSigner: false,
       isWritable: false,
     },
     stakeConfigSysvar: {
       value: input.stakeConfigSysvar ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    stakeProgram: { value: input.stakeProgram ?? null, isWritable: false },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    stakeProgram: {
+      value: input.stakeProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -583,7 +804,6 @@ export function getAddValidatorToPoolInstruction<
       "Stake11111111111111111111111111111111111111" as Address<"Stake11111111111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("stakePool", accounts.stakePool),
@@ -606,19 +826,58 @@ export function getAddValidatorToPoolInstruction<
     programAddress,
   } as AddValidatorToPoolInstruction<
     TProgramAddress,
-    TAccountStakePool,
-    TAccountStaker,
-    TAccountReserveStakeAccount,
-    TAccountWithdrawAuthority,
-    TAccountValidatorStakeList,
-    TAccountNewStakeAccount,
-    TAccountValidatorVoteAccount,
-    TAccountRentSysvar,
-    TAccountClockSysvar,
-    TAccountStakeHistorySysvar,
-    TAccountStakeConfigSysvar,
-    TAccountSystemProgram,
-    TAccountStakeProgram
+    ResolvedInstructionAccountMeta<
+      TAccountStakePool,
+      InstructionAccountInputAddress<TAccountStakePool>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStaker,
+      InstructionAccountInputAddress<TAccountStaker>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountReserveStakeAccount,
+      InstructionAccountInputAddress<TAccountReserveStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountWithdrawAuthority,
+      InstructionAccountInputAddress<TAccountWithdrawAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorStakeList,
+      InstructionAccountInputAddress<TAccountValidatorStakeList>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountNewStakeAccount,
+      InstructionAccountInputAddress<TAccountNewStakeAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountValidatorVoteAccount,
+      InstructionAccountInputAddress<TAccountValidatorVoteAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRentSysvar,
+      InstructionAccountInputAddress<TAccountRentSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountClockSysvar,
+      InstructionAccountInputAddress<TAccountClockSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeHistorySysvar,
+      InstructionAccountInputAddress<TAccountStakeHistorySysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeConfigSysvar,
+      InstructionAccountInputAddress<TAccountStakeConfigSysvar>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountStakeProgram,
+      InstructionAccountInputAddress<TAccountStakeProgram>
+    >
   >);
 }
 

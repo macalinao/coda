@@ -22,6 +22,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
 } from "@solana/kit";
 
 /** Obligation collateral state */
@@ -44,7 +45,7 @@ export type ObligationCollateral = {
 
 export type ObligationCollateralArgs = {
   /** Reserve collateral is deposited to */
-  depositReserve: Address;
+  depositReserve: Address | HasAddress;
   /** Amount of collateral deposited */
   depositedAmount: number | bigint;
   /** Collateral market value in quote currency (scaled fraction) */

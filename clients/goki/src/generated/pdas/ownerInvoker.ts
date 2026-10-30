@@ -12,22 +12,28 @@ import {
   getU64Encoder,
   getUtf8Encoder,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type OwnerInvokerSeeds = {
-  smartWallet: Address;
+  smartWallet: Address | HasAddress;
   index: number | bigint;
 };
 
 /** Subaccount an owner of a smart wallet can invoke instructions through */
 export async function findOwnerInvokerPda(
   seeds: OwnerInvokerSeeds,
-  config: { programAddress?: Address | undefined } = {},
+  config: { programAddress?: Address | HasAddress | undefined } = {},
 ): Promise<ProgramDerivedAddress> {
   const {
-    programAddress = "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH" as Address<"GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH">,
+    programAddress:
+      programAddressInput = "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH" as Address<"GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH">,
   } = config;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
   return await getProgramDerivedAddress({
     programAddress,
     seeds: [

@@ -26,12 +26,16 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type Codec,
   type Decoder,
   type EncodedAccount,
   type Encoder,
   type FetchAccountConfig,
   type FetchAccountsConfig,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -68,7 +72,7 @@ export type VoucherArgs = {
   /** Position the leaf occupied in the Merkle tree before it was redeemed. */
   index: number;
   /** Address of the tree the leaf was redeemed from. */
-  merkleTree: Address;
+  merkleTree: Address | HasAddress;
 };
 
 /** Gets the encoder for {@link VoucherArgs} account data. */
@@ -115,8 +119,10 @@ export function decodeVoucher<TAddress extends string = string>(
 }
 
 export async function fetchVoucher<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<Voucher, TAddress>> {
   const maybeAccount = await fetchMaybeVoucher(rpc, address, config);
@@ -125,17 +131,25 @@ export async function fetchVoucher<TAddress extends string = string>(
 }
 
 export async function fetchMaybeVoucher<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<Voucher, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeVoucher(maybeAccount);
 }
 
 export async function fetchAllVoucher(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<Voucher>[]> {
   const maybeAccounts = await fetchAllMaybeVoucher(rpc, addresses, config);
@@ -144,18 +158,26 @@ export async function fetchAllVoucher(
 }
 
 export async function fetchAllMaybeVoucher(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<Voucher>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    "rpc" in rpc ? rpc.rpc : rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeVoucher(maybeAccount));
 }
 
 export async function fetchVoucherFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoucherSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<Account<Voucher>> {
   const maybeAccount = await fetchMaybeVoucherFromSeeds(rpc, seeds, config);
   assertAccountExists(maybeAccount);
@@ -163,9 +185,11 @@ export async function fetchVoucherFromSeeds(
 }
 
 export async function fetchMaybeVoucherFromSeeds(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   seeds: VoucherSeeds,
-  config: FetchAccountConfig & { programAddress?: Address } = {},
+  config: FetchAccountConfig & { programAddress?: Address | HasAddress } = {},
 ): Promise<MaybeAccount<Voucher>> {
   const { programAddress, ...fetchConfig } = config;
   const [address] = await findVoucherPda(seeds, { programAddress });

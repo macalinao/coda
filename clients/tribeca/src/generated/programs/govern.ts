@@ -24,6 +24,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -458,40 +459,50 @@ export type GovernPluginAccounts = {
 export type GovernPluginInstructions = {
   createGovernor: (
     input: MakeOptional<CreateGovernorInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateGovernorInstruction> &
     SelfPlanAndSendFunctions;
   createProposal: (
     input: MakeOptional<CreateProposalInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateProposalInstruction> &
     SelfPlanAndSendFunctions;
   activateProposal: (
     input: ActivateProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getActivateProposalInstruction> &
     SelfPlanAndSendFunctions;
   cancelProposal: (
     input: CancelProposalInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCancelProposalInstruction> &
     SelfPlanAndSendFunctions;
   queueProposal: (
     input: MakeOptional<QueueProposalInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getQueueProposalInstruction> &
     SelfPlanAndSendFunctions;
   newVote: (
     input: MakeOptional<NewVoteInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getNewVoteInstruction> & SelfPlanAndSendFunctions;
   setVote: (
     input: SetVoteInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetVoteInstruction> & SelfPlanAndSendFunctions;
   setGovernanceParams: (
     input: SetGovernanceParamsInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetGovernanceParamsInstruction> &
     SelfPlanAndSendFunctions;
   setElectorate: (
     input: SetElectorateInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getSetElectorateInstruction> &
     SelfPlanAndSendFunctions;
   createProposalMeta: (
     input: MakeOptional<CreateProposalMetaInput, "payer">,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCreateProposalMetaInstruction> &
     SelfPlanAndSendFunctions;
 };
@@ -510,7 +521,9 @@ export type GovernPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function governProgram() {
+export function governProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends GovernPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { govern: GovernPlugin }> => {
@@ -523,74 +536,123 @@ export function governProgram() {
           vote: addSelfFetchFunctions(client, getVoteCodec()),
         },
         instructions: {
-          createGovernor: (input) =>
+          createGovernor: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateGovernorInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCreateGovernorInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          createProposal: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProposalInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
+            ),
+          activateProposal: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getActivateProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          createProposal: (input) =>
+          cancelProposal: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCreateProposalInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getCancelProposalInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          activateProposal: (input) =>
+          queueProposal: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getActivateProposalInstruction(input),
+              getQueueProposalInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          cancelProposal: (input) =>
+          newVote: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCancelProposalInstruction(input),
+              getNewVoteInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
-          queueProposal: (input) =>
+          setVote: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getQueueProposalInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetVoteInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          newVote: (input) =>
+          setGovernanceParams: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getNewVoteInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetGovernanceParamsInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
             ),
-          setVote: (input) =>
-            addSelfPlanAndSendFunctions(client, getSetVoteInstruction(input)),
-          setGovernanceParams: (input) =>
+          setElectorate: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getSetGovernanceParamsInstruction(input),
-            ),
-          setElectorate: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getSetElectorateInstruction(input),
-            ),
-          createProposalMeta: (input) =>
-            addSelfPlanAndSendFunctions(
-              client,
-              getCreateProposalMetaInstruction({
-                ...input,
-                payer: input.payer ?? client.payer,
+              getSetElectorateInstruction(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
               }),
+            ),
+          createProposalMeta: (input, instructionConfig) =>
+            addSelfPlanAndSendFunctions(
+              client,
+              getCreateProposalMetaInstruction(
+                { ...input, payer: input.payer ?? client.payer },
+                {
+                  programAddress:
+                    instructionConfig?.programAddress ?? config.programAddress,
+                },
+              ),
             ),
         },
         pdas: {
-          governor: findGovernorPda,
-          proposal: findProposalPda,
-          vote: findVotePda,
-          proposalMeta: findProposalMetaPda,
+          governor: (seeds, pdaConfig) =>
+            findGovernorPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          proposal: (seeds, pdaConfig) =>
+            findProposalPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          vote: (seeds, pdaConfig) =>
+            findVotePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          proposalMeta: (seeds, pdaConfig) =>
+            findProposalMetaPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyGovernAccount,
         identifyInstruction: identifyGovernInstruction,

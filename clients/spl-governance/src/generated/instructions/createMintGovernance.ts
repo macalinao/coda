@@ -29,12 +29,15 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/program-client-core";
 import { SPL_GOVERNANCE_PROGRAM_ADDRESS } from "../programs/index.ts";
 import {
@@ -155,52 +158,60 @@ export function getCreateMintGovernanceInstructionDataCodec(): Codec<
 }
 
 export type CreateMintGovernanceInput<
-  TAccountRealmAccount extends string = string,
-  TAccountMintGovernanceAccount extends string = string,
-  TAccountGovernedMint extends string = string,
-  TAccountMintAuthority extends string = string,
-  TAccountGoverningTokenOwnerRecord extends string = string,
-  TAccountPayer extends string = string,
-  TAccountTokenProgram extends string = string,
-  TAccountSystemProgram extends string = string,
-  TAccountGovernanceAuthority extends string = string,
-  TAccountRealmConfig extends string = string,
-  TAccountVoterWeightRecord extends string = string,
+  TAccountRealmAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMintGovernanceAccount extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernedMint extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountMintAuthority extends InstructionSignerInput = InstructionSignerInput,
+  TAccountGoverningTokenOwnerRecord extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput = InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountRealmConfig extends InstructionAccountInput = InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
   /** Realm account the created Governance belongs to */
-  realmAccount: Address<TAccountRealmAccount>;
+  realmAccount: TAccountRealmAccount;
   /** Mint Governance account. seeds=['mint-governance', realm, governed_mint] */
-  mintGovernanceAccount: Address<TAccountMintGovernanceAccount>;
+  mintGovernanceAccount: TAccountMintGovernanceAccount;
   /** Mint governed by this Governance account */
-  governedMint: Address<TAccountGovernedMint>;
+  governedMint: TAccountGovernedMint;
   /** Current Mint authority (MintTokens and optionally FreezeAccount) */
-  mintAuthority: TransactionSigner<TAccountMintAuthority>;
+  mintAuthority: TAccountMintAuthority;
   /** Governing TokenOwnerRecord account (Used only if not signed by RealmAuthority) */
-  governingTokenOwnerRecord: Address<TAccountGoverningTokenOwnerRecord>;
-  payer: TransactionSigner<TAccountPayer>;
-  tokenProgram?: Address<TAccountTokenProgram>;
-  systemProgram?: Address<TAccountSystemProgram>;
-  governanceAuthority: TransactionSigner<TAccountGovernanceAuthority>;
+  governingTokenOwnerRecord: TAccountGoverningTokenOwnerRecord;
+  payer: TAccountPayer;
+  tokenProgram?: TAccountTokenProgram;
+  systemProgram?: TAccountSystemProgram;
+  governanceAuthority: TAccountGovernanceAuthority;
   /** RealmConfig account. seeds=['realm-config', realm] */
-  realmConfig: Address<TAccountRealmConfig>;
+  realmConfig: TAccountRealmConfig;
   /** Optional Voter Weight Record */
-  voterWeightRecord?: Address<TAccountVoterWeightRecord>;
+  voterWeightRecord?: TAccountVoterWeightRecord;
   config: CreateMintGovernanceInstructionDataArgs["config"];
   transferMintAuthorities: CreateMintGovernanceInstructionDataArgs["transferMintAuthorities"];
 };
 
 export function getCreateMintGovernanceInstruction<
-  TAccountRealmAccount extends string,
-  TAccountMintGovernanceAccount extends string,
-  TAccountGovernedMint extends string,
-  TAccountMintAuthority extends string,
-  TAccountGoverningTokenOwnerRecord extends string,
-  TAccountPayer extends string,
-  TAccountTokenProgram extends string,
-  TAccountSystemProgram extends string,
-  TAccountGovernanceAuthority extends string,
-  TAccountRealmConfig extends string,
-  TAccountVoterWeightRecord extends string,
+  TAccountRealmAccount extends InstructionAccountInput,
+  TAccountMintGovernanceAccount extends InstructionAccountInput,
+  TAccountGovernedMint extends InstructionAccountInput,
+  TAccountMintAuthority extends InstructionSignerInput,
+  TAccountGoverningTokenOwnerRecord extends InstructionAccountInput,
+  TAccountPayer extends InstructionSignerInput,
+  TAccountTokenProgram extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountGovernanceAuthority extends InstructionSignerInput,
+  TAccountRealmConfig extends InstructionAccountInput,
+  TAccountVoterWeightRecord extends InstructionAccountInput,
   TProgramAddress extends Address = typeof SPL_GOVERNANCE_PROGRAM_ADDRESS,
 >(
   input: CreateMintGovernanceInput<
@@ -216,48 +227,121 @@ export function getCreateMintGovernanceInstruction<
     TAccountRealmConfig,
     TAccountVoterWeightRecord
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      | TProgramAddress
+      | { readonly address: TProgramAddress }
+      | undefined;
+  },
 ): CreateMintGovernanceInstruction<
   TProgramAddress,
-  TAccountRealmAccount,
-  TAccountMintGovernanceAccount,
-  TAccountGovernedMint,
-  TAccountMintAuthority,
-  TAccountGoverningTokenOwnerRecord,
-  TAccountPayer,
-  TAccountTokenProgram,
-  TAccountSystemProgram,
-  TAccountGovernanceAuthority,
-  TAccountRealmConfig,
-  TAccountVoterWeightRecord
+  ResolvedInstructionAccountMeta<
+    TAccountRealmAccount,
+    InstructionAccountInputAddress<TAccountRealmAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMintGovernanceAccount,
+    InstructionAccountInputAddress<TAccountMintGovernanceAccount>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernedMint,
+    InstructionAccountInputAddress<TAccountGovernedMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountMintAuthority,
+    InstructionAccountInputAddress<TAccountMintAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGoverningTokenOwnerRecord,
+    InstructionAccountInputAddress<TAccountGoverningTokenOwnerRecord>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountPayer,
+    InstructionAccountInputAddress<TAccountPayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenProgram,
+    InstructionAccountInputAddress<TAccountTokenProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountGovernanceAuthority,
+    InstructionAccountInputAddress<TAccountGovernanceAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountRealmConfig,
+    InstructionAccountInputAddress<TAccountRealmConfig>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountVoterWeightRecord,
+    InstructionAccountInputAddress<TAccountVoterWeightRecord>
+  >
 > {
   // Program address.
-  const programAddress =
+  const programAddressInput =
     config?.programAddress ?? SPL_GOVERNANCE_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
+
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
 
   // Original accounts.
   const originalAccounts = {
-    realmAccount: { value: input.realmAccount ?? null, isWritable: false },
+    realmAccount: {
+      value: input.realmAccount ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     mintGovernanceAccount: {
       value: input.mintGovernanceAccount ?? null,
+      isSigner: false,
       isWritable: true,
     },
-    governedMint: { value: input.governedMint ?? null, isWritable: true },
-    mintAuthority: { value: input.mintAuthority ?? null, isWritable: false },
+    governedMint: {
+      value: input.governedMint ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    mintAuthority: {
+      value: input.mintAuthority ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
     governingTokenOwnerRecord: {
       value: input.governingTokenOwnerRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
-    payer: { value: input.payer ?? null, isWritable: false },
-    tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    payer: { value: input.payer ?? null, isSigner: true, isWritable: false },
+    tokenProgram: {
+      value: input.tokenProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     governanceAuthority: {
       value: input.governanceAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    realmConfig: { value: input.realmConfig ?? null, isWritable: false },
+    realmConfig: {
+      value: input.realmConfig ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
     voterWeightRecord: {
       value: input.voterWeightRecord ?? null,
+      isSigner: false,
       isWritable: false,
     },
   };
@@ -279,7 +363,6 @@ export function getCreateMintGovernanceInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("realmAccount", accounts.realmAccount),
@@ -303,17 +386,50 @@ export function getCreateMintGovernanceInstruction<
     programAddress,
   } as CreateMintGovernanceInstruction<
     TProgramAddress,
-    TAccountRealmAccount,
-    TAccountMintGovernanceAccount,
-    TAccountGovernedMint,
-    TAccountMintAuthority,
-    TAccountGoverningTokenOwnerRecord,
-    TAccountPayer,
-    TAccountTokenProgram,
-    TAccountSystemProgram,
-    TAccountGovernanceAuthority,
-    TAccountRealmConfig,
-    TAccountVoterWeightRecord
+    ResolvedInstructionAccountMeta<
+      TAccountRealmAccount,
+      InstructionAccountInputAddress<TAccountRealmAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintGovernanceAccount,
+      InstructionAccountInputAddress<TAccountMintGovernanceAccount>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernedMint,
+      InstructionAccountInputAddress<TAccountGovernedMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountMintAuthority,
+      InstructionAccountInputAddress<TAccountMintAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGoverningTokenOwnerRecord,
+      InstructionAccountInputAddress<TAccountGoverningTokenOwnerRecord>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountPayer,
+      InstructionAccountInputAddress<TAccountPayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenProgram,
+      InstructionAccountInputAddress<TAccountTokenProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountGovernanceAuthority,
+      InstructionAccountInputAddress<TAccountGovernanceAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountRealmConfig,
+      InstructionAccountInputAddress<TAccountRealmConfig>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountVoterWeightRecord,
+      InstructionAccountInputAddress<TAccountVoterWeightRecord>
+    >
   >);
 }
 
