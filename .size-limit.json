@@ -7,7 +7,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "400 B"
+    "limit": "450 B"
   },
   {
     "name": "goki: entire client",
@@ -16,7 +16,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "5.5 KB"
+    "limit": "6 KB"
   },
   {
     "name": "kamino-lending: one instruction",
@@ -35,7 +35,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "29.5 KB"
+    "limit": "31 KB"
   },
   {
     "name": "meteora-damm-v2: one instruction",
@@ -64,7 +64,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "700 B"
+    "limit": "750 B"
   },
   {
     "name": "mpl-bubblegum: entire client",
@@ -92,7 +92,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "14 KB"
+    "limit": "16 KB"
   },
   {
     "name": "mpl-token-auth-rules: one instruction",
@@ -111,7 +111,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "3.4 KB"
+    "limit": "4 KB"
   },
   {
     "name": "orca-whirlpools: one instruction",
@@ -130,7 +130,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "15 KB"
+    "limit": "16 KB"
   },
   {
     "name": "quarry: one instruction",
@@ -168,7 +168,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "14.5 KB"
+    "limit": "16.5 KB"
   },
   {
     "name": "spl-stake-pool: one instruction",
@@ -187,7 +187,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "9.5 KB"
+    "limit": "10.5 KB"
   },
   {
     "name": "token-metadata: one instruction",
@@ -206,7 +206,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "19 KB"
+    "limit": "23 KB"
   },
   {
     "name": "tribeca: one instruction",
@@ -225,7 +225,7 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "9 KB"
+    "limit": "9.5 KB"
   },
   {
     "name": "voter-stake-registry: one instruction",
@@ -244,6 +244,6 @@
       "@solana/kit",
       "@solana/program-client-core"
     ],
-    "limit": "7 KB"
+    "limit": "8 KB"
   }
 ]

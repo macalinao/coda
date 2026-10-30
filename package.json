@@ -13,16 +13,16 @@
     "catalog": {
       "typescript": "^7.0.2",
       "@macalinao/tsconfig": "^4.0.0",
-      "@solana/kit": "^8.3.0",
-      "@solana/program-client-core": "^8.3.0",
-      "@types/bun": "~1.4.2",
+      "@solana/kit": "^8.5.0",
+      "@solana/program-client-core": "^8.5.0",
+      "@types/bun": "~1.4.4",
       "codama": "^1.11.0",
       "@codama/nodes": "^1.11.0",
       "@codama/nodes-from-anchor": "^1.5.6",
       "@codama/renderers-core": "^1.4.1",
       "@codama/visitors-core": "^1.11.0",
-      "ws": "^8.21.3",
-      "tsdown": "^0.23.0"
+      "ws": "^8.22.0",
+      "tsdown": "^0.23.1"
     }
   },
   "scripts": {
@@ -51,18 +51,18 @@
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
-    "@size-limit/preset-small-lib": "13.1.1",
+    "@size-limit/preset-small-lib": "14.3.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.1",
-    "oxfmt": "0.61.0",
-    "oxlint": "1.82.0",
-    "oxlint-tsgolint": "7.0.2001",
-    "size-limit": "13.1.1",
-    "tsdown": "^0.23.0",
-    "turbo": "^2.10.13",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "0.75.0",
+    "oxlint": "1.90.0",
+    "oxlint-tsgolint": "7.0.2005",
+    "size-limit": "14.3.0",
+    "tsdown": "^0.23.1",
+    "turbo": "^2.11.10",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
-    "wrangler": "^4.131.2"
+    "wrangler": "^4.152.0"
   },
   "packageManager": "bun@1.4.2",
   "engines": {
@@ -73,15 +73,15 @@
     "*.{js,mjs,cjs,jsx,ts,tsx}": "oxfmt --write"
   },
   "overrides": {
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "@codama/errors": "^1.10.2",
-    "@codama/nodes": "^1.10.2",
-    "@codama/renderers-core": "^1.4.0",
-    "@codama/visitors-core": "^1.10.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "@codama/errors": "^1.11.0",
+    "@codama/nodes": "^1.11.0",
+    "@codama/renderers-core": "^1.4.1",
+    "@codama/visitors-core": "^1.11.0",
     "js-yaml": "^4.3.2",
-    "brace-expansion": "^5.0.9",
+    "brace-expansion": "^5.0.12",
     "mdast-util-to-hast": "^13.2.1",
-    "baseline-browser-mapping": "^2.11.23"
+    "baseline-browser-mapping": "^2.11.31"
   }
 }
