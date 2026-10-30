@@ -1,6 +1,6 @@
 {
   "name": "@solana-programs/kamino-lending",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "TypeScript client for the Kamino Lending program",
   "type": "module",
   "sideEffects": false,
