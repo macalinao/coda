@@ -71,6 +71,7 @@
     "no-underscore-dangle": "off",
     "no-await-in-loop": "off",
     "react/react-in-jsx-scope": "off",
+    "react/react-compiler": "error",
     "jsdoc/check-tag-names": "off",
     "import/no-unassigned-import": "off",
     "oxc/only-used-in-recursion": "off",
