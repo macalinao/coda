@@ -48,7 +48,7 @@
     "@solana-program/system": "^0.16.0",
     "@solana-program/token": "^0.18.0",
     "@solana-program/token-2022": "^0.20.0",
-    "@solana/sysvars": "^8.5.0",
+    "@solana/sysvars": "^8.6.0",
     "codama": "catalog:"
   },
   "devDependencies": {
