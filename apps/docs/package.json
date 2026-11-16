@@ -23,13 +23,13 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/postcss": "^4.3.5",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "baseline-browser-mapping": "^2.11.31",
-    "postcss": "^8.5.31",
+    "baseline-browser-mapping": "^2.11.37",
+    "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2"
   }
